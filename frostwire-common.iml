@@ -1,9 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module type="JAVA_MODULE" version="4">
-  <component name="NewModuleRootManager" inherit-compiler-output="false">
-    <output url="file://$MODULE_DIR$/bin" />
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
-    <content url="file://$MODULE_DIR$" />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/apache" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/core" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/gson" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/httpserver" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/jdownloader" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/jmdns" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/json" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/libtorrent" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/mp4parser" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/okhttp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/vuze" isTestSource="false" />
+    </content>
+    <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>
