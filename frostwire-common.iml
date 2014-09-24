@@ -15,6 +15,9 @@
       <sourceFolder url="file://$MODULE_DIR$/okhttp" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/vuze" isTestSource="false" />
     </content>
+    <content url="file://$MODULE_DIR$/../frostwire-jlibtorrent">
+      <sourceFolder url="file://$MODULE_DIR$/../frostwire-jlibtorrent/src" isTestSource="false" />
+    </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
