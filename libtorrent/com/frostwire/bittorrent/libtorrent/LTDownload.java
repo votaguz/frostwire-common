@@ -148,12 +148,12 @@ public final class LTDownload extends TorrentAlertAdapter implements BTDownload 
 
     @Override
     public float getDownloadSpeed() {
-        return th.getStatus().getDownloadRate();
+        return th.getStatus().getDownloadPayloadRate();
     }
 
     @Override
     public float getUploadSpeed() {
-        return th.getStatus().getUploadRate();
+        return th.getStatus().getUploadPayloadRate();
     }
 
     @Override
