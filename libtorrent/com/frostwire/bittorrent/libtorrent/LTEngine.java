@@ -197,12 +197,6 @@ public final class LTEngine implements BTEngine {
         }
     }
 
-    @Override
-    public List<BTDownload> getDownloads() {
-        //session.
-        return null;
-    }
-
     private void addEngineListener() {
         session.addListener(new AlertListener() {
             @Override
