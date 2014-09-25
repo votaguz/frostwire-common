@@ -66,24 +66,24 @@ public final class LTDownload extends TorrentAlertAdapter implements BTDownload 
 
     @Override
     public boolean isPaused() {
-        return th.isPaused();
+        return th.getStatus().isPaused();
     }
 
     @Override
     public boolean isSeeding() {
-        return th.isSeeding();
+        return th.getStatus().isSeeding();
     }
 
     @Override
     public boolean isFinished() {
-        return th.isFinished();
+        return th.getStatus().isFinished();
     }
 
     @Override
     public TransferState getState() {
         TorrentStatus.State state = th.getStatus().getState();
 
-        if (th.isPaused()) {
+        if (th.getStatus().isPaused()) {
             return TransferState.PAUSED;
         }
 
@@ -363,8 +363,9 @@ public final class LTDownload extends TorrentAlertAdapter implements BTDownload 
         List<TransferItem> l = new ArrayList<TransferItem>(numFiles);
 
         for (int i = 0; i < numFiles; i++) {
-            File f = new File(fs.getFilePath(i, savePath));
-            l.add(new LTDownloadItem(f));
+            boolean skipped = th.getFilePriority(i) == Priority.IGNORE;
+            File file = new File(fs.getFilePath(i, savePath));
+            l.add(new LTDownloadItem(skipped, file));
         }
 
         return l;
@@ -373,5 +374,15 @@ public final class LTDownload extends TorrentAlertAdapter implements BTDownload 
     @Override
     public File getTorrentFile() {
         return LTEngine.getInstance().readTorrentPath(this.getInfoHash());
+    }
+
+    @Override
+    public void setFilesSelection(boolean[] filesSelection) {
+        Priority[] priorities = new Priority[filesSelection.length];
+
+        for (int i = 0; i < priorities.length; i++) {
+            priorities[i] = filesSelection[i] ? Priority.NORMAL : Priority.IGNORE;
+        }
+        th.prioritizeFiles(priorities);
     }
 }

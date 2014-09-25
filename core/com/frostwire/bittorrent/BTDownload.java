@@ -120,4 +120,6 @@ public interface BTDownload extends Transfer {
     public void setTrackers(Set<String> trackers);
 
     public File getTorrentFile();
+
+    public void setFilesSelection(boolean[] fileSelection);
 }

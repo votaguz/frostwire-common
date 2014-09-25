@@ -26,5 +26,7 @@ import java.io.File;
  */
 public interface TransferItem {
 
+    public boolean isSkipped();
+
     public File getFile();
 }

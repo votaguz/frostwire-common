@@ -28,10 +28,17 @@ import java.io.File;
  */
 public final class LTDownloadItem implements BTDownloadItem {
 
+    private final boolean skipped;
     private final File file;
 
-    public LTDownloadItem(File file) {
+    public LTDownloadItem(boolean skipped, File file) {
+        this.skipped = skipped;
         this.file = file;
+    }
+
+    @Override
+    public boolean isSkipped() {
+        return skipped;
     }
 
     public File getFile() {
