@@ -365,9 +365,7 @@ public final class LTDownload extends TorrentAlertAdapter implements BTDownload 
                     for (int i = 0; i < numFiles; i++) {
                         items.add(new LTDownloadItem(th, fs, i));
                     }
-
                 }
-
             }
         }
 
