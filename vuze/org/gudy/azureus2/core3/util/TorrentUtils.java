@@ -172,7 +172,7 @@ TorrentUtils
 			});
 	}
 	
-	static DNSUtils.DNSUtilsIntf dns_utils = DNSUtils.getSingleton();
+	//static DNSUtils.DNSUtilsIntf dns_utils = DNSUtils.getSingleton();
 	
 	static {
 		/*COConfigurationManager.addAndFireParameterListeners(
@@ -3593,7 +3593,7 @@ TorrentUtils
 					final Object[]	result = { null, null };
 					
 					final DNSTXTEntry	f_txt_entry = txt_entry;
-					
+					/*
 					dns_threads.run(
 						new AERunnable()
 						{
@@ -3670,7 +3670,7 @@ TorrentUtils
 									lookup_sem.release();
 								}
 							}
-						});
+						});*/
 					
 					List txts_cache = null;//COConfigurationManager.getListParameter( config_key, null );
 
