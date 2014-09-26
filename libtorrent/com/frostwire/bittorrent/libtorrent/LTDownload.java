@@ -350,31 +350,28 @@ public final class LTDownload extends TorrentAlertAdapter implements BTDownload 
 
     @Override
     public List<TransferItem> getItems() {
-        if (!th.isValid()) {
-            return Collections.emptyList();
+        List<TransferItem> items = Collections.emptyList();
+
+        if (th.isValid()) {
+            TorrentInfo ti = th.getTorrentInfo();
+            if (ti != null && ti.isValid()) {
+                FileStorage fs = ti.getFiles();
+                if (fs.isValid()) {
+                    int numFiles = fs.geNumFiles();
+                    String savePath = th.getSavePath();
+
+                    items = new ArrayList<TransferItem>(numFiles);
+
+                    for (int i = 0; i < numFiles; i++) {
+                        items.add(new LTDownloadItem(th, fs, i));
+                    }
+
+                }
+
+            }
         }
 
-        TorrentInfo ti = th.getTorrentInfo();
-        if (ti == null || !ti.isValid()) {
-            return Collections.emptyList();
-        }
-
-        FileStorage fs = ti.getFiles();
-
-        if (!fs.isValid()) {
-            return Collections.emptyList();
-        }
-
-        int numFiles = fs.geNumFiles();
-        String savePath = th.getSavePath();
-
-        List<TransferItem> l = new ArrayList<TransferItem>(numFiles);
-
-        for (int i = 0; i < numFiles; i++) {
-            l.add(new LTDownloadItem(th, fs, i));
-        }
-
-        return l;
+        return items;
     }
 
     @Override
