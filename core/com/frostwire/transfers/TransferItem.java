@@ -29,4 +29,8 @@ public interface TransferItem {
     public boolean isSkipped();
 
     public File getFile();
+
+    public long getSize();
+
+    public long getDownloaded();
 }

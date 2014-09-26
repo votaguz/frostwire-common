@@ -246,6 +246,14 @@ public final class LTDownload extends TorrentAlertAdapter implements BTDownload 
 
         engine.resumeDataFile(infoHash).delete();
         engine.resumeTorrentFile(infoHash).delete();
+
+        if (listener != null) {
+            try {
+                listener.stopped(this);
+            } catch (Throwable e) {
+                LOG.error("Error calling listener", e);
+            }
+        }
     }
 
     @Override
@@ -363,9 +371,7 @@ public final class LTDownload extends TorrentAlertAdapter implements BTDownload 
         List<TransferItem> l = new ArrayList<TransferItem>(numFiles);
 
         for (int i = 0; i < numFiles; i++) {
-            boolean skipped = th.getFilePriority(i) == Priority.IGNORE;
-            File file = new File(fs.getFilePath(i, savePath));
-            l.add(new LTDownloadItem(skipped, file));
+            l.add(new LTDownloadItem(th, fs, i));
         }
 
         return l;

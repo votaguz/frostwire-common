@@ -19,6 +19,9 @@
 package com.frostwire.bittorrent.libtorrent;
 
 import com.frostwire.bittorrent.BTDownloadItem;
+import com.frostwire.jlibtorrent.FileStorage;
+import com.frostwire.jlibtorrent.Priority;
+import com.frostwire.jlibtorrent.TorrentHandle;
 
 import java.io.File;
 
@@ -28,20 +31,34 @@ import java.io.File;
  */
 public final class LTDownloadItem implements BTDownloadItem {
 
-    private final boolean skipped;
-    private final File file;
+    private final TorrentHandle th;
+    private final FileStorage fs;
+    private final int index;
 
-    public LTDownloadItem(boolean skipped, File file) {
-        this.skipped = skipped;
-        this.file = file;
+    public LTDownloadItem(TorrentHandle th, FileStorage fs, int index) {
+        this.th = th;
+        this.fs = fs;
+        this.index = index;
     }
 
     @Override
     public boolean isSkipped() {
-        return skipped;
+        return th.getFilePriority(index) == Priority.IGNORE;
     }
 
+    @Override
     public File getFile() {
-        return file;
+        return new File(fs.getFilePath(index, th.getSavePath()));
+    }
+
+    @Override
+    public long getSize() {
+        return fs.getFileSize(index);
+    }
+
+    @Override
+    public long getDownloaded() {
+        long[] progress = th.getFileProgress(TorrentHandle.FileProgressFlags.PIECE_GRANULARITY);
+        return progress[index];
     }
 }

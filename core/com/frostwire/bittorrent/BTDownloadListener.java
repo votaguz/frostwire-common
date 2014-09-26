@@ -25,4 +25,6 @@ package com.frostwire.bittorrent;
 public interface BTDownloadListener {
 
     public void finished(BTDownload dl);
+
+    public void stopped(BTDownload dl);
 }
