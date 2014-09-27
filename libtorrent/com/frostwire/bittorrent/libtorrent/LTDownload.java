@@ -231,6 +231,7 @@ public final class LTDownload extends TorrentAlertAdapter implements BTDownload 
         Session s = engine.getSession();
 
         s.removeListener(this);
+
         if (deleteData) {
             s.removeTorrent(th, Session.Options.DELETE_FILES);
         } else {
