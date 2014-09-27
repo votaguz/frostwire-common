@@ -49,11 +49,11 @@ AddressUtils
 	
 	private static Map	host_map = null;
 	
-	/*public static URL
+	public static URL
 	adjustURL(
 		URL		url )
 	{
-		url = AEProxyFactory.getAddressMapper().internalise( url );
+		//url = AEProxyFactory.getAddressMapper().internalise( url );
 
 		if ( host_map != null ){
 			
@@ -95,7 +95,7 @@ AddressUtils
 		}
 		
 		return( url );
-	}*/
+	}
 	
 	public static synchronized void
 	addHostRedirect(
