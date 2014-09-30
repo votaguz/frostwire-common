@@ -133,7 +133,7 @@ public final class LTDownload extends TorrentAlertAdapter implements BTDownload 
 
     @Override
     public long getTotalBytesReceived() {
-        return th.getStatus().allTimeDownload;
+        return th.getStatus().getAllTimeDownload();
     }
 
     @Override
@@ -143,7 +143,7 @@ public final class LTDownload extends TorrentAlertAdapter implements BTDownload 
 
     @Override
     public long getTotalBytesSent() {
-        return th.getStatus().allTimeUpload;
+        return th.getStatus().getAllTimeUpload();
     }
 
     @Override
@@ -272,7 +272,7 @@ public final class LTDownload extends TorrentAlertAdapter implements BTDownload 
     }
 
     @Override
-    public void onTorrentFinished(TorrentFinishedAlert alert) {
+    public void torrentFinished(TorrentFinishedAlert alert) {
         if (listener != null) {
             try {
                 listener.finished(this);

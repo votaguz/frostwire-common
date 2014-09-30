@@ -212,7 +212,7 @@ public final class LTEngine implements BTEngine {
             }
 
             @Override
-            public void onAlert(Alert<?> alert) {
+            public void alert(Alert<?> alert) {
                 //LOG.info(a.message());
                 if (listener == null) {
                     return;
