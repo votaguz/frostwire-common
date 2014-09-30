@@ -25,6 +25,7 @@ import com.frostwire.jlibtorrent.alerts.SaveResumeDataAlert;
 import com.frostwire.jlibtorrent.alerts.TorrentAlert;
 import com.frostwire.jlibtorrent.swig.entry;
 import com.frostwire.logging.Logger;
+import com.frostwire.search.torrent.TorrentCrawledSearchResult;
 import com.frostwire.util.OSUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -99,6 +100,30 @@ public final class BTEngine {
 
         session.asyncAddTorrent(torrent, priorities, saveDir, null);
         saveResumeTorrent(torrent);
+    }
+
+    public void download(TorrentInfo ti, int fileIndex, File saveDir) {
+        Downloader d = new Downloader(session);
+
+        TorrentHandle th = d.find(ti.getInfoHash());
+
+        if (th != null) {
+            Priority[] priorities = th.getFilePriorities();
+            if (priorities[fileIndex] == Priority.IGNORE) {
+                priorities[fileIndex] = Priority.NORMAL;
+                d.download(ti, saveDir, priorities, null);
+            }
+        } else {
+            Priority[] priorities = Priority.array(Priority.IGNORE, ti.getNumFiles());
+            priorities[fileIndex] = Priority.NORMAL;
+            d.download(ti, saveDir, priorities, null);
+        }
+        // TODO:BITTORRENT
+//        saveResumeTorrent(torrent);
+    }
+
+    public void download(TorrentCrawledSearchResult sr, File saveDir) {
+        download(sr.getTorrentInfo(), sr.getFileIndex(), saveDir);
     }
 
     public void restoreDownloads(File saveDir) {

@@ -17,14 +17,13 @@
 
 package com.frostwire.search;
 
+import com.frostwire.jlibtorrent.FileEntry;
+import com.frostwire.jlibtorrent.FileStorage;
+import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.search.torrent.TorrentCrawlableSearchResult;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
-import org.gudy.azureus2.core3.torrent.TOTorrent;
 import org.gudy.azureus2.core3.torrent.TOTorrentException;
-import org.gudy.azureus2.core3.torrent.TOTorrentFile;
-import org.gudy.azureus2.core3.util.TorrentUtils;
 
-import java.io.ByteArrayInputStream;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -63,15 +62,20 @@ public final class PerformersHelper {
     public static List<? extends SearchResult> crawlTorrent(SearchPerformer performer, TorrentCrawlableSearchResult sr, byte[] data) throws TOTorrentException {
         List<TorrentCrawledSearchResult> list = new LinkedList<TorrentCrawledSearchResult>();
 
-        TOTorrent torrent = TorrentUtils.readFromBEncodedInputStream(new ByteArrayInputStream(data));
+        TorrentInfo ti = TorrentInfo.bdecode(data);
 
-        if (torrent != null) {
-            TOTorrentFile[] files = torrent.getFiles();
+        FileStorage fs = ti.getFiles();
 
-            for (int i = 0; !performer.isStopped() && i < files.length; i++) {
-                TOTorrentFile file = files[i];
-                list.add(new TorrentCrawledSearchResult(sr, file));
+        int numFiles = ti.getNumFiles();
+
+        for (int i = 0; !performer.isStopped() && i < numFiles; i++) {
+            FileEntry fe = ti.getFileAt(i);
+
+            if (fe.isPadFile() || fe.hasHiddenAttribute()) {
+                continue;
             }
+
+            list.add(new TorrentCrawledSearchResult(sr, ti, i, fe));
         }
 
         return list;

@@ -20,41 +20,39 @@ package com.frostwire.search;
 import com.frostwire.licences.License;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
-public abstract class AbstractCrawledSearchResult extends AbstractSearchResult implements CrawledSearchResult {
+public abstract class AbstractCrawledSearchResult<T extends CrawlableSearchResult> extends AbstractSearchResult implements CrawledSearchResult {
 
-    private final CrawlableSearchResult sr;
+    protected final T parent;
 
-    public AbstractCrawledSearchResult(CrawlableSearchResult parent) {
-        this.sr = parent;
+    public AbstractCrawledSearchResult(T parent) {
+        this.parent = parent;
     }
 
     @Override
-    public CrawlableSearchResult getParent() {
-        return sr;
+    public T getParent() {
+        return parent;
     }
 
     @Override
     public String getDetailsUrl() {
-        return sr.getDetailsUrl();
+        return parent.getDetailsUrl();
     }
 
     @Override
     public String getSource() {
-        return sr.getSource();
+        return parent.getSource();
     }
 
     @Override
     public License getLicense() {
-        return sr.getLicense();
+        return parent.getLicense();
     }
 
     @Override
     public long getCreationTime() {
-        return sr.getCreationTime();
+        return parent.getCreationTime();
     }
 }
