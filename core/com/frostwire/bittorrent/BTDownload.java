@@ -18,8 +18,6 @@
 
 package com.frostwire.bittorrent;
 
-import com.frostwire.bittorrent.BTDownload;
-import com.frostwire.bittorrent.BTDownloadListener;
 import com.frostwire.jlibtorrent.*;
 import com.frostwire.jlibtorrent.alerts.TorrentFinishedAlert;
 import com.frostwire.logging.Logger;
@@ -51,10 +49,6 @@ public final class BTDownload extends TorrentAlertAdapter implements Transfer {
 
     public String getName() {
         return th.getName();
-    }
-
-    public String getDisplayName() {
-        return th.getDisplayName();
     }
 
     public long getSize() {
@@ -256,7 +250,8 @@ public final class BTDownload extends TorrentAlertAdapter implements Transfer {
     }
 
     public boolean isPartial() {
-        return th.isPartial();
+        // TODO:BITTORRENT
+        return false;
     }
 
     public String makeMagnetUri() {
