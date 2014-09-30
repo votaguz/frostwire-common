@@ -96,7 +96,7 @@ public final class BTEngine {
     }
 
     public void setDataDir(File dir) {
-        this.dataDir = dataDir;
+        this.dataDir = dir;
     }
 
     public BTEngineListener getListener() {
@@ -112,20 +112,24 @@ public final class BTEngine {
         saveResumeTorrent(torrent);
     }
 
-    public void download(File torrent, File saveDir, boolean[] filesSelection) throws IOException {
-        Priority[] priorities = new Priority[filesSelection.length];
+    public void download(File torrent, File saveDir, boolean[] selection) {
+        Downloader d = new Downloader(session);
 
-        for (int i = 0; i < priorities.length; i++) {
-            priorities[i] = filesSelection[i] ? Priority.NORMAL : Priority.IGNORE;
+        if (saveDir == null) {
+            saveDir = dataDir;
         }
 
-        // TODO:BITTORRENT
-        //session.asyncAddTorrent(torrent, priorities, saveDir, null);
-        //saveResumeTorrent(torrent);
+        d.download(torrent, saveDir, selection);
+
+        saveResumeTorrent(torrent);
     }
 
-    public void download(TorrentInfo ti, int fileIndex, File saveDir) {
+    public void download(TorrentInfo ti, File saveDir, int fileIndex) {
         Downloader d = new Downloader(session);
+
+        if (saveDir == null) {
+            saveDir = dataDir;
+        }
 
         TorrentHandle th = d.find(ti.getInfoHash());
 
@@ -146,7 +150,7 @@ public final class BTEngine {
     }
 
     public void download(TorrentCrawledSearchResult sr, File saveDir) {
-        download(sr.getTorrentInfo(), sr.getFileIndex(), saveDir);
+        download(sr.getTorrentInfo(), saveDir, sr.getFileIndex());
     }
 
     public void restoreDownloads() {
