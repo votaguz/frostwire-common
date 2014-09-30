@@ -18,108 +18,336 @@
 
 package com.frostwire.bittorrent;
 
+import com.frostwire.bittorrent.BTDownload;
+import com.frostwire.bittorrent.BTDownloadListener;
+import com.frostwire.jlibtorrent.*;
+import com.frostwire.jlibtorrent.alerts.TorrentFinishedAlert;
+import com.frostwire.logging.Logger;
 import com.frostwire.transfers.Transfer;
+import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
 
 import java.io.File;
-import java.util.Date;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author gubatron
  * @author aldenml
  */
-public interface BTDownload extends Transfer {
+public final class BTDownload extends TorrentAlertAdapter implements Transfer {
 
-    public String getName();
+    private static final Logger LOG = Logger.getLogger(BTDownload.class);
 
-    public String getDisplayName();
+    private final TorrentHandle th;
 
-    public long getSize();
+    private BTDownloadListener listener;
 
-    public boolean isPaused();
+    public BTDownload(TorrentHandle th) {
+        super(th);
+        this.th = th;
 
-    public boolean isSeeding();
+        BTEngine.getInstance().getSession().addListener(this);
+    }
 
-    public boolean isFinished();
+    public String getName() {
+        return th.getName();
+    }
 
-    public TransferState getState();
+    public String getDisplayName() {
+        return th.getDisplayName();
+    }
 
-    public String getSavePath();
+    public long getSize() {
+        TorrentInfo ti = th.getTorrentInfo();
+        return ti != null ? ti.getTotalSize() : 0;
+    }
 
-    /**
-     * A value in the range [0, 100], that represents the progress of the torrent's
-     * current task. It may be checking files or downloading.
-     *
-     * @return
-     */
-    public int getProgress();
+    public boolean isPaused() {
+        return th.getStatus().isPaused();
+    }
 
-    public long getBytesReceived();
+    public boolean isSeeding() {
+        return th.getStatus().isSeeding();
+    }
 
-    public long getTotalBytesReceived();
+    public boolean isFinished() {
+        return th.getStatus().isFinished();
+    }
 
-    public long getBytesSent();
+    public TransferState getState() {
+        TorrentStatus.State state = th.getStatus().getState();
 
-    public long getTotalBytesSent();
+        if (th.getStatus().isPaused()) {
+            return TransferState.PAUSED;
+        }
 
-    public float getDownloadSpeed();
+        switch (state) {
+            case QUEUED_FOR_CHECKING:
+                return TransferState.QUEUED_FOR_CHECKING;
+            case CHECKING_FILES:
+                return TransferState.CHECKING;
+            case DOWNLOADING_METADATA:
+                return TransferState.DOWNLOADING_METADATA;
+            case DOWNLOADING:
+                return TransferState.DOWNLOADING;
+            case FINISHED:
+                return TransferState.FINISHED;
+            case SEEDING:
+                return TransferState.SEEDING;
+            case ALLOCATING:
+                return TransferState.ALLOCATING;
+            case CHECKING_RESUME_DATA:
+                return TransferState.CHECKING;
+            default:
+                throw new IllegalArgumentException("No enum value supported");
+        }
+    }
 
-    public float getUploadSpeed();
+    public String getSavePath() {
+        return th.getSavePath();
+    }
 
-    public int getConnectedPeers();
+    public int getProgress() {
+        float fp = th.getStatus().getProgress();
 
-    public int getTotalPeers();
+        if (Float.compare(fp, 1f) == 0) {
+            return 100;
+        }
 
-    public int getConnectedSeeds();
+        int p = (int) (th.getStatus().getProgress() * 100);
+        return Math.min(p, 100);
+    }
 
-    public int getTotalSeeds();
+    public long getBytesReceived() {
+        return th.getStatus().getTotalDownload();
+    }
 
-    public String getInfoHash();
+    public long getTotalBytesReceived() {
+        return th.getStatus().getAllTimeDownload();
+    }
 
-    public Date getDateCreated();
+    public long getBytesSent() {
+        return th.getStatus().getTotalUpload();
+    }
 
-    public long getETA();
+    public long getTotalBytesSent() {
+        return th.getStatus().getAllTimeUpload();
+    }
 
-    public void pause();
+    public float getDownloadSpeed() {
+        return th.getStatus().getDownloadPayloadRate();
+    }
 
-    public void resume();
+    public float getUploadSpeed() {
+        return th.getStatus().getUploadPayloadRate();
+    }
 
-    public void stop();
+    public int getConnectedPeers() {
+        return th.getStatus().getNumPeers();
+    }
 
-    /**
-     * This method is specific for torrent downloads
-     *
-     * @param deleteTorrent
-     * @param deleteData
-     */
-    public void stop(boolean deleteTorrent, boolean deleteData);
+    public int getTotalPeers() {
+        return th.getStatus().listPeers;
+    }
 
-    public BTDownloadListener getListener();
+    public int getConnectedSeeds() {
+        return th.getStatus().getNumSeeds();
+    }
 
-    public void setListener(BTDownloadListener listener);
+    public int getTotalSeeds() {
+        return th.getStatus().listSeeds;
+    }
 
-    public boolean isPartial();
+    public String getInfoHash() {
+        return th.getInfoHash().toString();
+    }
 
-    public String makeMagnetUri();
+    public Date getDateCreated() {
+        return new Date(th.getStatus().getAddedTime());
+    }
 
-    public int getDownloadRateLimit();
+    public long getETA() {
+        TorrentInfo ti = th.getTorrentInfo();
+        if (ti == null) {
+            return 0;
+        }
 
-    public void setDownloadRateLimit(int limit);
+        TorrentStatus status = th.getStatus();
+        long left = ti.getTotalSize() - status.getTotalDone();
+        long rate = status.getDownloadPayloadRate();
 
-    public int getUploadRateLimit();
+        if (left <= 0) {
+            return 0;
+        }
 
-    public void setUploadRateLimit(int limit);
+        if (rate <= 0) {
+            return -1;
+        }
 
-    public void requestTrackerAnnounce();
+        return left / rate;
+    }
 
-    public void requestTrackerScrape();
+    public void pause() {
+        th.pause();
+    }
 
-    public Set<String> getTrackers();
+    public void resume() {
+        th.resume();
+    }
 
-    public void setTrackers(Set<String> trackers);
+    public void stop() {
+        this.stop(false, false);
+    }
 
-    public File getTorrentFile();
+    public void stop(boolean deleteTorrent, boolean deleteData) {
+        String infoHash = this.getInfoHash();
 
-    public void setFilesSelection(boolean[] fileSelection);
+        BTEngine engine = BTEngine.getInstance();
+        Session s = engine.getSession();
+
+        s.removeListener(this);
+
+        if (deleteData) {
+            s.removeTorrent(th, Session.Options.DELETE_FILES);
+        } else {
+            s.removeTorrent(th);
+        }
+
+        if (deleteTorrent) {
+            File torrent = BTEngine.getInstance().readTorrentPath(infoHash);
+            if (torrent.exists()) {
+                torrent.delete();
+            }
+        }
+
+        engine.resumeDataFile(infoHash).delete();
+        engine.resumeTorrentFile(infoHash).delete();
+
+        if (listener != null) {
+            try {
+                listener.stopped(this);
+            } catch (Throwable e) {
+                LOG.error("Error calling listener", e);
+            }
+        }
+    }
+
+    public BTDownloadListener getListener() {
+        return listener;
+    }
+
+    public void setListener(BTDownloadListener listener) {
+        this.listener = listener;
+    }
+
+    TorrentHandle getTorrentHandle() {
+        return th;
+    }
+
+    @Override
+    public void torrentFinished(TorrentFinishedAlert alert) {
+        if (listener != null) {
+            try {
+                listener.finished(this);
+            } catch (Throwable e) {
+                LOG.error("Error calling listener", e);
+            }
+        }
+    }
+
+    public boolean isPartial() {
+        return th.isPartial();
+    }
+
+    public String makeMagnetUri() {
+        return th.makeMagnetUri();
+    }
+
+    public int getDownloadRateLimit() {
+        return th.getDownloadLimit();
+    }
+
+    public void setDownloadRateLimit(int limit) {
+        th.setDownloadLimit(limit);
+        th.saveResumeData();
+    }
+
+    public int getUploadRateLimit() {
+        return th.getUploadLimit();
+    }
+
+    public void setUploadRateLimit(int limit) {
+        th.setUploadLimit(limit);
+        th.saveResumeData();
+    }
+
+    public void requestTrackerAnnounce() {
+        th.forceReannounce();
+    }
+
+    public void requestTrackerScrape() {
+        th.scrapeTracker();
+    }
+
+    public Set<String> getTrackers() {
+        List<AnnounceEntry> trackers = th.getTrackers();
+
+        Set<String> urls = new HashSet<String>(trackers.size());
+
+        for (AnnounceEntry e : trackers) {
+            urls.add(e.getUrl());
+        }
+
+        return urls;
+    }
+
+    public void setTrackers(Set<String> trackers) {
+        List<AnnounceEntry> list = new ArrayList<AnnounceEntry>(trackers.size());
+
+        for (String url : trackers) {
+            list.add(new AnnounceEntry(url));
+        }
+
+        th.replaceTrackers(list);
+        th.saveResumeData();
+    }
+
+    @Override
+    public List<TransferItem> getItems() {
+        List<TransferItem> items = Collections.emptyList();
+
+        if (th.isValid()) {
+            TorrentInfo ti = th.getTorrentInfo();
+            if (ti != null && ti.isValid()) {
+                FileStorage fs = ti.getFiles();
+                if (fs.isValid()) {
+                    int numFiles = fs.geNumFiles();
+                    String savePath = th.getSavePath();
+
+                    items = new ArrayList<TransferItem>(numFiles);
+
+                    for (int i = 0; i < numFiles; i++) {
+                        items.add(new BTDownloadItem(th, fs, i));
+                    }
+
+                }
+
+            }
+        }
+
+        return items;
+    }
+
+    public File getTorrentFile() {
+        return BTEngine.getInstance().readTorrentPath(this.getInfoHash());
+    }
+
+    public void setFilesSelection(boolean[] filesSelection) {
+        Priority[] priorities = new Priority[filesSelection.length];
+
+        for (int i = 0; i < priorities.length; i++) {
+            priorities[i] = filesSelection[i] ? Priority.NORMAL : Priority.IGNORE;
+        }
+        th.prioritizeFiles(priorities);
+    }
 }
