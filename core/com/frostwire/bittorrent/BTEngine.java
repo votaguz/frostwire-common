@@ -108,8 +108,7 @@ public final class BTEngine {
     }
 
     public void download(File torrent, File saveDir) throws IOException {
-        session.asyncAddTorrent(torrent, saveDir, null);
-        saveResumeTorrent(torrent);
+        download(torrent, saveDir, null);
     }
 
     public void download(File torrent, File saveDir, boolean[] selection) {
@@ -164,7 +163,7 @@ public final class BTEngine {
         for (File t : torrents) {
             try {
                 File resumeFile = new File(homeDir, FilenameUtils.getBaseName(t.getName()) + ".resume");
-                session.asyncAddTorrent(t, dataDir, resumeFile);
+                session.asyncAddTorrent(t, null, resumeFile);
             } catch (Throwable e) {
                 LOG.error("Error restoring torrent download", e);
             }
@@ -255,6 +254,7 @@ public final class BTEngine {
                 switch (type) {
                     case TORRENT_ADDED:
                         listener.downloadAdded(new BTDownload(((TorrentAlert<?>) alert).getTorrentHandle()));
+                        doResumeData((TorrentAlert<?>) alert);
                         break;
                     case SAVE_RESUME_DATA:
                         saveResumeData((SaveResumeDataAlert) alert);
