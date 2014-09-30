@@ -44,7 +44,10 @@ public final class BTEngine {
 
     private final Session session;
 
-    private File home;
+    private File homeDir;
+    private File torrentsDir;
+    private File dataDir;
+
     private BTEngineListener listener;
 
     private boolean isFirewalled;
@@ -53,7 +56,9 @@ public final class BTEngine {
         this.session = new Session();
 
 
-        this.home = new File(".").getAbsoluteFile();
+        this.homeDir = new File(".").getAbsoluteFile();
+        this.torrentsDir = new File(".").getAbsoluteFile();
+        this.dataDir = new File(".").getAbsoluteFile();
 
         addEngineListener();
     }
@@ -70,12 +75,28 @@ public final class BTEngine {
         return session;
     }
 
-    public File getHome() {
-        return home;
+    public File getHomeDir() {
+        return homeDir;
     }
 
-    public void setHome(File home) {
-        this.home = home;
+    public void setHomeDir(File dir) {
+        this.homeDir = dir;
+    }
+
+    public File getTorrentsDir() {
+        return torrentsDir;
+    }
+
+    public void setTorrentsDir(File dir) {
+        this.torrentsDir = dir;
+    }
+
+    public File getDataDir() {
+        return dataDir;
+    }
+
+    public void setDataDir(File dir) {
+        this.dataDir = dataDir;
     }
 
     public BTEngineListener getListener() {
@@ -98,8 +119,9 @@ public final class BTEngine {
             priorities[i] = filesSelection[i] ? Priority.NORMAL : Priority.IGNORE;
         }
 
-        session.asyncAddTorrent(torrent, priorities, saveDir, null);
-        saveResumeTorrent(torrent);
+        // TODO:BITTORRENT
+        //session.asyncAddTorrent(torrent, priorities, saveDir, null);
+        //saveResumeTorrent(torrent);
     }
 
     public void download(TorrentInfo ti, int fileIndex, File saveDir) {
@@ -126,8 +148,8 @@ public final class BTEngine {
         download(sr.getTorrentInfo(), sr.getFileIndex(), saveDir);
     }
 
-    public void restoreDownloads(File saveDir) {
-        File[] torrents = home.listFiles(new FilenameFilter() {
+    public void restoreDownloads() {
+        File[] torrents = homeDir.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
                 return FilenameUtils.getExtension(name).equals("torrent");
@@ -136,8 +158,8 @@ public final class BTEngine {
 
         for (File t : torrents) {
             try {
-                File resumeFile = new File(home, FilenameUtils.getBaseName(t.getName()) + ".resume");
-                session.asyncAddTorrent(t, saveDir, resumeFile);
+                File resumeFile = new File(homeDir, FilenameUtils.getBaseName(t.getName()) + ".resume");
+                session.asyncAddTorrent(t, dataDir, resumeFile);
             } catch (Throwable e) {
                 LOG.error("Error restoring torrent download", e);
             }
@@ -246,6 +268,22 @@ public final class BTEngine {
         });
     }
 
+    public void saveTorrent(TorrentInfo ti, File saveDir) {
+        try {
+            String name = ti.getName();
+            if (name == null || name.length() == 0) {
+                name = ti.getInfoHash().toString();
+            }
+
+            File torrentFile = new File(saveDir, name);
+            byte[] arr = ti.toEntry().bencode();
+
+            FileUtils.writeByteArrayToFile(torrentFile, arr);
+        } catch (Throwable e) {
+            LOG.warn("Error saving torrent info to file", e);
+        }
+    }
+
     private void saveResumeTorrent(File torrent) {
         try {
             TorrentInfo ti = new TorrentInfo(torrent);
@@ -278,15 +316,15 @@ public final class BTEngine {
     }
 
     File resumeTorrentFile(String infoHash) {
-        return new File(home, infoHash + ".torrent");
+        return new File(homeDir, infoHash + ".torrent");
     }
 
     File resumeDataFile(String infoHash) {
-        return new File(home, infoHash + ".resume");
+        return new File(homeDir, infoHash + ".resume");
     }
 
     File stateFile() {
-        return new File(home, "settings.dat");
+        return new File(homeDir, "settings.dat");
     }
 
     File readTorrentPath(String infoHash) {
