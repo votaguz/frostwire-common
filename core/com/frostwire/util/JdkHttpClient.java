@@ -17,15 +17,12 @@
 
 package com.frostwire.util;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.Closeable;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import com.frostwire.logging.Logger;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSession;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
@@ -35,17 +32,11 @@ import java.util.Map.Entry;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSession;
-
-import com.frostwire.logging.Logger;
-
 /**
  * A pure java based HTTP client with resume capabilities.
+ *
  * @author gubatron
  * @author aldenml
- *
  */
 final class JdkHttpClient implements HttpClient {
 
@@ -56,7 +47,7 @@ final class JdkHttpClient implements HttpClient {
     private HttpClientListener listener;
 
     private boolean canceled;
-    
+
     @Override
     public int head(String url, int connectTimeoutInMillis) throws IOException {
         HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
@@ -125,8 +116,19 @@ final class JdkHttpClient implements HttpClient {
         return result;
     }
 
+    @Override
+    public byte[] getBytes(String url, int timeout, String referrer) {
+        return getBytes(url, timeout, DEFAULT_USER_AGENT, referrer);
+    }
+
+    @Override
+    public byte[] getBytes(String url, int timeout) {
+        return getBytes(url, timeout, null);
+    }
+
+    @Override
     public byte[] getBytes(String url) {
-        return getBytes(url, DEFAULT_TIMEOUT, DEFAULT_USER_AGENT, null);
+        return getBytes(url, DEFAULT_TIMEOUT);
     }
 
     public void save(String url, File file) throws IOException {
@@ -159,7 +161,7 @@ final class JdkHttpClient implements HttpClient {
             closeQuietly(fos);
         }
     }
-    
+
     @Override
     public String post(String url, int timeout, String userAgent, String content, String postContentType, boolean gzip) throws IOException {
         String result = null;
@@ -216,16 +218,16 @@ final class JdkHttpClient implements HttpClient {
             if (canceled) {
                 onCancel();
             } else {
-                BufferedInputStream bis = new BufferedInputStream(conn.getInputStream(),4096);
+                BufferedInputStream bis = new BufferedInputStream(conn.getInputStream(), 4096);
                 ByteArrayBuffer baf = new ByteArrayBuffer(1024);
                 byte[] buffer = new byte[64];
                 int read = 0;
-                while (true){
+                while (true) {
                     read = bis.read(buffer);
-                    if (read == -1){
+                    if (read == -1) {
                         break;
                     }
-                    baf.append(buffer,0,read);
+                    baf.append(buffer, 0, read);
                 }
                 result = new String(baf.toByteArray());
                 onComplete();
@@ -242,7 +244,7 @@ final class JdkHttpClient implements HttpClient {
 
     @Override
     public String post(String url, int timeout, String userAgent, String content, boolean gzip) throws IOException {
-        return post(url,timeout,userAgent,content,"text/plain",gzip);
+        return post(url, timeout, userAgent, content, "text/plain", gzip);
     }
 
     /**
@@ -316,11 +318,11 @@ final class JdkHttpClient implements HttpClient {
         }
 
         int httpResponseCode = getResponseCode(conn);
-        
-        if (httpResponseCode != HttpURLConnection.HTTP_OK && 
-            httpResponseCode != HttpURLConnection.HTTP_PARTIAL && 
-            httpResponseCode != HttpURLConnection.HTTP_MOVED_TEMP &&
-            httpResponseCode != HttpURLConnection.HTTP_MOVED_PERM) {
+
+        if (httpResponseCode != HttpURLConnection.HTTP_OK &&
+                httpResponseCode != HttpURLConnection.HTTP_PARTIAL &&
+                httpResponseCode != HttpURLConnection.HTTP_MOVED_TEMP &&
+                httpResponseCode != HttpURLConnection.HTTP_MOVED_PERM) {
             throw new ResponseCodeNotSupportedException(httpResponseCode);
         }
 
@@ -351,7 +353,7 @@ final class JdkHttpClient implements HttpClient {
             closeQuietly(conn);
         }
     }
-    
+
     @Override
     public void post(String url, int timeout, String userAgent, ProgressFileEntity fileEntity) throws Throwable {
         canceled = false;

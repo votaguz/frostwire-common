@@ -25,17 +25,19 @@ import java.util.Map;
 
 /**
  * A pure java based HTTP client with resume capabilities.
+ *
  * @author gubatron
  * @author aldenml
- *
  */
 public interface HttpClient {
 
     public void setListener(HttpClientListener listener);
 
     public HttpClientListener getListener();
-    
-    /** Returns the HTTP response code */
+
+    /**
+     * Returns the HTTP response code
+     */
     public int head(String url, int connectTimeoutInMillis) throws IOException;
 
     public String get(String url) throws IOException;
@@ -50,6 +52,10 @@ public interface HttpClient {
 
     public byte[] getBytes(String url, int timeout, String userAgent, String referrer);
 
+    public byte[] getBytes(String url, int timeout, String referrer);
+
+    public byte[] getBytes(String url, int timeout);
+
     public byte[] getBytes(String url);
 
     public void save(String url, File file) throws IOException;
@@ -61,9 +67,9 @@ public interface HttpClient {
     public String post(String url, int timeout, String userAgent, Map<String, String> formData);
 
     public String post(String url, int timeout, String userAgent, String content, boolean gzip) throws IOException;
-    
+
     public String post(String url, int timeout, String userAgent, String content, String postContentType, boolean gzip) throws IOException;
-    
+
     public void post(String url, int timeout, String userAgent, ProgressFileEntity fileEntity) throws Throwable;
 
     public void cancel();
@@ -82,18 +88,23 @@ public interface HttpClient {
 
         public void onHeaders(HttpClient httpClient, Map<String, List<String>> headerFields);
     }
-    
+
     public abstract class HttpClientListenerAdapter implements HttpClientListener {
-        
-        public void onError(HttpClient client, Throwable e) {}
 
-        public void onData(HttpClient client, byte[] buffer, int offset, int length) {}
+        public void onError(HttpClient client, Throwable e) {
+        }
 
-        public void onComplete(HttpClient client) {}
+        public void onData(HttpClient client, byte[] buffer, int offset, int length) {
+        }
 
-        public void onCancel(HttpClient client) {}
+        public void onComplete(HttpClient client) {
+        }
 
-        public void onHeaders(HttpClient httpClient, Map<String, List<String>> headerFields) {}
+        public void onCancel(HttpClient client) {
+        }
+
+        public void onHeaders(HttpClient httpClient, Map<String, List<String>> headerFields) {
+        }
     }
 
     public static class HttpRangeException extends IOException {

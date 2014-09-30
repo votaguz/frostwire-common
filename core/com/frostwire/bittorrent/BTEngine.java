@@ -43,6 +43,7 @@ public final class BTEngine {
     private static final Logger LOG = Logger.getLogger(BTEngine.class);
 
     private final Session session;
+    private final Downloader downloader;
 
     private File homeDir;
     private File torrentsDir;
@@ -54,6 +55,7 @@ public final class BTEngine {
 
     public BTEngine() {
         this.session = new Session();
+        this.downloader = new Downloader(this.session);
 
 
         this.homeDir = new File(".").getAbsoluteFile();
@@ -112,36 +114,42 @@ public final class BTEngine {
     }
 
     public void download(File torrent, File saveDir, boolean[] selection) {
-        Downloader d = new Downloader(session);
-
         if (saveDir == null) {
             saveDir = dataDir;
         }
 
-        d.download(torrent, saveDir, selection);
+        downloader.download(torrent, saveDir, selection);
 
         saveResumeTorrent(torrent);
     }
 
-    public void download(TorrentInfo ti, File saveDir, int fileIndex) {
-        Downloader d = new Downloader(session);
-
+    public void download(TorrentInfo ti, File saveDir) {
         if (saveDir == null) {
             saveDir = dataDir;
         }
 
-        TorrentHandle th = d.find(ti.getInfoHash());
+        downloader.download(ti, saveDir);
+        File torrent = saveTorrent(ti);
+        saveResumeTorrent(torrent);
+    }
+
+    public void download(TorrentInfo ti, File saveDir, int fileIndex) {
+        if (saveDir == null) {
+            saveDir = dataDir;
+        }
+
+        TorrentHandle th = downloader.find(ti.getInfoHash());
 
         if (th != null) {
             Priority[] priorities = th.getFilePriorities();
             if (priorities[fileIndex] == Priority.IGNORE) {
                 priorities[fileIndex] = Priority.NORMAL;
-                d.download(ti, saveDir, priorities, null);
+                downloader.download(ti, saveDir, priorities, null);
             }
         } else {
             Priority[] priorities = Priority.array(Priority.IGNORE, ti.getNumFiles());
             priorities[fileIndex] = Priority.NORMAL;
-            d.download(ti, saveDir, priorities, null);
+            downloader.download(ti, saveDir, priorities, null);
         }
 
         File torrent = saveTorrent(ti);
@@ -150,6 +158,10 @@ public final class BTEngine {
 
     public void download(TorrentCrawledSearchResult sr, File saveDir) {
         download(sr.getTorrentInfo(), saveDir, sr.getFileIndex());
+    }
+
+    public byte[] fetchMagnet(String uri, long timeout) {
+        return downloader.fetchMagnet(uri, timeout);
     }
 
     public void restoreDownloads() {
