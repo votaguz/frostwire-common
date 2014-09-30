@@ -140,8 +140,9 @@ public final class BTEngine {
             priorities[fileIndex] = Priority.NORMAL;
             d.download(ti, saveDir, priorities, null);
         }
-        // TODO:BITTORRENT
-//        saveResumeTorrent(torrent);
+
+        File torrent = saveTorrent(ti);
+        saveResumeTorrent(torrent);
     }
 
     public void download(TorrentCrawledSearchResult sr, File saveDir) {
@@ -268,29 +269,33 @@ public final class BTEngine {
         });
     }
 
-    public void saveTorrent(TorrentInfo ti, File saveDir) {
+    private File saveTorrent(TorrentInfo ti) {
+        File torrentFile = null;
+
         try {
             String name = ti.getName();
             if (name == null || name.length() == 0) {
                 name = ti.getInfoHash().toString();
             }
 
-            File torrentFile = new File(saveDir, name);
+            torrentFile = new File(torrentsDir, name + ".torrent");
             byte[] arr = ti.toEntry().bencode();
 
             FileUtils.writeByteArrayToFile(torrentFile, arr);
         } catch (Throwable e) {
+            torrentFile = null;
             LOG.warn("Error saving torrent info to file", e);
         }
+
+        return torrentFile;
     }
 
     private void saveResumeTorrent(File torrent) {
         try {
             TorrentInfo ti = new TorrentInfo(torrent);
-            byte[] arr = FileUtils.readFileToByteArray(torrent);
-            entry e = entry.bdecode(Vectors.bytes2char_vector(arr));
+            entry e = ti.toEntry().getSwig();
             e.dict().set("torrent_orig_path", new entry(torrent.getAbsolutePath()));
-            arr = Vectors.char_vector2bytes(e.bencode());
+            byte[] arr = Vectors.char_vector2bytes(e.bencode());
             FileUtils.writeByteArrayToFile(resumeTorrentFile(ti.getInfoHash().toString()), arr);
         } catch (Throwable e) {
             LOG.warn("Error saving resume torrent", e);
