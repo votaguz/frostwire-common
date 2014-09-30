@@ -250,11 +250,6 @@ public final class BTEngine {
     private void addEngineListener() {
         session.addListener(new AlertListener() {
             @Override
-            public boolean accept(Alert<?> alert) {
-                return true;
-            }
-
-            @Override
             public void alert(Alert<?> alert) {
                 //LOG.info(a.message());
                 if (listener == null) {
@@ -265,7 +260,7 @@ public final class BTEngine {
 
                 switch (type) {
                     case TORRENT_ADDED:
-                        listener.downloadAdded(new BTDownload(((TorrentAlert<?>) alert).getTorrentHandle()));
+                        listener.downloadAdded(new BTDownload(((TorrentAlert<?>) alert).getHandle()));
                         doResumeData((TorrentAlert<?>) alert);
                         break;
                     case SAVE_RESUME_DATA:
@@ -320,7 +315,7 @@ public final class BTEngine {
 
     private void saveResumeData(SaveResumeDataAlert alert) {
         try {
-            TorrentHandle th = alert.getTorrentHandle();
+            TorrentHandle th = alert.getHandle();
             entry d = alert.getResumeData();
             byte[] arr = Vectors.char_vector2bytes(d.bencode());
             FileUtils.writeByteArrayToFile(resumeDataFile(th.getInfoHash().toString()), arr);
@@ -330,7 +325,7 @@ public final class BTEngine {
     }
 
     private void doResumeData(TorrentAlert<?> alert) {
-        TorrentHandle th = alert.getTorrentHandle();
+        TorrentHandle th = alert.getHandle();
         if (th.needSaveResumeData()) {
             th.saveResumeData();
         }
