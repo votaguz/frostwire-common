@@ -50,6 +50,16 @@ public final class BTConfigurator {
         saveSettings(s);
     }
 
+    public static int getMaxDownloads() {
+        return getSettings().getActiveDownloads();
+    }
+
+    public static void setMaxDownloads(int limit) {
+        SessionSettings s = getSettings();
+        s.setActiveDownloads(limit);
+        saveSettings(s);
+    }
+
     public static int getMaxUploads() {
         return getSettings().getActiveSeeds();
     }
