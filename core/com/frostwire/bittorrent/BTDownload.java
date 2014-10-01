@@ -182,10 +182,12 @@ public final class BTDownload extends TorrentAlertAdapter implements Transfer {
     }
 
     public void pause() {
+        th.setAutoManaged(false);
         th.pause();
     }
 
     public void resume() {
+        th.setAutoManaged(true);
         th.resume();
     }
 
