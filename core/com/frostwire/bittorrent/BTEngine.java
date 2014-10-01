@@ -257,6 +257,7 @@ public final class BTEngine {
         } else {
             session.setSettings(SessionSettings.newDefaults());
         }
+        saveSettings();
     }
 
     private void addEngineListener() {
@@ -351,7 +352,7 @@ public final class BTEngine {
         return new File(homeDir, infoHash + ".resume");
     }
 
-    File stateFile() {
+    private File stateFile() {
         return new File(homeDir, "settings.dat");
     }
 
@@ -369,7 +370,7 @@ public final class BTEngine {
         return torrent;
     }
 
-    private void saveSettings() {
+    public void saveSettings() {
         byte[] data = session.saveState();
         try {
             FileUtils.writeByteArrayToFile(stateFile(), data);
