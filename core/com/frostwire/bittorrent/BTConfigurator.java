@@ -40,6 +40,16 @@ public final class BTConfigurator {
         saveSettings(s);
     }
 
+    public static int getUploadSpeedLimit() {
+        return getSettings().getUploadRateLimit();
+    }
+
+    public static void setUploadSpeedLimit(int limit) {
+        SessionSettings s = getSettings();
+        s.setUploadRateLimit(limit);
+        saveSettings(s);
+    }
+
     private static Session getSession() {
         return BTEngine.getInstance().getSession();
     }
