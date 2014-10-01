@@ -50,23 +50,43 @@ public final class BTConfigurator {
         saveSettings(s);
     }
 
-    public static int getMaxDownloads() {
+    public static int getMaxActiveDownloads() {
         return getSettings().getActiveDownloads();
     }
 
-    public static void setMaxDownloads(int limit) {
+    public static void setMaxActiveDownloads(int limit) {
         SessionSettings s = getSettings();
         s.setActiveDownloads(limit);
         saveSettings(s);
     }
 
-    public static int getMaxUploads() {
+    public static int getMaxActiveSeeds() {
         return getSettings().getActiveSeeds();
     }
 
-    public static void setMaxUploads(int limit) {
+    public static void setMaxActiveSeeds(int limit) {
         SessionSettings s = getSettings();
         s.setActiveSeeds(limit);
+        saveSettings(s);
+    }
+
+    public static int getMaxConnections() {
+        return getSettings().getConnectionsLimit();
+    }
+
+    public static void setMaxConnections(int limit) {
+        SessionSettings s = getSettings();
+        s.setConnectionsLimit(limit);
+        saveSettings(s);
+    }
+
+    public static int getMaxPeers() {
+        return getSettings().getMaxPeerlistSize();
+    }
+
+    public static void setMaxPeers(int limit) {
+        SessionSettings s = getSettings();
+        s.setMaxPeerlistSize(limit);
         saveSettings(s);
     }
 
