@@ -123,12 +123,24 @@ public final class BTEngine {
         saveResumeTorrent(torrent);
     }
 
+    public void download(TorrentInfo ti, File saveDir, boolean[] selection) {
+        if (saveDir == null) {
+            saveDir = dataDir;
+        }
+
+        downloader.download(ti, saveDir, selection);
+
+        File torrent = saveTorrent(ti);
+        saveResumeTorrent(torrent);
+    }
+
     public void download(TorrentInfo ti, File saveDir) {
         if (saveDir == null) {
             saveDir = dataDir;
         }
 
         downloader.download(ti, saveDir);
+
         File torrent = saveTorrent(ti);
         saveResumeTorrent(torrent);
     }
