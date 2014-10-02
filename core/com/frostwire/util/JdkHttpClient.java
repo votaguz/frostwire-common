@@ -88,7 +88,7 @@ final class JdkHttpClient implements HttpClient {
         } catch (java.net.SocketTimeoutException timeoutException) {
             throw timeoutException;
         } catch (IOException e) {
-            LOG.error("Error getting string from http body response: " + e.getMessage(), e);
+            LOG.error("Error getting string from http body response: " + e.getMessage());
             throw e;
         } finally {
             closeQuietly(baos);
@@ -559,7 +559,7 @@ final class JdkHttpClient implements HttpClient {
             try {
                 getListener().onError(this, e);
             } catch (Exception e2) {
-                LOG.warn(e2.getMessage(), e2);
+                LOG.warn(e2.getMessage());
             }
         }
     }
