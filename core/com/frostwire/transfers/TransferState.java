@@ -41,6 +41,5 @@ public enum TransferState {
     PAUSING,
     CANCELING,
     CANCELED,
-    WAITING,
-    DUPLICATED
+    WAITING
 }

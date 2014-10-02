@@ -41,18 +41,6 @@ public final class BTDownloadItem implements TransferItem {
         this.index = index;
     }
 
-    public TorrentHandle getTorrentHandle() {
-        return th;
-    }
-
-    public FileStorage getFileStorage() {
-        return fs;
-    }
-
-    public int getIndex() {
-        return index;
-    }
-
     @Override
     public boolean isSkipped() {
         return th.getFilePriority(index) == Priority.IGNORE;
