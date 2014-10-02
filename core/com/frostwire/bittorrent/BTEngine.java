@@ -347,4 +347,73 @@ public final class BTEngine {
             LOG.error("Error loading session state", e);
         }
     }
+
+    public int getDownloadSpeedLimit() {
+        return getSettings().getDownloadRateLimit();
+    }
+
+    public void setDownloadSpeedLimit(int limit) {
+        SessionSettings s = getSettings();
+        s.setDownloadRateLimit(limit);
+        saveSettings(s);
+    }
+
+    public int getUploadSpeedLimit() {
+        return getSettings().getUploadRateLimit();
+    }
+
+    public void setUploadSpeedLimit(int limit) {
+        SessionSettings s = getSettings();
+        s.setUploadRateLimit(limit);
+        saveSettings(s);
+    }
+
+    public int getMaxActiveDownloads() {
+        return getSettings().getActiveDownloads();
+    }
+
+    public void setMaxActiveDownloads(int limit) {
+        SessionSettings s = getSettings();
+        s.setActiveDownloads(limit);
+        saveSettings(s);
+    }
+
+    public int getMaxActiveSeeds() {
+        return getSettings().getActiveSeeds();
+    }
+
+    public void setMaxActiveSeeds(int limit) {
+        SessionSettings s = getSettings();
+        s.setActiveSeeds(limit);
+        saveSettings(s);
+    }
+
+    public int getMaxConnections() {
+        return getSettings().getConnectionsLimit();
+    }
+
+    public void setMaxConnections(int limit) {
+        SessionSettings s = getSettings();
+        s.setConnectionsLimit(limit);
+        saveSettings(s);
+    }
+
+    public int getMaxPeers() {
+        return getSettings().getMaxPeerlistSize();
+    }
+
+    public void setMaxPeers(int limit) {
+        SessionSettings s = getSettings();
+        s.setMaxPeerlistSize(limit);
+        saveSettings(s);
+    }
+
+    private SessionSettings getSettings() {
+        return getSession().getSettings();
+    }
+
+    private void saveSettings(SessionSettings s) {
+        session.setSettings(s);
+        saveSettings();
+    }
 }
