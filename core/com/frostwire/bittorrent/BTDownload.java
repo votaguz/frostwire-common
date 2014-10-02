@@ -51,6 +51,12 @@ public final class BTDownload extends TorrentAlertAdapter implements Transfer {
         return th.getName();
     }
 
+    @Override
+    public String getDisplayName() {
+        // TODO:BITTORRENT
+        return th.getName();
+    }
+
     public long getSize() {
         TorrentInfo ti = th.getTorrentInfo();
         return ti != null ? ti.getTotalSize() : 0;

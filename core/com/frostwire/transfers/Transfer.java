@@ -26,5 +26,9 @@ import java.util.List;
  */
 public interface Transfer {
 
+    public String getName();
+
+    public String getDisplayName();
+
     public List<TransferItem> getItems();
 }
