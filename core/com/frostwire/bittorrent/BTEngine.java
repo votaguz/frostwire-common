@@ -170,22 +170,7 @@ public final class BTEngine {
 
     public void stop() {
         saveSettings();
-// TODO:BITTORRENT
-                    /*
-                    if (AzureusStarter.isAzureusCoreStarted()) {
-						LOG.debug("LifecycleManagerImpl.handleEvent - SHUTINGDOWN - Azureus core pauseDownloads()!");
-						AzureusStarter.getAzureusCore().getGlobalManager().pauseDownloads();
-						AzureusStarter.getAzureusCore().stop();
-					}*/
-
-        // TODO:BITTORRENT
-        // see Session.abort()
-        /*
-        if (AzureusStarter.isAzureusCoreStarted()) {
-            System.out.println("Waiting for Vuze core to shutdown...");
-            AzureusStarter.getAzureusCore().stop();
-            System.out.println("Vuze core shutdown.");
-        }*/
+        session.abort();
     }
 
     public boolean isStarted() {

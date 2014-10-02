@@ -236,10 +236,6 @@ public final class BTDownload extends TorrentAlertAdapter implements Transfer {
         this.listener = listener;
     }
 
-    TorrentHandle getTorrentHandle() {
-        return th;
-    }
-
     @Override
     public void torrentFinished(TorrentFinishedAlert alert) {
         if (listener != null) {
@@ -252,7 +248,15 @@ public final class BTDownload extends TorrentAlertAdapter implements Transfer {
     }
 
     public boolean isPartial() {
-        // TODO:BITTORRENT
+        // review cache of this computation
+        Priority[] priorities = th.getFilePriorities();
+
+        for (Priority p : priorities) {
+            if (Priority.IGNORE.equals(p)) {
+                return true;
+            }
+        }
+
         return false;
     }
 
