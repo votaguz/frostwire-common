@@ -233,7 +233,7 @@ public final class BTDownload extends TorrentAlertAdapter implements Transfer {
 
         if (deleteTorrent) {
             File torrent = BTEngine.getInstance().readTorrentPath(infoHash);
-            if (torrent.exists()) {
+            if (torrent != null && torrent.exists()) {
                 torrent.delete();
             }
         }

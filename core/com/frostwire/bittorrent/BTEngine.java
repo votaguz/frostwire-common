@@ -108,21 +108,13 @@ public final class BTEngine {
         saveResumeTorrent(torrent);
     }
 
-    public void download(TorrentInfo ti, File saveDir) {
+    public void download(TorrentCrawledSearchResult sr, File saveDir) {
         if (saveDir == null) {
             saveDir = ctx.dataDir;
         }
 
-        downloader.download(ti, saveDir);
-
-        File torrent = saveTorrent(ti);
-        saveResumeTorrent(torrent);
-    }
-
-    public void download(TorrentInfo ti, File saveDir, int fileIndex) {
-        if (saveDir == null) {
-            saveDir = ctx.dataDir;
-        }
+        TorrentInfo ti = sr.getTorrentInfo();
+        int fileIndex = sr.getFileIndex();
 
         TorrentHandle th = downloader.find(ti.getInfoHash());
 
@@ -142,10 +134,6 @@ public final class BTEngine {
         saveResumeTorrent(torrent);
     }
 
-    public void download(TorrentCrawledSearchResult sr, File saveDir) {
-        download(sr.getTorrentInfo(), saveDir, sr.getFileIndex());
-    }
-
     public byte[] fetchMagnet(String uri, long timeout) {
         return downloader.fetchMagnet(uri, timeout);
     }
@@ -163,7 +151,7 @@ public final class BTEngine {
                 File resumeFile = new File(ctx.homeDir, FilenameUtils.getBaseName(t.getName()) + ".resume");
                 session.asyncAddTorrent(t, null, resumeFile);
             } catch (Throwable e) {
-                LOG.error("Error restoring torrent download", e);
+                LOG.error("Error restoring torrent download: " + t, e);
             }
         }
     }
@@ -171,10 +159,6 @@ public final class BTEngine {
     public void stop() {
         saveSettings();
         session.abort();
-    }
-
-    public boolean isStarted() {
-        return true;
     }
 
     public boolean isFirewalled() {
@@ -326,8 +310,8 @@ public final class BTEngine {
     }
 
     public void saveSettings() {
-        byte[] data = session.saveState();
         try {
+            byte[] data = session.saveState();
             FileUtils.writeByteArrayToFile(stateFile(), data);
         } catch (Throwable e) {
             LOG.error("Error saving session state", e);
