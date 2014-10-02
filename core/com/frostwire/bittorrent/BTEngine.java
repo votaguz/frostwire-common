@@ -52,7 +52,9 @@ public final class BTEngine {
     private boolean isFirewalled;
 
     public BTEngine() {
-        this.session = new Session();
+        Pair<Integer, Integer> prange = new Pair<Integer, Integer>(ctx.port0, ctx.port1);
+
+        this.session = new Session(prange, ctx.iface);
         this.downloader = new Downloader(this.session);
 
         addEngineListener();
