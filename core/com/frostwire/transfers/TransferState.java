@@ -27,6 +27,7 @@ public enum TransferState {
     QUEUED_FOR_CHECKING,
     CHECKING,
     DOWNLOADING_METADATA,
+    DOWNLOADING_TORRENT,
     DOWNLOADING,
     FINISHED,
     SEEDING,
@@ -40,6 +41,5 @@ public enum TransferState {
     PAUSING,
     CANCELING,
     CANCELED,
-    WAITING,
-    DUPLICATED
+    WAITING
 }

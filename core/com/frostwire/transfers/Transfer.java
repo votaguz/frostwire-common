@@ -18,6 +18,7 @@
 
 package com.frostwire.transfers;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -25,6 +26,14 @@ import java.util.List;
  * @author aldenml
  */
 public interface Transfer {
+
+    public String getName();
+
+    public String getDisplayName();
+
+    public File getSavePath();
+
+    public TransferState getState();
 
     public List<TransferItem> getItems();
 }

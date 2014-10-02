@@ -18,33 +18,44 @@
 
 package com.frostwire.search.torrent;
 
+import com.frostwire.jlibtorrent.FileEntry;
+import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.search.AbstractCrawledSearchResult;
 import org.apache.commons.io.FilenameUtils;
-import org.gudy.azureus2.core3.torrent.TOTorrentFile;
 
 /**
  * @author gubatron
  * @author aldenml
  */
-public class TorrentCrawledSearchResult extends AbstractCrawledSearchResult implements TorrentSearchResult {
+public final class TorrentCrawledSearchResult extends AbstractCrawledSearchResult<TorrentCrawlableSearchResult> implements TorrentSearchResult {
 
-    private final TorrentCrawlableSearchResult sr;
-    private final String relativePath;
+    private final TorrentInfo ti;
+    private final int fileIndex;
+    private final String filePath;
     private final String displayName;
     private final String filename;
     private final long size;
 
-    public TorrentCrawledSearchResult(TorrentCrawlableSearchResult sr, TOTorrentFile file) {
+    public TorrentCrawledSearchResult(TorrentCrawlableSearchResult sr, TorrentInfo ti, int fileIndex, FileEntry fe) {
         super(sr);
-        this.sr = sr;
-        this.relativePath = file.getRelativePath();
-        this.filename = FilenameUtils.getName(this.relativePath);
-        this.size = file.getLength();
+        this.ti = ti;
+        this.fileIndex = fileIndex;
+        this.filePath = fe.getPath();
+        this.filename = FilenameUtils.getName(this.filePath);
+        this.size = fe.getSize();
         this.displayName = FilenameUtils.getBaseName(this.filename);
     }
 
-    public String getRelativePath() {
-        return relativePath;
+    public TorrentInfo getTorrentInfo() {
+        return ti;
+    }
+
+    public int getFileIndex() {
+        return fileIndex;
+    }
+
+    public String getFilePath() {
+        return filePath;
     }
 
     @Override
@@ -63,27 +74,22 @@ public class TorrentCrawledSearchResult extends AbstractCrawledSearchResult impl
     }
 
     @Override
-    public long getCreationTime() {
-        return sr.getCreationTime();
-    }
-
-    @Override
     public String getTorrentUrl() {
-        return sr.getTorrentUrl();
+        return parent.getTorrentUrl();
     }
 
     @Override
     public int getSeeds() {
-        return sr.getSeeds();
+        return parent.getSeeds();
     }
 
     @Override
     public String getHash() {
-        return sr.getHash();
+        return parent.getHash();
     }
 
     @Override
     public String getThumbnailUrl() {
-        return sr.getThumbnailUrl();
+        return parent.getThumbnailUrl();
     }
 }

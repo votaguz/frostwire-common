@@ -23,12 +23,9 @@ import com.frostwire.search.FileSearchResult;
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public interface TorrentSearchResult extends FileSearchResult {
 
-    public static final int UNKOWN_SEEDS = -1;
-    
     public long getCreationTime();
 
     public String getTorrentUrl();

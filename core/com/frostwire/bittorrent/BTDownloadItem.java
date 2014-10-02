@@ -18,12 +18,47 @@
 
 package com.frostwire.bittorrent;
 
+import com.frostwire.jlibtorrent.FileStorage;
+import com.frostwire.jlibtorrent.Priority;
+import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.transfers.TransferItem;
+
+import java.io.File;
 
 /**
  * @author gubatron
  * @author aldenml
  */
-public interface BTDownloadItem extends TransferItem {
+public final class BTDownloadItem implements TransferItem {
 
+    private final TorrentHandle th;
+    private final FileStorage fs;
+    private final int index;
+
+    public BTDownloadItem(TorrentHandle th, FileStorage fs, int index) {
+        this.th = th;
+        this.fs = fs;
+        this.index = index;
+    }
+
+    @Override
+    public boolean isSkipped() {
+        return th.getFilePriority(index) == Priority.IGNORE;
+    }
+
+    @Override
+    public File getFile() {
+        return new File(fs.getFilePath(index, th.getSavePath()));
+    }
+
+    @Override
+    public long getSize() {
+        return fs.getFileSize(index);
+    }
+
+    @Override
+    public long getDownloaded() {
+        long[] progress = th.getFileProgress(TorrentHandle.FileProgressFlags.PIECE_GRANULARITY);
+        return progress[index];
+    }
 }
