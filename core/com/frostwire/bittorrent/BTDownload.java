@@ -38,12 +38,14 @@ public final class BTDownload extends TorrentAlertAdapter implements Transfer {
     private static final Logger LOG = Logger.getLogger(BTDownload.class);
 
     private final TorrentHandle th;
+    private final File savePath;
 
     private BTDownloadListener listener;
 
     public BTDownload(TorrentHandle th) {
         super(th);
         this.th = th;
+        this.savePath = new File(th.getSavePath());
 
         BTEngine.getInstance().getSession().addListener(this);
     }
@@ -119,8 +121,9 @@ public final class BTDownload extends TorrentAlertAdapter implements Transfer {
         }
     }
 
-    public String getSavePath() {
-        return th.getSavePath();
+    @Override
+    public File getSavePath() {
+        return savePath;
     }
 
     public int getProgress() {
@@ -213,17 +216,15 @@ public final class BTDownload extends TorrentAlertAdapter implements Transfer {
         th.resume();
     }
 
-    public void stop() {
-        this.stop(false, false);
-    }
-
-    public void stop(boolean deleteTorrent, boolean deleteData) {
+    public void remove(boolean deleteTorrent, boolean deleteData) {
         String infoHash = this.getInfoHash();
 
         BTEngine engine = BTEngine.getInstance();
         Session s = engine.getSession();
 
         s.removeListener(this);
+
+        Set<File> incompleteFiles = getIncompleteFiles();
 
         if (deleteData) {
             s.removeTorrent(th, Session.Options.DELETE_FILES);
@@ -243,7 +244,7 @@ public final class BTDownload extends TorrentAlertAdapter implements Transfer {
 
         if (listener != null) {
             try {
-                listener.stopped(this);
+                listener.removed(this, incompleteFiles);
             } catch (Throwable e) {
                 LOG.error("Error calling listener", e);
             }
@@ -345,7 +346,6 @@ public final class BTDownload extends TorrentAlertAdapter implements Transfer {
                 FileStorage fs = ti.getFiles();
                 if (fs.isValid()) {
                     int numFiles = fs.geNumFiles();
-                    String savePath = th.getSavePath();
 
                     items = new ArrayList<TransferItem>(numFiles);
 
@@ -363,5 +363,22 @@ public final class BTDownload extends TorrentAlertAdapter implements Transfer {
 
     public File getTorrentFile() {
         return BTEngine.getInstance().readTorrentPath(this.getInfoHash());
+    }
+
+    public Set<File> getIncompleteFiles() {
+        Set<File> s = new HashSet<File>();
+
+        long[] progress = th.getFileProgress(TorrentHandle.FileProgressFlags.PIECE_GRANULARITY);
+
+        FileStorage fs = th.getTorrentInfo().getFiles();
+        String prefix = savePath.getAbsolutePath();
+
+        for (int i = 0; i < progress.length; i++) {
+            if (progress[i] < fs.getFileSize(i)) {
+                s.add(new File(fs.getFilePath(i, prefix)));
+            }
+        }
+
+        return s;
     }
 }

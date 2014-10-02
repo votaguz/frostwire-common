@@ -18,13 +18,18 @@
 
 package com.frostwire.bittorrent;
 
+import java.io.File;
+import java.util.Set;
+
 /**
  * @author gubatron
  * @author aldenml
  */
 public interface BTDownloadListener {
 
+    public void update(BTDownload dl);
+
     public void finished(BTDownload dl);
 
-    public void stopped(BTDownload dl);
+    public void removed(BTDownload dl, Set<File> incompleteFiles);
 }
