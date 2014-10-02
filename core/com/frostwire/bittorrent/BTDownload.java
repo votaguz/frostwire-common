@@ -20,6 +20,7 @@ package com.frostwire.bittorrent;
 
 import com.frostwire.jlibtorrent.*;
 import com.frostwire.jlibtorrent.alerts.TorrentFinishedAlert;
+import com.frostwire.jlibtorrent.alerts.TorrentPrioritizeAlert;
 import com.frostwire.logging.Logger;
 import com.frostwire.transfers.Transfer;
 import com.frostwire.transfers.TransferItem;
@@ -56,7 +57,6 @@ public final class BTDownload extends TorrentAlertAdapter implements Transfer {
 
     @Override
     public String getDisplayName() {
-        // cache this computation
         Priority[] priorities = th.getFilePriorities();
 
         int count = 0;
@@ -260,6 +260,17 @@ public final class BTDownload extends TorrentAlertAdapter implements Transfer {
     }
 
     @Override
+    public void torrentPrioritize(TorrentPrioritizeAlert alert) {
+        if (listener != null) {
+            try {
+                listener.update(this);
+            } catch (Throwable e) {
+                LOG.error("Error calling listener", e);
+            }
+        }
+    }
+
+    @Override
     public void torrentFinished(TorrentFinishedAlert alert) {
         if (listener != null) {
             try {
@@ -271,7 +282,6 @@ public final class BTDownload extends TorrentAlertAdapter implements Transfer {
     }
 
     public boolean isPartial() {
-        // review cache of this computation
         Priority[] priorities = th.getFilePriorities();
 
         for (Priority p : priorities) {
@@ -354,7 +364,6 @@ public final class BTDownload extends TorrentAlertAdapter implements Transfer {
                     }
 
                 }
-
             }
         }
 
