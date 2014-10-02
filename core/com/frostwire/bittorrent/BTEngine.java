@@ -42,12 +42,10 @@ public final class BTEngine {
 
     private static final Logger LOG = Logger.getLogger(BTEngine.class);
 
+    public static BTContext ctx;
+
     private final Session session;
     private final Downloader downloader;
-
-    private File homeDir;
-    private File torrentsDir;
-    private File dataDir;
 
     private BTEngineListener listener;
 
@@ -57,11 +55,6 @@ public final class BTEngine {
         this.session = new Session();
         this.downloader = new Downloader(this.session);
 
-
-        this.homeDir = new File(".").getAbsoluteFile();
-        this.torrentsDir = new File(".").getAbsoluteFile();
-        this.dataDir = new File(".").getAbsoluteFile();
-
         addEngineListener();
     }
 
@@ -70,35 +63,14 @@ public final class BTEngine {
     }
 
     public static BTEngine getInstance() {
+        if (ctx == null) {
+            throw new IllegalStateException("Context can't be null");
+        }
         return Loader.INSTANCE;
     }
 
     public Session getSession() {
         return session;
-    }
-
-    public File getHomeDir() {
-        return homeDir;
-    }
-
-    public void setHomeDir(File dir) {
-        this.homeDir = dir;
-    }
-
-    public File getTorrentsDir() {
-        return torrentsDir;
-    }
-
-    public void setTorrentsDir(File dir) {
-        this.torrentsDir = dir;
-    }
-
-    public File getDataDir() {
-        return dataDir;
-    }
-
-    public void setDataDir(File dir) {
-        this.dataDir = dir;
     }
 
     public BTEngineListener getListener() {
@@ -115,7 +87,7 @@ public final class BTEngine {
 
     public void download(File torrent, File saveDir, boolean[] selection) {
         if (saveDir == null) {
-            saveDir = dataDir;
+            saveDir = ctx.dataDir;
         }
 
         downloader.download(torrent, saveDir, selection);
@@ -125,7 +97,7 @@ public final class BTEngine {
 
     public void download(TorrentInfo ti, File saveDir, boolean[] selection) {
         if (saveDir == null) {
-            saveDir = dataDir;
+            saveDir = ctx.dataDir;
         }
 
         downloader.download(ti, saveDir, selection);
@@ -136,7 +108,7 @@ public final class BTEngine {
 
     public void download(TorrentInfo ti, File saveDir) {
         if (saveDir == null) {
-            saveDir = dataDir;
+            saveDir = ctx.dataDir;
         }
 
         downloader.download(ti, saveDir);
@@ -147,7 +119,7 @@ public final class BTEngine {
 
     public void download(TorrentInfo ti, File saveDir, int fileIndex) {
         if (saveDir == null) {
-            saveDir = dataDir;
+            saveDir = ctx.dataDir;
         }
 
         TorrentHandle th = downloader.find(ti.getInfoHash());
@@ -177,7 +149,7 @@ public final class BTEngine {
     }
 
     public void restoreDownloads() {
-        File[] torrents = homeDir.listFiles(new FilenameFilter() {
+        File[] torrents = ctx.homeDir.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
                 return FilenameUtils.getExtension(name).equals("torrent");
@@ -186,16 +158,12 @@ public final class BTEngine {
 
         for (File t : torrents) {
             try {
-                File resumeFile = new File(homeDir, FilenameUtils.getBaseName(t.getName()) + ".resume");
+                File resumeFile = new File(ctx.homeDir, FilenameUtils.getBaseName(t.getName()) + ".resume");
                 session.asyncAddTorrent(t, null, resumeFile);
             } catch (Throwable e) {
                 LOG.error("Error restoring torrent download", e);
             }
         }
-    }
-
-    public void start() {
-        loadSettings();
     }
 
     public void stop() {
@@ -302,7 +270,7 @@ public final class BTEngine {
                 name = ti.getInfoHash().toString();
             }
 
-            torrentFile = new File(torrentsDir, name + ".torrent");
+            torrentFile = new File(ctx.torrentsDir, name + ".torrent");
             byte[] arr = ti.toEntry().bencode();
 
             FileUtils.writeByteArrayToFile(torrentFile, arr);
@@ -345,15 +313,15 @@ public final class BTEngine {
     }
 
     File resumeTorrentFile(String infoHash) {
-        return new File(homeDir, infoHash + ".torrent");
+        return new File(ctx.homeDir, infoHash + ".torrent");
     }
 
     File resumeDataFile(String infoHash) {
-        return new File(homeDir, infoHash + ".resume");
+        return new File(ctx.homeDir, infoHash + ".resume");
     }
 
     private File stateFile() {
-        return new File(homeDir, "settings.dat");
+        return new File(ctx.homeDir, "settings.dat");
     }
 
     File readTorrentPath(String infoHash) {
@@ -379,7 +347,7 @@ public final class BTEngine {
         }
     }
 
-    private void loadSettings() {
+    public void loadSettings() {
         try {
             File f = stateFile();
             if (f.exists()) {
