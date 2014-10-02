@@ -30,5 +30,7 @@ public interface Transfer {
 
     public String getDisplayName();
 
+    public TransferState getState();
+
     public List<TransferItem> getItems();
 }

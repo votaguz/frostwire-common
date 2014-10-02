@@ -24,6 +24,7 @@ import com.frostwire.logging.Logger;
 import com.frostwire.transfers.Transfer;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
+import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.util.*;
@@ -53,7 +54,22 @@ public final class BTDownload extends TorrentAlertAdapter implements Transfer {
 
     @Override
     public String getDisplayName() {
-        // TODO:BITTORRENT
+        // cache this computation
+        Priority[] priorities = th.getFilePriorities();
+
+        int count = 0;
+        int index = 0;
+        for (int i = 0; i < priorities.length; i++) {
+            if (!Priority.IGNORE.equals(priorities[i])) {
+                count++;
+                index = i;
+            }
+        }
+
+        if (count == 1) {
+            return FilenameUtils.getName(th.getTorrentInfo().getFileAt(index).getPath());
+        }
+
         return th.getName();
     }
 
@@ -347,14 +363,5 @@ public final class BTDownload extends TorrentAlertAdapter implements Transfer {
 
     public File getTorrentFile() {
         return BTEngine.getInstance().readTorrentPath(this.getInfoHash());
-    }
-
-    public void setFilesSelection(boolean[] filesSelection) {
-        Priority[] priorities = new Priority[filesSelection.length];
-
-        for (int i = 0; i < priorities.length; i++) {
-            priorities[i] = filesSelection[i] ? Priority.NORMAL : Priority.IGNORE;
-        }
-        th.prioritizeFiles(priorities);
     }
 }
