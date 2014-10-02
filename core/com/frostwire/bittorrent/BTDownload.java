@@ -40,6 +40,7 @@ public final class BTDownload extends TorrentAlertAdapter implements Transfer {
 
     private final TorrentHandle th;
     private final File savePath;
+    private final Date dateCreated;
 
     private BTDownloadListener listener;
 
@@ -47,10 +48,12 @@ public final class BTDownload extends TorrentAlertAdapter implements Transfer {
         super(th);
         this.th = th;
         this.savePath = new File(th.getSavePath());
+        this.dateCreated = new Date(th.getStatus().getAddedTime());
 
         BTEngine.getInstance().getSession().addListener(this);
     }
 
+    @Override
     public String getName() {
         return th.getName();
     }
@@ -68,11 +71,7 @@ public final class BTDownload extends TorrentAlertAdapter implements Transfer {
             }
         }
 
-        if (count == 1) {
-            return FilenameUtils.getName(th.getTorrentInfo().getFileAt(index).getPath());
-        }
-
-        return th.getName();
+        return count != 1 ? th.getName() : FilenameUtils.getName(th.getTorrentInfo().getFileAt(index).getPath());
     }
 
     public long getSize() {
@@ -117,7 +116,7 @@ public final class BTDownload extends TorrentAlertAdapter implements Transfer {
             case CHECKING_RESUME_DATA:
                 return TransferState.CHECKING;
             default:
-                throw new IllegalArgumentException("No enum value supported");
+                return TransferState.ERROR;
         }
     }
 
@@ -166,7 +165,7 @@ public final class BTDownload extends TorrentAlertAdapter implements Transfer {
     }
 
     public int getTotalPeers() {
-        return th.getStatus().listPeers;
+        return th.getStatus().getListPeers();
     }
 
     public int getConnectedSeeds() {
@@ -174,7 +173,7 @@ public final class BTDownload extends TorrentAlertAdapter implements Transfer {
     }
 
     public int getTotalSeeds() {
-        return th.getStatus().listSeeds;
+        return th.getStatus().getListSeeds();
     }
 
     public String getInfoHash() {
@@ -182,7 +181,7 @@ public final class BTDownload extends TorrentAlertAdapter implements Transfer {
     }
 
     public Date getDateCreated() {
-        return new Date(th.getStatus().getAddedTime());
+        return dateCreated;
     }
 
     public long getETA() {
@@ -362,7 +361,6 @@ public final class BTDownload extends TorrentAlertAdapter implements Transfer {
                     for (int i = 0; i < numFiles; i++) {
                         items.add(new BTDownloadItem(th, fs, i));
                     }
-
                 }
             }
         }
