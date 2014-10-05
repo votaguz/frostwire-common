@@ -375,15 +375,19 @@ public final class BTDownload extends TorrentAlertAdapter implements Transfer {
     public Set<File> getIncompleteFiles() {
         Set<File> s = new HashSet<File>();
 
-        long[] progress = th.getFileProgress(TorrentHandle.FileProgressFlags.PIECE_GRANULARITY);
+        try {
+            long[] progress = th.getFileProgress(TorrentHandle.FileProgressFlags.PIECE_GRANULARITY);
 
-        FileStorage fs = th.getTorrentInfo().getFiles();
-        String prefix = savePath.getAbsolutePath();
+            FileStorage fs = th.getTorrentInfo().getFiles();
+            String prefix = savePath.getAbsolutePath();
 
-        for (int i = 0; i < progress.length; i++) {
-            if (progress[i] < fs.getFileSize(i)) {
-                s.add(new File(fs.getFilePath(i, prefix)));
+            for (int i = 0; i < progress.length; i++) {
+                if (progress[i] < fs.getFileSize(i)) {
+                    s.add(new File(fs.getFilePath(i, prefix)));
+                }
             }
+        } catch (Throwable e) {
+            LOG.error("Error calculating the incomplete files set", e);
         }
 
         return s;

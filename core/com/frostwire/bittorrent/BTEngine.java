@@ -83,7 +83,7 @@ public final class BTEngine {
         this.listener = listener;
     }
 
-    public void download(File torrent, File saveDir) throws IOException {
+    public void download(File torrent, File saveDir) {
         download(torrent, saveDir, null);
     }
 
@@ -92,7 +92,27 @@ public final class BTEngine {
             saveDir = ctx.dataDir;
         }
 
-        downloader.download(torrent, saveDir, selection);
+        TorrentInfo ti = new TorrentInfo(torrent);
+
+        Priority[] priorities = null;
+
+        if (selection != null) {
+            TorrentHandle th = downloader.find(ti.getInfoHash());
+
+            if (th != null) {
+                priorities = th.getFilePriorities();
+            } else {
+                priorities = Priority.array(Priority.IGNORE, ti.getNumFiles());
+            }
+
+            for (int i = 0; i < selection.length; i++) {
+                if (selection[i]) {
+                    priorities[i] = Priority.NORMAL;
+                }
+            }
+        }
+
+        downloader.download(ti, saveDir, priorities, null);
 
         saveResumeTorrent(torrent);
     }
@@ -102,7 +122,25 @@ public final class BTEngine {
             saveDir = ctx.dataDir;
         }
 
-        downloader.download(ti, saveDir, selection);
+        Priority[] priorities = null;
+
+        if (selection != null) {
+            TorrentHandle th = downloader.find(ti.getInfoHash());
+
+            if (th != null) {
+                priorities = th.getFilePriorities();
+            } else {
+                priorities = Priority.array(Priority.IGNORE, ti.getNumFiles());
+            }
+
+            for (int i = 0; i < selection.length; i++) {
+                if (selection[i]) {
+                    priorities[i] = Priority.NORMAL;
+                }
+            }
+        }
+
+        downloader.download(ti, saveDir, priorities, null);
 
         File torrent = saveTorrent(ti);
         saveResumeTorrent(torrent);
