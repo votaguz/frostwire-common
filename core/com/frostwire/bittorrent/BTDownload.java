@@ -267,6 +267,7 @@ public final class BTDownload extends TorrentAlertAdapter implements Transfer {
                 LOG.error("Error calling listener", e);
             }
         }
+        resume();
     }
 
     @Override
