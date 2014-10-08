@@ -1,21 +1,3 @@
-/*
- * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.frostwire.bittorrent;
 
 import com.frostwire.jlibtorrent.*;
@@ -32,39 +14,32 @@ import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.io.IOException;
+import java.util.concurrent.locks.ReentrantLock;
 
-/**
- * @author gubatron
- * @author aldenml
- */
-public final class BTEngine {
+public final class BTEngine2 {
 
-    private static final Logger LOG = Logger.getLogger(BTEngine.class);
+    private static final Logger LOG = Logger.getLogger(BTEngine2.class);
 
     public static BTContext ctx;
 
-    private final Session session;
-    private final Downloader downloader;
+    private final ReentrantLock sync = new ReentrantLock();
+    private final InnerListener innerListener = new InnerListener();
 
+    private Session session;
+    private Downloader downloader;
+    private SessionSettings defaultSettings;
+
+    private boolean firewalled;
     private BTEngineListener listener;
 
-    private boolean isFirewalled;
-
-    public BTEngine() {
-        Pair<Integer, Integer> prange = new Pair<Integer, Integer>(ctx.port0, ctx.port1);
-
-        this.session = new Session(prange, ctx.iface);
-        this.downloader = new Downloader(this.session);
-
-        addEngineListener();
+    private BTEngine2() {
     }
 
     private static class Loader {
-        static BTEngine INSTANCE = new BTEngine();
+        static BTEngine2 INSTANCE = new BTEngine2();
     }
 
-    public static BTEngine getInstance() {
+    public static BTEngine2 getInstance() {
         if (ctx == null) {
             throw new IllegalStateException("Context can't be null");
         }
@@ -75,6 +50,14 @@ public final class BTEngine {
         return session;
     }
 
+    private SessionSettings getSettings() {
+        if (session == null) {
+            return null;
+        }
+
+        return session.getSettings();
+    }
+
     public BTEngineListener getListener() {
         return listener;
     }
@@ -83,11 +66,195 @@ public final class BTEngine {
         this.listener = listener;
     }
 
+    public boolean isFirewalled() {
+        return firewalled;
+    }
+
+    public long getDownloadRate() {
+        if (session == null) {
+            return 0;
+        }
+
+        return session.getStatus().getDownloadRate();
+    }
+
+    public long getUploadRate() {
+        if (session == null) {
+            return 0;
+        }
+
+        return session.getStatus().getUploadRate();
+    }
+
+    public long getTotalDownload() {
+        if (session == null) {
+            return 0;
+        }
+
+        return session.getStatus().getTotalDownload();
+    }
+
+    public long getTotalUpload() {
+        if (session == null) {
+            return 0;
+        }
+
+        return session.getStatus().getTotalUpload();
+    }
+
+    public int getDownloadRateLimit() {
+        if (session == null) {
+            return 0;
+        }
+
+        return session.getSettings().getDownloadRateLimit();
+    }
+
+    public int getUploadRateLimit() {
+        if (session == null) {
+            return 0;
+        }
+
+        return session.getSettings().getDownloadRateLimit();
+    }
+
+    public void start() {
+        sync.lock();
+
+        try {
+            if (session != null) {
+                return;
+            }
+
+            Pair<Integer, Integer> prange = new Pair<Integer, Integer>(ctx.port0, ctx.port1);
+            session = new Session(prange, ctx.iface);
+
+            downloader = new Downloader(session);
+            defaultSettings = session.getSettings();
+
+            loadSettings();
+            session.addListener(innerListener);
+
+        } finally {
+            sync.unlock();
+        }
+    }
+
+    public void stop() {
+        sync.lock();
+
+        try {
+            if (session == null) {
+                return;
+            }
+
+            session.removeListener(innerListener);
+            saveSettings();
+
+            downloader = null;
+            defaultSettings = null;
+
+            session.abort();
+            session = null;
+
+        } finally {
+            sync.unlock();
+        }
+    }
+
+    public void restart() {
+        sync.lock();
+
+        try {
+
+            stop();
+            Thread.sleep(1000); // allow some time to release native resources
+            start();
+
+        } catch (InterruptedException e) {
+            // ignore
+        } finally {
+            sync.unlock();
+        }
+    }
+
+    public void pause() {
+        if (session != null && !session.isPaused()) {
+            session.pause();
+        }
+    }
+
+    public void resume() {
+        if (session != null) {
+            session.resume();
+        }
+    }
+
+    public void loadSettings() {
+        if (session == null) {
+            return;
+        }
+
+        try {
+            File f = settingsFile();
+            if (f.exists()) {
+                byte[] data = FileUtils.readFileToByteArray(f);
+                session.loadState(data);
+            } else {
+                revertToDefaultConfiguration();
+            }
+        } catch (Throwable e) {
+            LOG.error("Error loading session state", e);
+        }
+    }
+
+    public void saveSettings() {
+        if (session == null) {
+            return;
+        }
+
+        try {
+            byte[] data = session.saveState();
+            FileUtils.writeByteArrayToFile(settingsFile(), data);
+        } catch (Throwable e) {
+            LOG.error("Error saving session state", e);
+        }
+    }
+
+    private void saveSettings(SessionSettings s) {
+        if (session == null) {
+            return;
+        }
+        
+        session.setSettings(s);
+        saveSettings();
+    }
+
+    public void revertToDefaultConfiguration() {
+        if (session == null) {
+            return;
+        }
+
+        session.setSettings(defaultSettings);
+
+        if (OSUtils.isAndroid()) {
+            SessionSettings s = session.getSettings(); // working with a copy?
+            // TODO: modify this for android
+            session.setSettings(s);
+        }
+
+        saveSettings();
+    }
+
     public void download(File torrent, File saveDir) {
         download(torrent, saveDir, null);
     }
 
     public void download(File torrent, File saveDir, boolean[] selection) {
+        if (session == null) {
+            return;
+        }
+
         if (saveDir == null) {
             saveDir = ctx.dataDir;
         }
@@ -118,6 +285,10 @@ public final class BTEngine {
     }
 
     public void download(TorrentInfo ti, File saveDir, boolean[] selection) {
+        if (session == null) {
+            return;
+        }
+
         if (saveDir == null) {
             saveDir = ctx.dataDir;
         }
@@ -147,6 +318,10 @@ public final class BTEngine {
     }
 
     public void download(TorrentCrawledSearchResult sr, File saveDir) {
+        if (session == null) {
+            return;
+        }
+
         if (saveDir == null) {
             saveDir = ctx.dataDir;
         }
@@ -173,10 +348,18 @@ public final class BTEngine {
     }
 
     public byte[] fetchMagnet(String uri, long timeout) {
+        if (session == null) {
+            return null;
+        }
+
         return downloader.fetchMagnet(uri, timeout);
     }
 
     public void restoreDownloads() {
+        if (session == null) {
+            return;
+        }
+
         File[] torrents = ctx.homeDir.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
@@ -194,86 +377,20 @@ public final class BTEngine {
         }
     }
 
-    public void stop() {
-        saveSettings();
-        session.abort();
+    File settingsFile() {
+        return new File(ctx.homeDir, "settings.dat");
     }
 
-    public boolean isFirewalled() {
-        return isFirewalled;
+    File resumeTorrentFile(String infoHash) {
+        return new File(ctx.homeDir, infoHash + ".torrent");
     }
 
-    public long getDownloadRate() {
-        return session.getStatus().getDownloadRate();
-    }
-
-    public long getUploadRate() {
-        return session.getStatus().getUploadRate();
-    }
-
-    public long getTotalDownload() {
-        return session.getStatus().getTotalDownload();
-    }
-
-    public long getTotalUpload() {
-        return session.getStatus().getTotalUpload();
-    }
-
-    public int getDownloadRateLimit() {
-        return session.getSettings().getDownloadRateLimit();
-    }
-
-    public int getUploadRateLimit() {
-        return session.getSettings().getDownloadRateLimit();
-    }
-
-    public void revertToDefaultConfiguration() {
-        // TODO:BITTORRENT
-        if (OSUtils.isAndroid()) {
-            // need to test
-            //session.setSettings(SessionSettings.newMinMemoryUsage());
-            session.setSettings(SessionSettings.newDefaults());
-        } else {
-            session.setSettings(SessionSettings.newDefaults());
-        }
-        saveSettings();
-    }
-
-    private void addEngineListener() {
-        session.addListener(new AlertListener() {
-            @Override
-            public void alert(Alert<?> alert) {
-                //LOG.info(a.message());
-                if (listener == null) {
-                    return;
-                }
-
-                AlertType type = alert.getType();
-
-                switch (type) {
-                    case TORRENT_ADDED:
-                        listener.downloadAdded(new BTDownload(((TorrentAlert<?>) alert).getHandle()));
-                        doResumeData((TorrentAlert<?>) alert);
-                        break;
-                    case SAVE_RESUME_DATA:
-                        saveResumeData((SaveResumeDataAlert) alert);
-                        break;
-                    case BLOCK_FINISHED:
-                        doResumeData((TorrentAlert<?>) alert);
-                        break;
-                    case PORTMAP:
-                        isFirewalled = false;
-                        break;
-                    case PORTMAP_ERROR:
-                        isFirewalled = true;
-                        break;
-                }
-            }
-        });
+    File resumeDataFile(String infoHash) {
+        return new File(ctx.homeDir, infoHash + ".resume");
     }
 
     private File saveTorrent(TorrentInfo ti) {
-        File torrentFile = null;
+        File torrentFile;
 
         try {
             String name = ti.getName();
@@ -309,8 +426,11 @@ public final class BTEngine {
     private void saveResumeData(SaveResumeDataAlert alert) {
         try {
             TorrentHandle th = alert.getHandle();
-            byte[] arr = alert.getResumeData().bencode();
-            FileUtils.writeByteArrayToFile(resumeDataFile(th.getInfoHash().toString()), arr);
+            if (th.isValid()) {
+                String infoHash = th.getInfoHash().toString();
+                byte[] arr = alert.getResumeData().bencode();
+                FileUtils.writeByteArrayToFile(resumeDataFile(infoHash), arr);
+            }
         } catch (Throwable e) {
             LOG.warn("Error saving resume data", e);
         }
@@ -318,130 +438,150 @@ public final class BTEngine {
 
     private void doResumeData(TorrentAlert<?> alert) {
         TorrentHandle th = alert.getHandle();
-        if (th.needSaveResumeData()) {
+        if (th.isValid() && th.needSaveResumeData()) {
             th.saveResumeData();
         }
     }
 
-    File resumeTorrentFile(String infoHash) {
-        return new File(ctx.homeDir, infoHash + ".torrent");
-    }
+    private final class InnerListener implements AlertListener {
+        @Override
+        public void alert(Alert<?> alert) {
+            //LOG.info(a.message());
 
-    File resumeDataFile(String infoHash) {
-        return new File(ctx.homeDir, infoHash + ".resume");
-    }
+            AlertType type = alert.getType();
 
-    private File stateFile() {
-        return new File(ctx.homeDir, "settings.dat");
-    }
-
-    File readTorrentPath(String infoHash) {
-        File torrent = null;
-
-        try {
-            byte[] arr = FileUtils.readFileToByteArray(resumeTorrentFile(infoHash));
-            entry e = entry.bdecode(Vectors.bytes2char_vector(arr));
-            torrent = new File(e.dict().get("torrent_orig_path").string());
-        } catch (Throwable e) {
-            // can't recover original torrent path
-        }
-
-        return torrent;
-    }
-
-    public void saveSettings() {
-        try {
-            byte[] data = session.saveState();
-            FileUtils.writeByteArrayToFile(stateFile(), data);
-        } catch (Throwable e) {
-            LOG.error("Error saving session state", e);
-        }
-    }
-
-    public void loadSettings() {
-        try {
-            revertToDefaultConfiguration();
-            if (true) {
-                return;
+            switch (type) {
+                case TORRENT_ADDED:
+                    if (listener != null) {
+                        listener.downloadAdded(new BTDownload(((TorrentAlert<?>) alert).getHandle()));
+                        doResumeData((TorrentAlert<?>) alert);
+                    }
+                    break;
+                case SAVE_RESUME_DATA:
+                    saveResumeData((SaveResumeDataAlert) alert);
+                    break;
+                case BLOCK_FINISHED:
+                    doResumeData((TorrentAlert<?>) alert);
+                    break;
+                case PORTMAP:
+                    firewalled = false;
+                    break;
+                case PORTMAP_ERROR:
+                    firewalled = true;
+                    break;
             }
-            File f = stateFile();
-            if (f.exists()) {
-                byte[] data = FileUtils.readFileToByteArray(f);
-                session.loadState(data);
-            } else {
-                revertToDefaultConfiguration();
-            }
-        } catch (IOException e) {
-            LOG.error("Error loading session state", e);
         }
     }
+
+    //--------------------------------------------------
+    // Settings methods
+    //--------------------------------------------------
 
     public int getDownloadSpeedLimit() {
+        if (session == null) {
+            return 0;
+        }
+
         return getSettings().getDownloadRateLimit();
     }
 
     public void setDownloadSpeedLimit(int limit) {
+        if (session == null) {
+            return;
+        }
+
         SessionSettings s = getSettings();
         s.setDownloadRateLimit(limit);
         saveSettings(s);
     }
 
     public int getUploadSpeedLimit() {
+        if (session == null) {
+            return 0;
+        }
+
         return getSettings().getUploadRateLimit();
     }
 
     public void setUploadSpeedLimit(int limit) {
+        if (session == null) {
+            return;
+        }
+
         SessionSettings s = getSettings();
         s.setUploadRateLimit(limit);
         saveSettings(s);
     }
 
     public int getMaxActiveDownloads() {
+        if (session == null) {
+            return 0;
+        }
+
         return getSettings().getActiveDownloads();
     }
 
     public void setMaxActiveDownloads(int limit) {
+        if (session == null) {
+            return;
+        }
+
         SessionSettings s = getSettings();
         s.setActiveDownloads(limit);
         saveSettings(s);
     }
 
     public int getMaxActiveSeeds() {
+        if (session == null) {
+            return 0;
+        }
+
         return getSettings().getActiveSeeds();
     }
 
     public void setMaxActiveSeeds(int limit) {
+        if (session == null) {
+            return;
+        }
+
         SessionSettings s = getSettings();
         s.setActiveSeeds(limit);
         saveSettings(s);
     }
 
     public int getMaxConnections() {
+        if (session == null) {
+            return 0;
+        }
+
         return getSettings().getConnectionsLimit();
     }
 
     public void setMaxConnections(int limit) {
+        if (session == null) {
+            return;
+        }
+
         SessionSettings s = getSettings();
         s.setConnectionsLimit(limit);
         saveSettings(s);
     }
 
     public int getMaxPeers() {
+        if (session == null) {
+            return 0;
+        }
+
         return getSettings().getMaxPeerlistSize();
     }
 
     public void setMaxPeers(int limit) {
+        if (session == null) {
+            return;
+        }
+
         SessionSettings s = getSettings();
         s.setMaxPeerlistSize(limit);
         saveSettings(s);
-    }
-
-    private SessionSettings getSettings() {
-        return getSession().getSettings();
-    }
-
-    private void saveSettings(SessionSettings s) {
-        session.setSettings(s);
-        saveSettings();
     }
 }
