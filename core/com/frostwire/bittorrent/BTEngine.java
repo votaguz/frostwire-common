@@ -16,9 +16,13 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.concurrent.locks.ReentrantLock;
 
-public final class BTEngine2 {
+/**
+ * @author gubatron
+ * @author aldenml
+ */
+public final class BTEngine {
 
-    private static final Logger LOG = Logger.getLogger(BTEngine2.class);
+    private static final Logger LOG = Logger.getLogger(BTEngine.class);
 
     public static BTContext ctx;
 
@@ -32,14 +36,14 @@ public final class BTEngine2 {
     private boolean firewalled;
     private BTEngineListener listener;
 
-    private BTEngine2() {
+    private BTEngine() {
     }
 
     private static class Loader {
-        static BTEngine2 INSTANCE = new BTEngine2();
+        static BTEngine INSTANCE = new BTEngine();
     }
 
-    public static BTEngine2 getInstance() {
+    public static BTEngine getInstance() {
         if (ctx == null) {
             throw new IllegalStateException("Context can't be null");
         }

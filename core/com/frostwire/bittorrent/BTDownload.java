@@ -23,7 +23,6 @@ import com.frostwire.jlibtorrent.alerts.TorrentFinishedAlert;
 import com.frostwire.jlibtorrent.alerts.TorrentPrioritizeAlert;
 import com.frostwire.logging.Logger;
 import com.frostwire.transfers.BittorrentDownload;
-import com.frostwire.transfers.Transfer;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
 import org.apache.commons.io.FilenameUtils;
@@ -51,7 +50,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         this.savePath = new File(th.getSavePath());
         this.dateCreated = new Date(th.getStatus().getAddedTime());
 
-        BTEngine2.getInstance().getSession().addListener(this);
+        BTEngine.getInstance().getSession().addListener(this);
     }
 
     @Override
@@ -245,7 +244,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     public void remove(boolean deleteTorrent, boolean deleteData) {
         String infoHash = this.getInfoHash();
 
-        BTEngine2 engine = BTEngine2.getInstance();
+        BTEngine engine = BTEngine.getInstance();
         Session s = engine.getSession();
 
         s.removeListener(this);
@@ -395,7 +394,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     }
 
     public File getTorrentFile() {
-        return BTEngine2.getInstance().readTorrentPath(this.getInfoHash());
+        return BTEngine.getInstance().readTorrentPath(this.getInfoHash());
     }
 
     public Set<File> getIncompleteFiles() {
