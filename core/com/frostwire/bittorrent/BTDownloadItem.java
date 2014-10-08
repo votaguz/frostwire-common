@@ -18,7 +18,7 @@
 
 package com.frostwire.bittorrent;
 
-import com.frostwire.jlibtorrent.FileStorage;
+import com.frostwire.jlibtorrent.FileEntry;
 import com.frostwire.jlibtorrent.Priority;
 import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.transfers.TransferItem;
@@ -32,13 +32,31 @@ import java.io.File;
 public final class BTDownloadItem implements TransferItem {
 
     private final TorrentHandle th;
-    private final FileStorage fs;
+    private final FileEntry fe;
     private final int index;
 
-    public BTDownloadItem(TorrentHandle th, FileStorage fs, int index) {
+    private final File file;
+    private final String name;
+    private final long size;
+
+    public BTDownloadItem(TorrentHandle th, FileEntry fe, int index) {
         this.th = th;
-        this.fs = fs;
+        this.fe = fe;
         this.index = index;
+
+        this.file = new File(fe.getPath());
+        this.name = file.getName();
+        this.size = fe.getSize();
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String getDisplayName() {
+        return name;
     }
 
     @Override
@@ -48,17 +66,44 @@ public final class BTDownloadItem implements TransferItem {
 
     @Override
     public File getFile() {
-        return new File(fs.getFilePath(index, th.getSavePath()));
+        return file;
     }
 
     @Override
     public long getSize() {
-        return fs.getFileSize(index);
+        return size;
     }
 
     @Override
     public long getDownloaded() {
+        if (!th.isValid()) {
+            return 0;
+        }
+
         long[] progress = th.getFileProgress(TorrentHandle.FileProgressFlags.PIECE_GRANULARITY);
         return progress[index];
+    }
+
+    @Override
+    public int getProgress() {
+        if (!th.isValid() || size == 0) { // edge cases
+            return 0;
+        }
+
+        int progress;
+        long downloaded = getDownloaded();
+
+        if (downloaded == size) {
+            progress = 100;
+        } else {
+            progress = (int) ((float) getDownloaded() / (float) size);
+        }
+
+        return progress;
+    }
+
+    @Override
+    public boolean isComplete() {
+        return getDownloaded() == size;
     }
 }

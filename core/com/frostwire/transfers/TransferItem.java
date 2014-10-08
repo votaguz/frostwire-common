@@ -26,11 +26,24 @@ import java.io.File;
  */
 public interface TransferItem {
 
-    public boolean isSkipped();
+    public String getName();
+
+    public String getDisplayName();
 
     public File getFile();
+
+    public boolean isSkipped();
 
     public long getSize();
 
     public long getDownloaded();
+
+    /**
+     * [0..100]
+     *
+     * @return
+     */
+    public int getProgress();
+
+    public boolean isComplete();
 }
