@@ -51,7 +51,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         this.savePath = new File(th.getSavePath());
         this.dateCreated = new Date(th.getStatus().getAddedTime());
 
-        BTEngine.getInstance().getSession().addListener(this);
+        BTEngine2.getInstance().getSession().addListener(this);
     }
 
     @Override
@@ -245,7 +245,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     public void remove(boolean deleteTorrent, boolean deleteData) {
         String infoHash = this.getInfoHash();
 
-        BTEngine engine = BTEngine.getInstance();
+        BTEngine2 engine = BTEngine2.getInstance();
         Session s = engine.getSession();
 
         s.removeListener(this);
@@ -259,7 +259,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         }
 
         if (deleteTorrent) {
-            File torrent = BTEngine.getInstance().readTorrentPath(infoHash);
+            File torrent = engine.readTorrentPath(infoHash);
             if (torrent != null && torrent.exists()) {
                 torrent.delete();
             }
@@ -395,7 +395,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     }
 
     public File getTorrentFile() {
-        return BTEngine.getInstance().readTorrentPath(this.getInfoHash());
+        return BTEngine2.getInstance().readTorrentPath(this.getInfoHash());
     }
 
     public Set<File> getIncompleteFiles() {

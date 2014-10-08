@@ -118,6 +118,10 @@ public final class BTEngine2 {
         return session.getSettings().getDownloadRateLimit();
     }
 
+    public boolean isStarted() {
+        return session != null;
+    }
+
     public void start() {
         sync.lock();
 
@@ -225,7 +229,7 @@ public final class BTEngine2 {
         if (session == null) {
             return;
         }
-        
+
         session.setSettings(s);
         saveSettings();
     }
@@ -387,6 +391,20 @@ public final class BTEngine2 {
 
     File resumeDataFile(String infoHash) {
         return new File(ctx.homeDir, infoHash + ".resume");
+    }
+
+    File readTorrentPath(String infoHash) {
+        File torrent = null;
+
+        try {
+            byte[] arr = FileUtils.readFileToByteArray(resumeTorrentFile(infoHash));
+            entry e = entry.bdecode(Vectors.bytes2char_vector(arr));
+            torrent = new File(e.dict().get("torrent_orig_path").string());
+        } catch (Throwable e) {
+            // can't recover original torrent path
+        }
+
+        return torrent;
     }
 
     private File saveTorrent(TorrentInfo ti) {
