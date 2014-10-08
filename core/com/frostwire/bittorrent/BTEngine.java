@@ -278,6 +278,7 @@ public final class BTEngine {
             if (name == null || name.length() == 0) {
                 name = ti.getInfoHash().toString();
             }
+            name = OSUtils.escapeFilename(name);
 
             torrentFile = new File(ctx.torrentsDir, name + ".torrent");
             byte[] arr = ti.toEntry().bencode();

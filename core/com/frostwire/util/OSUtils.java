@@ -19,10 +19,8 @@
 package com.frostwire.util;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public final class OSUtils {
 
@@ -41,5 +39,9 @@ public final class OSUtils {
 
     public static boolean isAndroid() {
         return isAndroid;
+    }
+
+    public static String escapeFilename(String s) {
+        return s.replaceAll("[\\\\/:*?\"<>|\\[\\]]+", "_");
     }
 }
