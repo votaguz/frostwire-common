@@ -44,6 +44,4 @@ public interface TransferItem {
      * @return
      */
     public int getProgress();
-
-    public boolean isComplete();
 }

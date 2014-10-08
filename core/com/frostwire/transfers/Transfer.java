@@ -19,13 +19,14 @@
 package com.frostwire.transfers;
 
 import java.io.File;
+import java.util.Date;
 import java.util.List;
 
 /**
  * @author gubatron
  * @author aldenml
  */
-public interface Transfer {
+public interface Transfer<T extends TransferItem> {
 
     public String getName();
 
@@ -33,7 +34,26 @@ public interface Transfer {
 
     public File getSavePath();
 
+    public Date getCreated();
+
     public TransferState getState();
 
-    public List<TransferItem> getItems();
+    public long getBytesReceived();
+
+    public long getBytesSent();
+
+    public int getDownloadSpeed();
+
+    public int getUploadSpeed();
+
+    public long getETA();
+
+    /**
+     * [0..100]
+     *
+     * @return
+     */
+    public int getProgress();
+
+    public List<T> getItems();
 }

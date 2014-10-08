@@ -101,9 +101,4 @@ public final class BTDownloadItem implements TransferItem {
 
         return progress;
     }
-
-    @Override
-    public boolean isComplete() {
-        return getDownloaded() == size;
-    }
 }

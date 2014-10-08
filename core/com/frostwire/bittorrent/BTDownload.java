@@ -34,7 +34,7 @@ import java.util.*;
  * @author gubatron
  * @author aldenml
  */
-public final class BTDownload extends TorrentAlertAdapter implements Transfer {
+public final class BTDownload extends TorrentAlertAdapter implements Transfer<BTDownloadItem> {
 
     private static final Logger LOG = Logger.getLogger(BTDownload.class);
 
@@ -152,11 +152,11 @@ public final class BTDownload extends TorrentAlertAdapter implements Transfer {
         return th.getStatus().getAllTimeUpload();
     }
 
-    public float getDownloadSpeed() {
+    public int getDownloadSpeed() {
         return th.getStatus().getDownloadPayloadRate();
     }
 
-    public float getUploadSpeed() {
+    public int getUploadSpeed() {
         return th.getStatus().getUploadPayloadRate();
     }
 
@@ -180,7 +180,8 @@ public final class BTDownload extends TorrentAlertAdapter implements Transfer {
         return th.getInfoHash().toString();
     }
 
-    public Date getDateCreated() {
+    @Override
+    public Date getCreated() {
         return dateCreated;
     }
 
@@ -347,15 +348,15 @@ public final class BTDownload extends TorrentAlertAdapter implements Transfer {
     }
 
     @Override
-    public List<TransferItem> getItems() {
-        List<TransferItem> items = Collections.emptyList();
+    public List<BTDownloadItem> getItems() {
+        List<BTDownloadItem> items = Collections.emptyList();
 
         if (th.isValid()) {
             TorrentInfo ti = th.getTorrentInfo();
             if (ti != null && ti.isValid()) {
                 int numFiles = ti.getNumFiles();
 
-                items = new ArrayList<TransferItem>(numFiles);
+                items = new ArrayList<BTDownloadItem>(numFiles);
 
                 for (int i = 0; i < numFiles; i++) {
                     items.add(new BTDownloadItem(th, ti.getFileAt(i), i));
