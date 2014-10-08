@@ -22,6 +22,7 @@ import com.frostwire.jlibtorrent.*;
 import com.frostwire.jlibtorrent.alerts.TorrentFinishedAlert;
 import com.frostwire.jlibtorrent.alerts.TorrentPrioritizeAlert;
 import com.frostwire.logging.Logger;
+import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.Transfer;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
@@ -34,7 +35,7 @@ import java.util.*;
  * @author gubatron
  * @author aldenml
  */
-public final class BTDownload extends TorrentAlertAdapter implements Transfer {
+public final class BTDownload extends TorrentAlertAdapter implements BittorrentDownload {
 
     private static final Logger LOG = Logger.getLogger(BTDownload.class);
 
@@ -89,6 +90,16 @@ public final class BTDownload extends TorrentAlertAdapter implements Transfer {
 
     public boolean isFinished() {
         return th.getStatus().isFinished();
+    }
+
+    @Override
+    public boolean isDownloading() {
+        return getDownloadSpeed() > 0;
+    }
+
+    @Override
+    public boolean isUploading() {
+        return getUploadSpeed() > 0;
     }
 
     public TransferState getState() {
@@ -224,6 +235,11 @@ public final class BTDownload extends TorrentAlertAdapter implements Transfer {
 
     public void remove() {
         remove(false, false);
+    }
+
+    @Override
+    public void remove(boolean deleteData) {
+        remove(false, true);
     }
 
     public void remove(boolean deleteTorrent, boolean deleteData) {
