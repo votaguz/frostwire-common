@@ -364,12 +364,13 @@ public final class BTDownload extends TorrentAlertAdapter implements Transfer {
         if (th.isValid()) {
             TorrentInfo ti = th.getTorrentInfo();
             if (ti != null && ti.isValid()) {
+                FileStorage fs = ti.getFiles();
                 int numFiles = ti.getNumFiles();
 
                 items = new ArrayList<TransferItem>(numFiles);
 
                 for (int i = 0; i < numFiles; i++) {
-                    items.add(new BTDownloadItem(th, ti.getFileAt(i), i));
+                    items.add(new BTDownloadItem(th, fs, i));
                 }
             }
         }
