@@ -228,9 +228,11 @@ public final class BTEngine {
     }
 
     public void revertToDefaultConfiguration() {
+        // TODO:BITTORRENT
         if (OSUtils.isAndroid()) {
             // need to test
-            session.setSettings(SessionSettings.newMinMemoryUsage());
+            //session.setSettings(SessionSettings.newMinMemoryUsage());
+            session.setSettings(SessionSettings.newDefaults());
         } else {
             session.setSettings(SessionSettings.newDefaults());
         }
@@ -359,6 +361,10 @@ public final class BTEngine {
 
     public void loadSettings() {
         try {
+            revertToDefaultConfiguration();
+            if (true) {
+                return;
+            }
             File f = stateFile();
             if (f.exists()) {
                 byte[] data = FileUtils.readFileToByteArray(f);
