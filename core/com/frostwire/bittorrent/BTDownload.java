@@ -34,7 +34,7 @@ import java.util.*;
  * @author gubatron
  * @author aldenml
  */
-public final class BTDownload extends TorrentAlertAdapter implements Transfer<BTDownloadItem> {
+public final class BTDownload extends TorrentAlertAdapter implements Transfer {
 
     private static final Logger LOG = Logger.getLogger(BTDownload.class);
 
@@ -125,6 +125,7 @@ public final class BTDownload extends TorrentAlertAdapter implements Transfer<BT
         return savePath;
     }
 
+    @Override
     public int getProgress() {
         float fp = th.getStatus().getProgress();
 
@@ -134,6 +135,11 @@ public final class BTDownload extends TorrentAlertAdapter implements Transfer<BT
 
         int p = (int) (th.getStatus().getProgress() * 100);
         return Math.min(p, 100);
+    }
+
+    @Override
+    public boolean isComplete() {
+        return getProgress() == 100;
     }
 
     public long getBytesReceived() {
@@ -152,11 +158,11 @@ public final class BTDownload extends TorrentAlertAdapter implements Transfer<BT
         return th.getStatus().getAllTimeUpload();
     }
 
-    public int getDownloadSpeed() {
+    public long getDownloadSpeed() {
         return th.getStatus().getDownloadPayloadRate();
     }
 
-    public int getUploadSpeed() {
+    public long getUploadSpeed() {
         return th.getStatus().getUploadPayloadRate();
     }
 
@@ -214,6 +220,10 @@ public final class BTDownload extends TorrentAlertAdapter implements Transfer<BT
     public void resume() {
         th.setAutoManaged(true);
         th.resume();
+    }
+
+    public void remove() {
+        remove(false, false);
     }
 
     public void remove(boolean deleteTorrent, boolean deleteData) {
@@ -348,15 +358,15 @@ public final class BTDownload extends TorrentAlertAdapter implements Transfer<BT
     }
 
     @Override
-    public List<BTDownloadItem> getItems() {
-        List<BTDownloadItem> items = Collections.emptyList();
+    public List<TransferItem> getItems() {
+        List<TransferItem> items = Collections.emptyList();
 
         if (th.isValid()) {
             TorrentInfo ti = th.getTorrentInfo();
             if (ti != null && ti.isValid()) {
                 int numFiles = ti.getNumFiles();
 
-                items = new ArrayList<BTDownloadItem>(numFiles);
+                items = new ArrayList<TransferItem>(numFiles);
 
                 for (int i = 0; i < numFiles; i++) {
                     items.add(new BTDownloadItem(th, ti.getFileAt(i), i));

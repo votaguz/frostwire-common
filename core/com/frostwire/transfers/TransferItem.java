@@ -32,9 +32,9 @@ public interface TransferItem {
 
     public File getFile();
 
-    public boolean isSkipped();
-
     public long getSize();
+
+    public boolean isSkipped();
 
     public long getDownloaded();
 
@@ -44,4 +44,6 @@ public interface TransferItem {
      * @return
      */
     public int getProgress();
+
+    public boolean isComplete();
 }

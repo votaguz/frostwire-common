@@ -26,13 +26,15 @@ import java.util.List;
  * @author gubatron
  * @author aldenml
  */
-public interface Transfer<T extends TransferItem> {
+public interface Transfer {
 
     public String getName();
 
     public String getDisplayName();
 
     public File getSavePath();
+
+    public long getSize();
 
     public Date getCreated();
 
@@ -42,9 +44,9 @@ public interface Transfer<T extends TransferItem> {
 
     public long getBytesSent();
 
-    public int getDownloadSpeed();
+    public long getDownloadSpeed();
 
-    public int getUploadSpeed();
+    public long getUploadSpeed();
 
     public long getETA();
 
@@ -55,5 +57,9 @@ public interface Transfer<T extends TransferItem> {
      */
     public int getProgress();
 
-    public List<T> getItems();
+    public boolean isComplete();
+
+    public List<TransferItem> getItems();
+
+    public void remove();
 }
