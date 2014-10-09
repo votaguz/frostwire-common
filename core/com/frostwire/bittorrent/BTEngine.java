@@ -148,6 +148,9 @@ public final class BTEngine {
         }
     }
 
+    /**
+     * Abort and destroy the internal libtorrent session.
+     */
     public void stop() {
         sync.lock();
 
