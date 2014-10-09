@@ -14,4 +14,5 @@ public final class BTContext {
     public int port0;
     public int port1;
     public String iface;
+    public boolean optimizeMemory;
 }

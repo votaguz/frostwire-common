@@ -243,11 +243,26 @@ public final class BTEngine {
             return;
         }
 
+        defaultSettings.broadcastLSD(true);
+
         session.setSettings(defaultSettings);
 
-        if (OSUtils.isAndroid()) {
+        if (ctx.optimizeMemory) {
             SessionSettings s = session.getSettings(); // working with a copy?
-            // TODO: modify this for android
+
+            int maxQueuedDiskBytes = s.getMaxQueuedDiskBytes();
+            s.setMaxQueuedDiskBytes(maxQueuedDiskBytes / 2);
+            int sendBufferWatermark = s.getSendBufferWatermark();
+            s.setSendBufferWatermark(sendBufferWatermark / 2);
+            s.setCacheSize(256);
+            s.setActiveLimit(4);
+            s.setMaxPeerlistSize(200);
+            s.setUtpDynamicSockBuf(false);
+            s.setGuidedReadCache(true);
+            s.setTickInterval(1000);
+            s.setInactivityTimeout(60);
+            s.optimizeHashingForSpeed(false);
+
             session.setSettings(s);
         }
 
