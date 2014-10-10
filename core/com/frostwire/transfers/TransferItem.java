@@ -30,6 +30,12 @@ public interface TransferItem {
 
     public String getDisplayName();
 
+    /**
+     * Actual file in the file system to which the data is saved. Ideally it should be
+     * inside the save path of the parent transfer.
+     *
+     * @return
+     */
     public File getFile();
 
     public long getSize();
