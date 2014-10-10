@@ -43,4 +43,6 @@ public interface BittorrentDownload extends DownloadTransfer, UploadTransfer {
     public void pause();
 
     public void resume();
+
+    public void remove(boolean deleteTorrent, boolean deleteData);
 }
