@@ -28,9 +28,23 @@ public interface TorrentSearchResult extends FileSearchResult {
 
     public long getCreationTime();
 
+    /**
+     * Returns the torrent uri, could be a magnet uri.
+     * <p/>
+     * Should be renamed to getTorrentUri
+     *
+     * @return
+     */
     public String getTorrentUrl();
 
     public int getSeeds();
 
+    /**
+     * Returns the info hash of the torrent.
+     * <p/>
+     * Should be renamed to getInfoHash
+     *
+     * @return
+     */
     public String getHash();
 }

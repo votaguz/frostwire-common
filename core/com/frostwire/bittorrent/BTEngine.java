@@ -320,12 +320,14 @@ public final class BTEngine {
         }
 
         Priority[] priorities = null;
+        boolean exists = false;
 
         if (selection != null) {
             TorrentHandle th = downloader.find(ti.getInfoHash());
 
             if (th != null) {
                 priorities = th.getFilePriorities();
+                exists = true;
             } else {
                 priorities = Priority.array(Priority.IGNORE, ti.getNumFiles());
             }
@@ -339,8 +341,10 @@ public final class BTEngine {
 
         downloader.download(ti, saveDir, priorities, null);
 
-        File torrent = saveTorrent(ti);
-        saveResumeTorrent(torrent);
+        if (!exists) {
+            File torrent = saveTorrent(ti);
+            saveResumeTorrent(torrent);
+        }
     }
 
     public void download(TorrentCrawledSearchResult sr, File saveDir) {
