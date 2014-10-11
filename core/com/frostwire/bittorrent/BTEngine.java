@@ -8,12 +8,15 @@ import com.frostwire.jlibtorrent.alerts.TorrentAlert;
 import com.frostwire.jlibtorrent.swig.entry;
 import com.frostwire.logging.Logger;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
+import com.frostwire.transfers.TransferState;
 import com.frostwire.util.OSUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -24,10 +27,13 @@ public final class BTEngine {
 
     private static final Logger LOG = Logger.getLogger(BTEngine.class);
 
+    private static final String TORRENT_ORIG_PATH_KEY = "torrent_orig_path";
+
     public static BTContext ctx;
 
-    private final ReentrantLock sync = new ReentrantLock();
-    private final InnerListener innerListener = new InnerListener();
+    private final ReentrantLock sync;
+    private final InnerListener innerListener;
+    private final Map<String, TransferState> savedStates;
 
     private Session session;
     private Downloader downloader;
@@ -37,6 +43,9 @@ public final class BTEngine {
     private BTEngineListener listener;
 
     private BTEngine() {
+        this.sync = new ReentrantLock();
+        this.innerListener = new InnerListener();
+        this.savedStates = new HashMap<String, TransferState>();
     }
 
     private static class Loader {
@@ -399,7 +408,11 @@ public final class BTEngine {
 
         for (File t : torrents) {
             try {
-                File resumeFile = new File(ctx.homeDir, FilenameUtils.getBaseName(t.getName()) + ".resume");
+                String infoHash = FilenameUtils.getBaseName(t.getName());
+                File resumeFile = resumeDataFile(infoHash);
+
+                savedStates.put(infoHash, readSavedState(resumeFile));
+
                 session.asyncAddTorrent(t, null, resumeFile);
             } catch (Throwable e) {
                 LOG.error("Error restoring torrent download: " + t, e);
@@ -425,12 +438,32 @@ public final class BTEngine {
         try {
             byte[] arr = FileUtils.readFileToByteArray(resumeTorrentFile(infoHash));
             entry e = entry.bdecode(Vectors.bytes2char_vector(arr));
-            torrent = new File(e.dict().get("torrent_orig_path").string());
+            torrent = new File(e.dict().get(TORRENT_ORIG_PATH_KEY).string());
         } catch (Throwable e) {
             // can't recover original torrent path
         }
 
         return torrent;
+    }
+
+    TransferState getSavedState(String infoHash) {
+        return savedStates.containsKey(infoHash) ? savedStates.get(infoHash) : TransferState.UNKNOWN;
+    }
+
+    private TransferState readSavedState(File resumeFile) {
+        TransferState state = TransferState.UNKNOWN;
+
+        try {
+            byte[] arr = FileUtils.readFileToByteArray(resumeFile);
+            entry e = entry.bdecode(Vectors.bytes2char_vector(arr));
+            if (e.dict().get("paused").integer() > 0) {
+                state = TransferState.PAUSED;
+            }
+        } catch (Throwable e) {
+            // can't recover original torrent path
+        }
+
+        return state;
     }
 
     private File saveTorrent(TorrentInfo ti) {
@@ -459,7 +492,7 @@ public final class BTEngine {
         try {
             TorrentInfo ti = new TorrentInfo(torrent);
             entry e = ti.toEntry().getSwig();
-            e.dict().set("torrent_orig_path", new entry(torrent.getAbsolutePath()));
+            e.dict().set(TORRENT_ORIG_PATH_KEY, new entry(torrent.getAbsolutePath()));
             byte[] arr = Vectors.char_vector2bytes(e.bencode());
             FileUtils.writeByteArrayToFile(resumeTorrentFile(ti.getInfoHash().toString()), arr);
         } catch (Throwable e) {

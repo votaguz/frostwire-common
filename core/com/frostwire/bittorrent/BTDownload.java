@@ -125,8 +125,10 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
                 return TransferState.ALLOCATING;
             case CHECKING_RESUME_DATA:
                 return TransferState.CHECKING;
+            case UNKNOWN:
+                return TransferState.UNKNOWN;
             default:
-                return TransferState.ERROR;
+                return TransferState.UNKNOWN;
         }
     }
 
@@ -220,6 +222,10 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         }
 
         return left / rate;
+    }
+
+    public TransferState getSavedState() {
+        return BTEngine.getInstance().getSavedState(this.getInfoHash());
     }
 
     public void pause() {

@@ -45,5 +45,6 @@ public enum TransferState {
     COMPLETE,
     UPLOADING,
     UNCOMPRESSING,
-    DEMUXING
+    DEMUXING,
+    UNKNOWN
 }
