@@ -14,7 +14,7 @@ public final class ThreadPool extends ThreadPoolExecutor {
     private final String name;
 
     public ThreadPool(String name, int maximumPoolSize, BlockingQueue<Runnable> workQueue, boolean daemon) {
-        super(0, maximumPoolSize, 1, TimeUnit.SECONDS, workQueue, new PoolThreadFactory(daemon));
+        super(0, maximumPoolSize, 1L, TimeUnit.SECONDS, workQueue, new PoolThreadFactory(daemon));
         this.name = name;
     }
 
@@ -26,7 +26,7 @@ public final class ThreadPool extends ThreadPoolExecutor {
             threadName = thread.getName();
         }
 
-        t.setName(name + "-thread-" + threadNumber.getAndIncrement() + (threadName != null ? "-" + threadName : ""));
+        t.setName(name + "-thread-" + threadNumber.getAndIncrement() + "-" + (threadName != null ? threadName : "@" + r.hashCode()));
     }
 
     public static ExecutorService newThreadPool(String name, int maxThreads, boolean daemon) {
