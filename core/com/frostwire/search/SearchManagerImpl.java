@@ -17,23 +17,20 @@
 
 package com.frostwire.search;
 
+import com.frostwire.logging.Logger;
+import com.frostwire.util.ThreadPool;
+
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.PriorityBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import com.frostwire.concurrent.DefaultThreadFactory;
-import com.frostwire.logging.Logger;
-
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class SearchManagerImpl implements SearchManager {
 
@@ -47,7 +44,7 @@ public class SearchManagerImpl implements SearchManager {
     private SearchManagerListener listener;
 
     public SearchManagerImpl(int nThreads) {
-        this.executor = newFixedThreadPool(nThreads);
+        this.executor = new ThreadPool("SearchManager", nThreads, new PriorityBlockingQueue<Runnable>(), true);
         this.tasks = Collections.synchronizedList(new LinkedList<SearchTask>());
     }
 
@@ -194,10 +191,6 @@ public class SearchManagerImpl implements SearchManager {
             }
         }
         return order;
-    }
-
-    private static ExecutorService newFixedThreadPool(int nThreads) {
-        return new ThreadPoolExecutor(nThreads, nThreads, 0L, TimeUnit.MILLISECONDS, new PriorityBlockingQueue<Runnable>(), new DefaultThreadFactory("SearchManager", false));
     }
 
     private static abstract class SearchTask implements Runnable, Comparable<SearchTask> {
