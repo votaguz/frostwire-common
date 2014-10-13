@@ -298,9 +298,10 @@ public final class BTEngine {
 
         Priority[] priorities = null;
 
-        if (selection != null) {
-            TorrentHandle th = downloader.find(ti.getInfoHash());
+        TorrentHandle th = downloader.find(ti.getInfoHash());
+        boolean exists = th != null;
 
+        if (selection != null) {
             if (th != null) {
                 priorities = th.getFilePriorities();
             } else {
@@ -316,7 +317,9 @@ public final class BTEngine {
 
         downloader.download(ti, saveDir, priorities, null);
 
-        saveResumeTorrent(torrent);
+        if (!exists) {
+            saveResumeTorrent(torrent);
+        }
     }
 
     public void download(TorrentInfo ti, File saveDir, boolean[] selection) {
@@ -329,14 +332,13 @@ public final class BTEngine {
         }
 
         Priority[] priorities = null;
-        boolean exists = false;
+
+        TorrentHandle th = downloader.find(ti.getInfoHash());
+        boolean exists = th != null;
 
         if (selection != null) {
-            TorrentHandle th = downloader.find(ti.getInfoHash());
-
             if (th != null) {
                 priorities = th.getFilePriorities();
-                exists = true;
             } else {
                 priorities = Priority.array(Priority.IGNORE, ti.getNumFiles());
             }
@@ -369,6 +371,7 @@ public final class BTEngine {
         int fileIndex = sr.getFileIndex();
 
         TorrentHandle th = downloader.find(ti.getInfoHash());
+        boolean exists = th != null;
 
         if (th != null) {
             Priority[] priorities = th.getFilePriorities();
@@ -382,8 +385,10 @@ public final class BTEngine {
             downloader.download(ti, saveDir, priorities, null);
         }
 
-        File torrent = saveTorrent(ti);
-        saveResumeTorrent(torrent);
+        if (!exists) {
+            File torrent = saveTorrent(ti);
+            saveResumeTorrent(torrent);
+        }
     }
 
     public byte[] fetchMagnet(String uri, long timeout) {
