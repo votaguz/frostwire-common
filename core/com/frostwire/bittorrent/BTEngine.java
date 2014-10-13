@@ -3,20 +3,16 @@ package com.frostwire.bittorrent;
 import com.frostwire.jlibtorrent.*;
 import com.frostwire.jlibtorrent.alerts.Alert;
 import com.frostwire.jlibtorrent.alerts.AlertType;
-import com.frostwire.jlibtorrent.alerts.SaveResumeDataAlert;
 import com.frostwire.jlibtorrent.alerts.TorrentAlert;
 import com.frostwire.jlibtorrent.swig.entry;
 import com.frostwire.logging.Logger;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
-import com.frostwire.transfers.TransferState;
 import com.frostwire.util.OSUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -33,7 +29,6 @@ public final class BTEngine {
 
     private final ReentrantLock sync;
     private final InnerListener innerListener;
-    private final Map<String, TransferState> savedStates;
 
     private Session session;
     private Downloader downloader;
@@ -45,7 +40,6 @@ public final class BTEngine {
     private BTEngine() {
         this.sync = new ReentrantLock();
         this.innerListener = new InnerListener();
-        this.savedStates = new HashMap<String, TransferState>();
     }
 
     private static class Loader {
@@ -416,8 +410,6 @@ public final class BTEngine {
                 String infoHash = FilenameUtils.getBaseName(t.getName());
                 File resumeFile = resumeDataFile(infoHash);
 
-                savedStates.put(infoHash, readSavedState(resumeFile));
-
                 session.asyncAddTorrent(t, null, resumeFile);
             } catch (Throwable e) {
                 LOG.error("Error restoring torrent download: " + t, e);
@@ -449,26 +441,6 @@ public final class BTEngine {
         }
 
         return torrent;
-    }
-
-    TransferState getSavedState(String infoHash) {
-        return savedStates.containsKey(infoHash) ? savedStates.get(infoHash) : TransferState.UNKNOWN;
-    }
-
-    private TransferState readSavedState(File resumeFile) {
-        TransferState state = TransferState.UNKNOWN;
-
-        try {
-            byte[] arr = FileUtils.readFileToByteArray(resumeFile);
-            entry e = entry.bdecode(Vectors.bytes2char_vector(arr));
-            if (e.dict().get("paused").integer() > 0) {
-                state = TransferState.PAUSED;
-            }
-        } catch (Throwable e) {
-            // can't recover original torrent path
-        }
-
-        return state;
     }
 
     private File saveTorrent(TorrentInfo ti) {
@@ -505,19 +477,6 @@ public final class BTEngine {
         }
     }
 
-    private void saveResumeData(SaveResumeDataAlert alert) {
-        try {
-            TorrentHandle th = alert.getHandle();
-            if (th.isValid()) {
-                String infoHash = th.getInfoHash().toString();
-                byte[] arr = alert.getResumeData().bencode();
-                FileUtils.writeByteArrayToFile(resumeDataFile(infoHash), arr);
-            }
-        } catch (Throwable e) {
-            LOG.warn("Error saving resume data", e);
-        }
-    }
-
     private void doResumeData(TorrentAlert<?> alert) {
         TorrentHandle th = alert.getHandle();
         if (th.isValid() && th.needSaveResumeData()) {
@@ -538,9 +497,6 @@ public final class BTEngine {
                         listener.downloadAdded(new BTDownload(BTEngine.this, ((TorrentAlert<?>) alert).getHandle()));
                         doResumeData((TorrentAlert<?>) alert);
                     }
-                    break;
-                case SAVE_RESUME_DATA:
-                    saveResumeData((SaveResumeDataAlert) alert);
                     break;
                 case BLOCK_FINISHED:
                     doResumeData((TorrentAlert<?>) alert);

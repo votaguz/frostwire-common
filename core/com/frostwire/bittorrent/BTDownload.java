@@ -19,12 +19,17 @@
 package com.frostwire.bittorrent;
 
 import com.frostwire.jlibtorrent.*;
+import com.frostwire.jlibtorrent.alerts.SaveResumeDataAlert;
 import com.frostwire.jlibtorrent.alerts.TorrentFinishedAlert;
 import com.frostwire.jlibtorrent.alerts.TorrentPrioritizeAlert;
+import com.frostwire.jlibtorrent.swig.entry;
+import com.frostwire.jlibtorrent.swig.string_entry_map;
+import com.frostwire.jlibtorrent.swig.string_vector;
 import com.frostwire.logging.Logger;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
@@ -43,6 +48,8 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     private final File savePath;
     private final Date created;
 
+    private final Map<String, String> extra;
+
     private BTDownloadListener listener;
 
     public BTDownload(BTEngine engine, TorrentHandle th) {
@@ -52,7 +59,13 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         this.savePath = new File(th.getSavePath());
         this.created = new Date(th.getStatus().getAddedTime());
 
+        this.extra = createExtra();
+
         engine.getSession().addListener(this);
+    }
+
+    public Map<String, String> getExtra() {
+        return extra;
     }
 
     @Override
@@ -226,18 +239,20 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         return left / rate;
     }
 
-    public TransferState getSavedState() {
-        return engine.getSavedState(this.getInfoHash());
-    }
-
     public void pause() {
+        extra.put("was_paused", Boolean.TRUE.toString());
+
         th.setAutoManaged(false);
         th.pause();
+        th.saveResumeData();
     }
 
     public void resume() {
+        extra.put("was_paused", Boolean.FALSE.toString());
+
         th.setAutoManaged(true);
         th.resume();
+        th.saveResumeData();
     }
 
     public void remove() {
@@ -311,6 +326,24 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
             } catch (Throwable e) {
                 LOG.error("Error calling listener", e);
             }
+        }
+    }
+
+    @Override
+    public void saveResumeData(SaveResumeDataAlert alert) {
+        try {
+            TorrentHandle th = alert.getHandle();
+            if (th.isValid()) {
+                String infoHash = th.getInfoHash().toString();
+                File file = engine.resumeDataFile(infoHash);
+
+                Entry e = alert.getResumeData();
+                e.getSwig().dict().set("extra_data", Entry.fromMap(extra).getSwig());
+
+                FileUtils.writeByteArrayToFile(file, e.bencode());
+            }
+        } catch (Throwable e) {
+            LOG.warn("Error saving resume data", e);
         }
     }
 
@@ -423,5 +456,54 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         }
 
         return s;
+    }
+
+    private Map<String, String> createExtra() {
+        Map<String, String> map = new HashMap<String, String>();
+
+        try {
+            String infoHash = getInfoHash();
+            File file = engine.resumeDataFile(infoHash);
+
+            if (file.exists()) {
+                byte[] arr = FileUtils.readFileToByteArray(file);
+                entry e = entry.bdecode(Vectors.bytes2char_vector(arr));
+                string_entry_map d = e.dict();
+
+                if (d.has_key("extra_data")) {
+                    readExtra(d.get("extra_data").dict(), map);
+                }
+            }
+
+        } catch (Throwable e) {
+            LOG.error("Error reading extra data from resume file", e);
+        }
+
+        return map;
+    }
+
+    private void readExtra(string_entry_map dict, Map<String, String> map) {
+        string_vector keys = dict.keys();
+        int size = (int) keys.size();
+        for (int i = 0; i < size; i++) {
+            String k = keys.get(i);
+            entry e = dict.get(k);
+            if (e.type() == entry.data_type.string_t) {
+                map.put(k, e.string());
+            }
+        }
+    }
+
+    public boolean wasPaused() {
+        boolean flag = false;
+        if (extra.containsKey("was_paused")) {
+            try {
+                flag = Boolean.parseBoolean(extra.get("was_paused"));
+            } catch (Throwable e) {
+                // ignore
+            }
+        }
+
+        return flag;
     }
 }
