@@ -38,19 +38,21 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
     private static final Logger LOG = Logger.getLogger(BTDownload.class);
 
+    private final BTEngine engine;
     private final TorrentHandle th;
     private final File savePath;
-    private final Date dateCreated;
+    private final Date created;
 
     private BTDownloadListener listener;
 
-    public BTDownload(TorrentHandle th) {
+    public BTDownload(BTEngine engine, TorrentHandle th) {
         super(th);
+        this.engine = engine;
         this.th = th;
         this.savePath = new File(th.getSavePath());
-        this.dateCreated = new Date(th.getStatus().getAddedTime());
+        this.created = new Date(th.getStatus().getAddedTime());
 
-        BTEngine.getInstance().getSession().addListener(this);
+        engine.getSession().addListener(this);
     }
 
     @Override
@@ -200,7 +202,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
     @Override
     public Date getCreated() {
-        return dateCreated;
+        return created;
     }
 
     public long getETA() {
@@ -225,7 +227,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     }
 
     public TransferState getSavedState() {
-        return BTEngine.getInstance().getSavedState(this.getInfoHash());
+        return engine.getSavedState(this.getInfoHash());
     }
 
     public void pause() {
@@ -250,7 +252,6 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     public void remove(boolean deleteTorrent, boolean deleteData) {
         String infoHash = this.getInfoHash();
 
-        BTEngine engine = BTEngine.getInstance();
         Session s = engine.getSession();
 
         s.removeListener(this);
@@ -400,7 +401,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     }
 
     public File getTorrentFile() {
-        return BTEngine.getInstance().readTorrentPath(this.getInfoHash());
+        return engine.readTorrentPath(this.getInfoHash());
     }
 
     public Set<File> getIncompleteFiles() {

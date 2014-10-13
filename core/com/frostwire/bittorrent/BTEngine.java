@@ -535,7 +535,7 @@ public final class BTEngine {
             switch (type) {
                 case TORRENT_ADDED:
                     if (listener != null) {
-                        listener.downloadAdded(new BTDownload(((TorrentAlert<?>) alert).getHandle()));
+                        listener.downloadAdded(new BTDownload(BTEngine.this, ((TorrentAlert<?>) alert).getHandle()));
                         doResumeData((TorrentAlert<?>) alert);
                     }
                     break;
