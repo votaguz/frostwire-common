@@ -43,6 +43,8 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
     private static final Logger LOG = Logger.getLogger(BTDownload.class);
 
+    public static final String WAS_PAUSED_EXTRA_KEY = "was_paused";
+
     private final BTEngine engine;
     private final TorrentHandle th;
     private final File savePath;
@@ -240,7 +242,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     }
 
     public void pause() {
-        extra.put("was_paused", Boolean.TRUE.toString());
+        extra.put(WAS_PAUSED_EXTRA_KEY, Boolean.TRUE.toString());
 
         th.setAutoManaged(false);
         th.pause();
@@ -248,7 +250,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     }
 
     public void resume() {
-        extra.put("was_paused", Boolean.FALSE.toString());
+        extra.put(WAS_PAUSED_EXTRA_KEY, Boolean.FALSE.toString());
 
         th.setAutoManaged(true);
         th.resume();
@@ -496,9 +498,9 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
     public boolean wasPaused() {
         boolean flag = false;
-        if (extra.containsKey("was_paused")) {
+        if (extra.containsKey(WAS_PAUSED_EXTRA_KEY)) {
             try {
-                flag = Boolean.parseBoolean(extra.get("was_paused"));
+                flag = Boolean.parseBoolean(extra.get(WAS_PAUSED_EXTRA_KEY));
             } catch (Throwable e) {
                 // ignore
             }
