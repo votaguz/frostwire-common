@@ -146,6 +146,8 @@ public final class BTEngine {
             loadSettings();
             session.addListener(innerListener);
 
+            fireStarted();
+
         } finally {
             sync.unlock();
         }
@@ -170,6 +172,8 @@ public final class BTEngine {
 
             session.abort();
             session = null;
+
+            fireStopped();
 
         } finally {
             sync.unlock();
@@ -484,6 +488,24 @@ public final class BTEngine {
         }
     }
 
+    private void fireStarted() {
+        if (listener != null) {
+            listener.started(this);
+        }
+    }
+
+    private void fireStopped() {
+        if (listener != null) {
+            listener.stopped(this);
+        }
+    }
+
+    private void fireDownloadAdded(BTDownload dl) {
+        if (listener != null) {
+            listener.downloadAdded(this, dl);
+        }
+    }
+
     private final class InnerListener implements AlertListener {
         @Override
         public void alert(Alert<?> alert) {
@@ -493,10 +515,8 @@ public final class BTEngine {
 
             switch (type) {
                 case TORRENT_ADDED:
-                    if (listener != null) {
-                        listener.downloadAdded(new BTDownload(BTEngine.this, ((TorrentAlert<?>) alert).getHandle()));
-                        doResumeData((TorrentAlert<?>) alert);
-                    }
+                    fireDownloadAdded(new BTDownload(BTEngine.this, ((TorrentAlert<?>) alert).getHandle()));
+                    doResumeData((TorrentAlert<?>) alert);
                     break;
                 case BLOCK_FINISHED:
                     doResumeData((TorrentAlert<?>) alert);

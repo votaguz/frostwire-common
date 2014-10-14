@@ -22,11 +22,14 @@ package com.frostwire.bittorrent;
  * @author gubatron
  * @author aldenml
  */
-public interface BTEngineListener {
+public class BTEngineAdapter implements BTEngineListener {
 
-    public void started(BTEngine engine);
+    public void started(BTEngine engine) {
+    }
 
-    public void stopped(BTEngine engine);
+    public void stopped(BTEngine engine) {
+    }
 
-    public void downloadAdded(BTEngine engine, BTDownload dl);
+    public void downloadAdded(BTEngine engine, BTDownload dl) {
+    }
 }
