@@ -53,7 +53,7 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
 
     @Override
     protected String getUrl(int page, String encodedKeywords) {
-        return "http://"+getDomainNameToUse()+"/search/";
+        return "https://"+getDomainNameToUse()+"/search/";
     }
 
     @Override

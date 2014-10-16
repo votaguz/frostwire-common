@@ -34,7 +34,7 @@ public class EztvTempSearchResult extends AbstractSearchResult implements Crawla
 
     public EztvTempSearchResult(String domainName, String itemId) {
         this.itemId = itemId;
-        this.detailsUrl = "http://" + domainName + itemId;
+        this.detailsUrl = "https://" + domainName + itemId;
     }
 
     public String getItemId() {
