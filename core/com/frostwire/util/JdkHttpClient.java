@@ -561,6 +561,8 @@ final class JdkHttpClient implements HttpClient {
             } catch (Exception e2) {
                 LOG.warn(e2.getMessage());
             }
+        }  else {
+            e.printStackTrace();
         }
     }
 
