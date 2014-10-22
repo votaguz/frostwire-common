@@ -125,6 +125,10 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
             return TransferState.PAUSED;
         }
 
+        if (th.getStatus().isFinished()) { // see the docs of isFinished
+            return TransferState.SEEDING;
+        }
+
         switch (state) {
             case QUEUED_FOR_CHECKING:
                 return TransferState.QUEUED_FOR_CHECKING;
