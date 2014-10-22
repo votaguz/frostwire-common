@@ -265,7 +265,8 @@ public final class BTEngine {
             int sendBufferWatermark = s.getSendBufferWatermark();
             s.setSendBufferWatermark(sendBufferWatermark / 2);
             s.setCacheSize(256);
-            s.setActiveLimit(4);
+            s.setActiveDownloads(4);
+            s.setActiveSeeds(4);
             s.setMaxPeerlistSize(200);
             s.setUtpDynamicSockBuf(false);
             s.setGuidedReadCache(true);
