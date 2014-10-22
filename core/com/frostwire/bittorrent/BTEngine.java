@@ -272,6 +272,8 @@ public final class BTEngine {
             s.setTickInterval(1000);
             s.setInactivityTimeout(60);
             s.optimizeHashingForSpeed(false);
+            s.setSeedingOutgoingConnections(false);
+            s.setConnectionsLimit(200);
 
             session.setSettings(s);
         }
