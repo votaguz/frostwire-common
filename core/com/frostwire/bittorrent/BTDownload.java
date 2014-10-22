@@ -425,13 +425,13 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         if (th.isValid()) {
             TorrentInfo ti = th.getTorrentInfo();
             if (ti != null && ti.isValid()) {
-                FileStorage fs = ti.getFiles();
                 int numFiles = ti.getNumFiles();
 
                 items = new ArrayList<TransferItem>(numFiles);
 
                 for (int i = 0; i < numFiles; i++) {
-                    items.add(new BTDownloadItem(th, fs, i));
+                    FileEntry fe = ti.getFileAt(i);
+                    items.add(new BTDownloadItem(th, i, fe));
                 }
             }
         }
