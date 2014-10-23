@@ -22,6 +22,7 @@ import com.frostwire.jlibtorrent.*;
 import com.frostwire.jlibtorrent.alerts.SaveResumeDataAlert;
 import com.frostwire.jlibtorrent.alerts.TorrentFinishedAlert;
 import com.frostwire.jlibtorrent.alerts.TorrentPrioritizeAlert;
+import com.frostwire.jlibtorrent.alerts.TorrentRemovedAlert;
 import com.frostwire.jlibtorrent.swig.entry;
 import com.frostwire.jlibtorrent.swig.string_entry_map;
 import com.frostwire.jlibtorrent.swig.string_vector;
@@ -53,6 +54,8 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     private final Map<String, String> extra;
 
     private BTDownloadListener listener;
+
+    private Set<File> incompleteFilesToRemove;
 
     public BTDownload(BTEngine engine, TorrentHandle th) {
         super(th);
@@ -275,9 +278,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
         Session s = engine.getSession();
 
-        s.removeListener(this);
-
-        Set<File> incompleteFiles = getIncompleteFiles();
+        incompleteFilesToRemove = getIncompleteFiles();
 
         if (deleteData) {
             s.removeTorrent(th, Session.Options.DELETE_FILES);
@@ -294,14 +295,6 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
         engine.resumeDataFile(infoHash).delete();
         engine.resumeTorrentFile(infoHash).delete();
-
-        if (listener != null) {
-            try {
-                listener.removed(this, incompleteFiles);
-            } catch (Throwable e) {
-                LOG.error("Error calling listener", e);
-            }
-        }
     }
 
     public BTDownloadListener getListener() {
@@ -333,6 +326,12 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
                 LOG.error("Error calling listener", e);
             }
         }
+    }
+
+    @Override
+    public void torrentRemoved(TorrentRemovedAlert alert) {
+        engine.getSession().removeListener(this);
+        fireRemoved(incompleteFilesToRemove);
     }
 
     @Override
@@ -511,5 +510,15 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         }
 
         return flag;
+    }
+
+    private void fireRemoved(Set<File> incompleteFiles) {
+        if (listener != null) {
+            try {
+                listener.removed(this, incompleteFiles);
+            } catch (Throwable e) {
+                LOG.error("Error calling listener", e);
+            }
+        }
     }
 }
