@@ -122,6 +122,14 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     }
 
     public TransferState getState() {
+        if (!engine.isStarted()) {
+            return TransferState.STOPPED;
+        }
+
+        if (engine.isPaused()) {
+            return TransferState.PAUSED;
+        }
+        
         TorrentStatus.State state = th.getStatus().getState();
 
         if (th.getStatus().isPaused()) {

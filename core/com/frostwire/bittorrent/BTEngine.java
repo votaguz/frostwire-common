@@ -129,6 +129,10 @@ public final class BTEngine {
         return session != null;
     }
 
+    public boolean isPaused() {
+        return session != null && session.isPaused();
+    }
+
     public void start() {
         sync.lock();
 
