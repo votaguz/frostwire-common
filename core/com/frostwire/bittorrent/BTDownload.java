@@ -19,10 +19,7 @@
 package com.frostwire.bittorrent;
 
 import com.frostwire.jlibtorrent.*;
-import com.frostwire.jlibtorrent.alerts.SaveResumeDataAlert;
-import com.frostwire.jlibtorrent.alerts.TorrentFinishedAlert;
-import com.frostwire.jlibtorrent.alerts.TorrentPrioritizeAlert;
-import com.frostwire.jlibtorrent.alerts.TorrentRemovedAlert;
+import com.frostwire.jlibtorrent.alerts.*;
 import com.frostwire.jlibtorrent.swig.entry;
 import com.frostwire.jlibtorrent.swig.string_entry_map;
 import com.frostwire.jlibtorrent.swig.string_vector;
@@ -43,6 +40,10 @@ import java.util.*;
 public final class BTDownload extends TorrentAlertAdapter implements BittorrentDownload {
 
     private static final Logger LOG = Logger.getLogger(BTDownload.class);
+
+    private static final int[] ALERT_TYPES = {AlertType.TORRENT_PRIORITIZE.getSwig(),
+            AlertType.TORRENT_FINISHED.getSwig(),
+            AlertType.TORRENT_REMOVED.getSwig(), AlertType.SAVE_RESUME_DATA.getSwig()};
 
     public static final String WAS_PAUSED_EXTRA_KEY = "was_paused";
 
@@ -311,6 +312,11 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
     public void setListener(BTDownloadListener listener) {
         this.listener = listener;
+    }
+
+    @Override
+    public int[] types() {
+        return ALERT_TYPES;
     }
 
     @Override
