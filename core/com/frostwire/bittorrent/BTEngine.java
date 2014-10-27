@@ -3,6 +3,7 @@ package com.frostwire.bittorrent;
 import com.frostwire.jlibtorrent.*;
 import com.frostwire.jlibtorrent.alerts.Alert;
 import com.frostwire.jlibtorrent.alerts.AlertType;
+import static com.frostwire.jlibtorrent.alerts.AlertType.*;
 import com.frostwire.jlibtorrent.alerts.TorrentAlert;
 import com.frostwire.jlibtorrent.swig.entry;
 import com.frostwire.logging.Logger;
@@ -20,6 +21,11 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author aldenml
  */
 public final class BTEngine {
+
+    private static final int[] INNER_LISTENER_TYPES = new int[]{TORRENT_ADDED.getSwig(),
+            BLOCK_FINISHED.getSwig(),
+            PORTMAP.getSwig(),
+            PORTMAP_ERROR.getSwig()};
 
     private static final Logger LOG = Logger.getLogger(BTEngine.class);
 
@@ -514,6 +520,11 @@ public final class BTEngine {
     }
 
     private final class InnerListener implements AlertListener {
+        @Override
+        public int[] types() {
+            return INNER_LISTENER_TYPES;
+        }
+
         @Override
         public void alert(Alert<?> alert) {
             //LOG.info(a.message());
