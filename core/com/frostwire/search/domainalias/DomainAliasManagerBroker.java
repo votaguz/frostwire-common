@@ -18,6 +18,8 @@
 
 package com.frostwire.search.domainalias;
 
+import com.frostwire.logging.Logger;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +33,8 @@ import java.util.Set;
  *
  */
 public class DomainAliasManagerBroker implements DomainAliasManifestFetcherListener {
+
+    private static final Logger LOG = Logger.getLogger(DomainAliasManagerBroker.class);
 
     private final HashMap<String, DomainAliasManager> managers;
     
@@ -59,13 +63,12 @@ public class DomainAliasManagerBroker implements DomainAliasManifestFetcherListe
 
     @Override
     public void onManifestFetched(DomainAliasManifest aliasManifest) {
-        System.out.println("DomainAliasManagerBroker: Got the manifest, updating DomainAliasManagers!!!");
         updateManagers(aliasManifest);
     }
 
     @Override
     public void onManifestNotFetched() {
-        System.err.println("DomainAliasManagerBroker:  Could not fetch alias list, should we try again later? attempts left");
+        LOG.error("DomainAliasManagerBroker:  Could not fetch alias list, should we try again later? attempts left");
         //attempts++;?? timestamp, to try again later. etc.
     }
 
@@ -75,7 +78,6 @@ public class DomainAliasManagerBroker implements DomainAliasManifestFetcherListe
         for (Entry<String, List<String>> entry : aliasSet) {
             final List<String> aliasNames = entry.getValue();
             DomainAliasManager domainAliasManager = getDomainAliasManager(entry.getKey());
-            System.out.println("DomainAliasManagerBroker.updateManagers() About to update aliases for " + entry.getKey());
             domainAliasManager.updateAliases(aliasNames);
         }
     }

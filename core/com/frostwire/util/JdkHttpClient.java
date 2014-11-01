@@ -88,7 +88,6 @@ final class JdkHttpClient implements HttpClient {
         } catch (java.net.SocketTimeoutException timeoutException) {
             throw timeoutException;
         } catch (IOException e) {
-            LOG.error("Error getting string from http body response: " + e.getMessage());
             throw e;
         } finally {
             closeQuietly(baos);
@@ -108,7 +107,7 @@ final class JdkHttpClient implements HttpClient {
 
             result = baos.toByteArray();
         } catch (Throwable e) {
-            LOG.error("Error getting string from http body response: " + e.getMessage(), e);
+            LOG.error("Error getting bytes from http body response: " + e.getMessage(), e);
         } finally {
             closeQuietly(baos);
         }
@@ -261,7 +260,7 @@ final class JdkHttpClient implements HttpClient {
             post(url, baos, timeout, userAgent, formData);
             result = new String(baos.toByteArray(), "UTF-8");
         } catch (Throwable e) {
-            LOG.error("Error getting string from http body response: " + e.getMessage(), e);
+            LOG.error("Error posting data via http: " + e.getMessage(), e);
         } finally {
             closeQuietly(baos);
         }
