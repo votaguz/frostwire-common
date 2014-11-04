@@ -19,10 +19,7 @@ import java.io.File;
 import java.net.InetAddress;
 
 import org.gudy.azureus2.platform.PlatformManager;
-import org.gudy.azureus2.platform.PlatformManagerCapabilities;
 import org.gudy.azureus2.platform.PlatformManagerFactory;
-import org.gudy.azureus2.platform.PlatformManagerListener;
-import org.gudy.azureus2.platform.PlatformManagerPingCallback;
 import org.gudy.azureus2.plugins.platform.PlatformManagerException;
 
 //import com.aelitis.azureus.core.AzureusCore;
@@ -294,28 +291,6 @@ public class PlatformManagerImpl implements PlatformManager
 	    throw new PlatformManagerException("Unsupported capability called on platform manager");		
 	}
 	
-	public void
-	traceRoute(
-		InetAddress							interface_address,
-		InetAddress							target,
-		PlatformManagerPingCallback			callback )
-	
-		throws PlatformManagerException
-	{
-	    throw new PlatformManagerException("Unsupported capability called on platform manager");		
-	}
-	
-	public void
-	ping(
-		InetAddress							interface_address,
-		InetAddress							target,
-		PlatformManagerPingCallback			callback )
-	
-		throws PlatformManagerException
-	{
-	    throw new PlatformManagerException("Unsupported capability called on platform manager");		
-	}
-	
 	public int
 	getMaxOpenFiles()
 	
@@ -323,31 +298,11 @@ public class PlatformManagerImpl implements PlatformManager
 	{
 	    throw new PlatformManagerException("Unsupported capability called on platform manager");		
 	}
-	
-    /**
-     * {@inheritDoc}
-     */
-    public boolean hasCapability(PlatformManagerCapabilities capability)
-    {
-        return false;
-    }
 
     /**
      * Does nothing
      */
     public void dispose()
-    {
-    }
-    
-    public void
-    addListener(
-    	PlatformManagerListener		listener )
-    {
-    }
-    
-    public void
-    removeListener(
-    	PlatformManagerListener		listener )
     {
     }
 

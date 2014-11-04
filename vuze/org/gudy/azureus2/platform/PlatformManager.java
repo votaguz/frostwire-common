@@ -166,22 +166,6 @@ PlatformManager
 	
 		throws PlatformManagerException;
 	
-	public void
-	traceRoute(
-		InetAddress						interface_address,
-		InetAddress						target,
-		PlatformManagerPingCallback		callback )
-	
-		throws PlatformManagerException;
-	
-	public void
-	ping(
-		InetAddress						interface_address,
-		InetAddress						target,
-		PlatformManagerPingCallback		callback )
-	
-		throws PlatformManagerException;
-	
 		/**
 		 * This max-open-files concept here is from linux/osx where network connections are treated as 'files' 
 		 * @return
@@ -207,34 +191,12 @@ PlatformManager
 		String		class_name )
 		
 		throws PlatformManagerException;
-		
-    /**
-     * <p>Gets whether the platform manager supports a capability</p>
-     * <p>Users of PlatformManager should check for supported capabilities before calling
-     * the corresponding methods</p>
-     * <p>Note that support for a particular capability may change arbitrarily in
-     * the duration of the application session, but the manager will cache where
-     * necessary.</p>
-     * @param capability A platform manager capability
-     * @return True if the manager supports the capability
-     */
-    public boolean
-	hasCapability(
-		PlatformManagerCapabilities	capability );
 
     /**
      * Disposes system resources. This method is optional.
      */
     public void
     dispose();
-    
-    public void
-    addListener(
-    	PlatformManagerListener		listener );
-    
-    public void
-    removeListener(
-    	PlatformManagerListener		listener );
 
 		/**
 		 * Requests the user's attention such as bouncing the application icon on OSX
