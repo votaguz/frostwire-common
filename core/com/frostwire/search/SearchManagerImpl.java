@@ -61,7 +61,7 @@ public class SearchManagerImpl implements SearchManager {
     public void perform(SearchPerformer performer) {
         if (performer != null) {
             if (performer.getToken() < 0) {
-                throw new IllegalArgumentException("Search token id mut be >= 0");
+                throw new IllegalArgumentException("Search token id must be >= 0");
             }
 
             performer.registerListener(new PerformerResultListener(this));
