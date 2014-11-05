@@ -130,8 +130,10 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         if (engine.isPaused()) {
             return TransferState.PAUSED;
         }
-        
-        TorrentStatus.State state = th.getStatus().getState();
+
+        if (!th.isValid()) {
+            return TransferState.ERROR;
+        }
 
         if (th.getStatus().isPaused()) {
             return TransferState.PAUSED;
@@ -140,6 +142,8 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         if (th.getStatus().isFinished()) { // see the docs of isFinished
             return TransferState.SEEDING;
         }
+
+        TorrentStatus.State state = th.getStatus().getState();
 
         switch (state) {
             case QUEUED_FOR_CHECKING:
@@ -460,6 +464,10 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         Set<File> s = new HashSet<File>();
 
         try {
+            if (!th.isValid()) {
+                return s;
+            }
+
             long[] progress = th.getFileProgress(TorrentHandle.FileProgressFlags.PIECE_GRANULARITY);
 
             FileStorage fs = th.getTorrentInfo().getFiles();
