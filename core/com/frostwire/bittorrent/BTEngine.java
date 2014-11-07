@@ -3,7 +3,6 @@ package com.frostwire.bittorrent;
 import com.frostwire.jlibtorrent.*;
 import com.frostwire.jlibtorrent.alerts.Alert;
 import com.frostwire.jlibtorrent.alerts.AlertType;
-import static com.frostwire.jlibtorrent.alerts.AlertType.*;
 import com.frostwire.jlibtorrent.alerts.TorrentAlert;
 import com.frostwire.jlibtorrent.swig.entry;
 import com.frostwire.logging.Logger;
@@ -14,7 +13,12 @@ import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
+
+import static com.frostwire.jlibtorrent.alerts.AlertType.*;
 
 /**
  * @author gubatron
@@ -432,6 +436,8 @@ public final class BTEngine {
                 LOG.error("Error restoring torrent download: " + t, e);
             }
         }
+
+        migrateVuzeDownloads();
     }
 
     File settingsFile() {
@@ -516,6 +522,46 @@ public final class BTEngine {
     private void fireDownloadAdded(BTDownload dl) {
         if (listener != null) {
             listener.downloadAdded(this, dl);
+        }
+    }
+
+    private void migrateVuzeDownloads() {
+        try {
+            File dir = new File(ctx.homeDir.getParent(), "azureus");
+            File file = new File(dir, "downloads.config");
+
+            if (file.exists()) {
+                Entry configEntry = Entry.bdecode(file);
+                List<Entry> downloads = configEntry.dictionary().get("downloads").list();
+
+                for (Entry d : downloads) {
+                    try {
+                        Map<String, Entry> map = d.dictionary();
+                        File saveDir = new File(map.get("save_dir").string());
+                        File torrent = new File(map.get("torrent").string());
+                        ArrayList<Entry> filePriorities = map.get("file_priorities").list();
+
+                        Priority[] priorities = Priority.array(Priority.IGNORE, filePriorities.size());
+                        for (int i = 0; i < filePriorities.size(); i++) {
+                            long p = filePriorities.get(i).integer();
+                            if (p != 0) {
+                                priorities[i] = Priority.NORMAL;
+                            }
+                        }
+
+                        if (torrent.exists() && saveDir.exists()) {
+                            LOG.info("Restored old vuze download: " + torrent);
+                            downloader.download(new TorrentInfo(torrent), saveDir, priorities, null);
+                        }
+                    } catch (Throwable e) {
+                        LOG.error("Error restoring vuze torrent download", e);
+                    }
+                }
+
+                //file.delete();
+            }
+        } catch (Throwable e) {
+            LOG.error("Error migrating old vuze downloads", e);
         }
     }
 
