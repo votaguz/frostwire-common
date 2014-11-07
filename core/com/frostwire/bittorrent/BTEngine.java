@@ -558,7 +558,7 @@ public final class BTEngine {
                     }
                 }
 
-                //file.delete();
+                file.delete();
             }
         } catch (Throwable e) {
             LOG.error("Error migrating old vuze downloads", e);
