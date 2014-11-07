@@ -103,13 +103,6 @@ AENetworkClassifier
 		return( null );
 	}
 	
-	public static String
-	categoriseAddress(
-		InetSocketAddress		isa )
-	{
-		return( categoriseAddress( AddressUtils.getHostAddress( isa )));
-	}
-	
 	public static String[]
 	getNetworks(
 		TOTorrent	torrent,

@@ -1148,49 +1148,6 @@ public class UrlUtils
 		return( url.toString());
 	}
 	
-		/**
-		 * Returns an explicit IPv4 url if the supplied one has both IPv6 and IPv4 addresses
-		 * @param url
-		 * @return
-		 */
-	
-	public static URL
-	getIPV4Fallback(
-		URL	url )
-	{
-		try{
-			InetAddress[] addresses = AddressUtils.getAllByName( url.getHost());
-			
-			if ( addresses.length > 0 ){
-				
-				InetAddress	ipv4	= null;
-				InetAddress	ipv6	= null;
-				
-				for ( InetAddress a: addresses ){
-					
-					if ( a instanceof Inet4Address ){
-						
-						ipv4 = a;
-						
-					}else{
-						
-						ipv6 = a;
-					}
-				}
-				
-				if ( ipv4 != null && ipv6 != null ){
-					
-					url = UrlUtils.setHost( url, ipv4.getHostAddress());
-					
-					return( url );
-				}
-			}
-		}catch( Throwable f ){
-		}	
-		
-		return( null );
-	}
-	
 	public static long
 	getContentLength(
 		URLConnection	con )
