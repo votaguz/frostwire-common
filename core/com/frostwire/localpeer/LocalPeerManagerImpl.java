@@ -133,12 +133,15 @@ public final class LocalPeerManagerImpl implements LocalPeerManager {
                 jmdns = null;
             }
 
-            if (lock != null) {
-                lock.release();
-            }
-
             cache.clear();
 
+            if (lock != null) {
+                try {
+                    lock.release();
+                } catch (RuntimeException re) {
+                    LOG.error("RuntimeException caught: Could not release multicast lock", re);
+                }
+            }
         } catch (Throwable e) {
             LOG.error("Error stopping local peer manager", e);
         }
