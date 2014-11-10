@@ -76,16 +76,18 @@ public final class DirectoryUtils {
         boolean canDelete = true;
 
         File[] files = directory.listFiles();
-        for (int i = 0; i < files.length; i++) {
-            try {
-                if (!files[i].getCanonicalPath().startsWith(canonicalParent))
-                    continue;
-            } catch (IOException ioe) {
-                canDelete = false;
-            }
+        if (files != null) {
+            for (int i = 0; i < files.length; i++) {
+                try {
+                    if (!files[i].getCanonicalPath().startsWith(canonicalParent))
+                        continue;
+                } catch (IOException ioe) {
+                    canDelete = false;
+                }
 
-            if (!deleteEmptyDirectoryRecursive(files[i])) {
-                canDelete = false;
+                if (!deleteEmptyDirectoryRecursive(files[i])) {
+                    canDelete = false;
+                }
             }
         }
 
