@@ -470,12 +470,13 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
             long[] progress = th.getFileProgress(TorrentHandle.FileProgressFlags.PIECE_GRANULARITY);
 
-            FileStorage fs = th.getTorrentInfo().getFiles();
+            TorrentInfo ti = th.getTorrentInfo();
             String prefix = savePath.getAbsolutePath();
 
             for (int i = 0; i < progress.length; i++) {
-                if (progress[i] < fs.getFileSize(i)) {
-                    s.add(new File(fs.getFilePath(i, prefix)));
+                FileEntry fe = ti.getFileAt(i);
+                if (progress[i] < fe.getSize()) {
+                    s.add(new File(prefix, fe.getPath()));
                 }
             }
         } catch (Throwable e) {

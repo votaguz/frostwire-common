@@ -64,8 +64,6 @@ public final class PerformersHelper {
 
         TorrentInfo ti = TorrentInfo.bdecode(data);
 
-        FileStorage fs = ti.getFiles();
-
         int numFiles = ti.getNumFiles();
 
         for (int i = 0; !performer.isStopped() && i < numFiles; i++) {
