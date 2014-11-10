@@ -283,7 +283,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
     @Override
     public void remove(boolean deleteData) {
-        remove(false, true);
+        remove(false, deleteData);
     }
 
     public void remove(boolean deleteTorrent, boolean deleteData) {
