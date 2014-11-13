@@ -552,6 +552,7 @@ public final class BTEngine {
                         if (torrent.exists() && saveDir.exists()) {
                             LOG.info("Restored old vuze download: " + torrent);
                             downloader.download(new TorrentInfo(torrent), saveDir, priorities, null);
+                            saveResumeTorrent(torrent);
                         }
                     } catch (Throwable e) {
                         LOG.error("Error restoring vuze torrent download", e);
