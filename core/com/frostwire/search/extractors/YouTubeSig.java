@@ -33,7 +33,7 @@ public final class YouTubeSig {
 	private final JsFunction<String> fn;
 
 	public YouTubeSig(String jscode) {
-		Matcher m = Pattern.compile("signature=([$a-zA-Z]+)").matcher(jscode);
+		Matcher m = Pattern.compile("\\.sig\\|\\|([$a-zA-Z0-9]+)\\(").matcher(jscode);
         m.find();
         String funcname = m.group(1);
         this.fn = new JsFunction<String>(jscode, funcname);
