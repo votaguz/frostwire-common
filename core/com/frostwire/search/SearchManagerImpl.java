@@ -36,7 +36,7 @@ public class SearchManagerImpl implements SearchManager {
 
     private static final Logger LOG = Logger.getLogger(SearchManagerImpl.class);
 
-    private static final int DEFAULT_NTHREADS = 4;
+    private static final int DEFAULT_NTHREADS = 6;
 
     private final ExecutorService executor;
     private final List<SearchTask> tasks;
@@ -44,7 +44,7 @@ public class SearchManagerImpl implements SearchManager {
     private SearchManagerListener listener;
 
     public SearchManagerImpl(int nThreads) {
-        this.executor = new ThreadPool("SearchManager", nThreads, new PriorityBlockingQueue<Runnable>(), true);
+        this.executor = new ThreadPool("SearchManager", nThreads, nThreads, 1L, new PriorityBlockingQueue<Runnable>(), true);
         this.tasks = Collections.synchronizedList(new LinkedList<SearchTask>());
     }
 

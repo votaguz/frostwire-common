@@ -18,6 +18,11 @@ public final class ThreadPool extends ThreadPoolExecutor {
         this.name = name;
     }
 
+    public ThreadPool(String name, int corePoolSize, int maximumPoolSize, long keepAliveTime, BlockingQueue<Runnable> workQueue, boolean daemon) {
+        super(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.MILLISECONDS, workQueue, new PoolThreadFactory(daemon));
+        this.name = name;
+    }
+
     @Override
     protected void beforeExecute(Thread t, Runnable r) {
         String threadName = null;
