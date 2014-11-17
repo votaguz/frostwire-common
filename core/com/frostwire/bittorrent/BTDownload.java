@@ -291,7 +291,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
         Session s = engine.getSession();
 
-        incompleteFilesToRemove = getIncompleteFiles();
+        incompleteFilesToRemove = getIncompleteFiles(true);
 
         if (deleteData) {
             s.removeTorrent(th, Session.Options.DELETE_FILES);
@@ -461,6 +461,10 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     }
 
     public Set<File> getIncompleteFiles() {
+        return getIncompleteFiles(false);
+    }
+
+    private Set<File> getIncompleteFiles(boolean accurate) {
         Set<File> s = new HashSet<File>();
 
         try {
@@ -468,7 +472,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
                 return s;
             }
 
-            long[] progress = th.getFileProgress(TorrentHandle.FileProgressFlags.PIECE_GRANULARITY);
+            long[] progress = accurate ? th.getFileProgress() : th.getFileProgress(TorrentHandle.FileProgressFlags.PIECE_GRANULARITY);
 
             TorrentInfo ti = th.getTorrentInfo();
             String prefix = savePath.getAbsolutePath();
