@@ -376,14 +376,16 @@ public final class YouTubeExtractor {
         // concurrency issues are not important in this point
         YouTubeSig sig = null;
         if (!YT_SIG_MAP.containsKey(html5playerUrl)) {
+            String jscode="";
             try {
                 html5playerUrl = html5playerUrl.replace("\\", "");
                 HttpClient httpClient = HttpClientFactory.newInstance();
-                String jscode = httpClient.get(html5playerUrl);
+                jscode = httpClient.get(html5playerUrl);
                 sig = new YouTubeSig(jscode);
                 YT_SIG_MAP.put(html5playerUrl, sig);
             } catch (Throwable t) {
                 LOG.error("Could not getYouTubeSig", t);
+                LOG.error("jscode:\n" + jscode);
             }
         } else {
             //cache hit, it worked with this url.            
