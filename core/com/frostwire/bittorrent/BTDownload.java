@@ -293,10 +293,12 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
         incompleteFilesToRemove = getIncompleteFiles(true);
 
-        if (deleteData) {
-            s.removeTorrent(th, Session.Options.DELETE_FILES);
-        } else {
-            s.removeTorrent(th);
+        if (th.isValid()) {
+            if (deleteData) {
+                s.removeTorrent(th, Session.Options.DELETE_FILES);
+            } else {
+                s.removeTorrent(th);
+            }
         }
 
         if (deleteTorrent) {
