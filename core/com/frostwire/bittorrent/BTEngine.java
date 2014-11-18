@@ -271,8 +271,9 @@ public final class BTEngine {
 
         session.setSettings(defaultSettings);
 
+        SessionSettings s = session.getSettings(); // working with a copy?
+
         if (ctx.optimizeMemory) {
-            SessionSettings s = session.getSettings(); // working with a copy?
 
             int maxQueuedDiskBytes = s.getMaxQueuedDiskBytes();
             s.setMaxQueuedDiskBytes(maxQueuedDiskBytes / 2);
@@ -290,8 +291,13 @@ public final class BTEngine {
             s.setSeedingOutgoingConnections(false);
             s.setConnectionsLimit(200);
 
-            session.setSettings(s);
+        } else {
+
+            s.setActiveDownloads(10);
+            s.setActiveSeeds(10);
         }
+
+        session.setSettings(s);
 
         saveSettings();
     }
