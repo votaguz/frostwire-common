@@ -425,6 +425,11 @@ public final class BTEngine {
             return;
         }
 
+        if (ctx.homeDir == null || !ctx.homeDir.exists()) {
+            LOG.warn("Wrong setup with BTEngine home dir");
+            return;
+        }
+
         File[] torrents = ctx.homeDir.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
