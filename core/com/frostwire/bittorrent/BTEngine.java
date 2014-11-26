@@ -598,6 +598,11 @@ public final class BTEngine {
             LOG.warn("Failed to create save dir to download");
         }
 
+        if (result != null && !result.canWrite()) {
+            result = null;
+            LOG.warn("Failed to setup save dir with write access");
+        }
+
         return result;
     }
 
