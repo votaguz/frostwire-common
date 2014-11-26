@@ -27,7 +27,7 @@ import static com.frostwire.jlibtorrent.alerts.AlertType.*;
 public final class BTEngine {
 
     private static final int[] INNER_LISTENER_TYPES = new int[]{TORRENT_ADDED.getSwig(),
-            BLOCK_FINISHED.getSwig(),
+            PIECE_FINISHED.getSwig(),
             PORTMAP.getSwig(),
             PORTMAP_ERROR.getSwig()};
 
@@ -623,7 +623,7 @@ public final class BTEngine {
                     fireDownloadAdded(new BTDownload(BTEngine.this, ((TorrentAlert<?>) alert).getHandle()));
                     doResumeData((TorrentAlert<?>) alert);
                     break;
-                case BLOCK_FINISHED:
+                case PIECE_FINISHED:
                     doResumeData((TorrentAlert<?>) alert);
                     break;
                 case PORTMAP:
