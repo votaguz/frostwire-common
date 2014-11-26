@@ -311,8 +311,9 @@ public final class BTEngine {
             return;
         }
 
+        saveDir = setupSaveDir(saveDir);
         if (saveDir == null) {
-            saveDir = ctx.dataDir;
+            return;
         }
 
         TorrentInfo ti = new TorrentInfo(torrent);
@@ -348,8 +349,9 @@ public final class BTEngine {
             return;
         }
 
+        saveDir = setupSaveDir(saveDir);
         if (saveDir == null) {
-            saveDir = ctx.dataDir;
+            return;
         }
 
         Priority[] priorities = null;
@@ -384,8 +386,9 @@ public final class BTEngine {
             return;
         }
 
+        saveDir = setupSaveDir(saveDir);
         if (saveDir == null) {
-            saveDir = ctx.dataDir;
+            return;
         }
 
         TorrentInfo ti = sr.getTorrentInfo();
@@ -575,6 +578,27 @@ public final class BTEngine {
         } catch (Throwable e) {
             LOG.error("Error migrating old vuze downloads", e);
         }
+    }
+
+    private File setupSaveDir(File saveDir) {
+        File result = null;
+
+        if (saveDir == null) {
+            if (ctx.dataDir != null) {
+                result = ctx.dataDir;
+            } else {
+                LOG.warn("Unable to setup save dir path, review your logic, both saveDir and ctx.dataDir are null.");
+            }
+        } else {
+            result = saveDir;
+        }
+
+        if (result != null && !result.isDirectory() && !result.mkdirs()) {
+            result = null;
+            LOG.warn("Failed to create save dir to download");
+        }
+
+        return result;
     }
 
     private final class InnerListener implements AlertListener {
