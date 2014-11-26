@@ -41,6 +41,8 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
     private static final Logger LOG = Logger.getLogger(BTDownload.class);
 
+    private static final long SAVE_RESUME_RESOLUTION_MILLIS = 10000;
+
     private static final int[] ALERT_TYPES = {AlertType.TORRENT_PRIORITIZE.getSwig(),
             AlertType.TORRENT_FINISHED.getSwig(),
             AlertType.TORRENT_REMOVED.getSwig(), AlertType.SAVE_RESUME_DATA.getSwig()};
@@ -57,6 +59,8 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     private BTDownloadListener listener;
 
     private Set<File> incompleteFilesToRemove;
+
+    private long lastSaveResumeTime;
 
     public BTDownload(BTEngine engine, TorrentHandle th) {
         super(th);
@@ -356,6 +360,14 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
     @Override
     public void saveResumeData(SaveResumeDataAlert alert) {
+        long now = System.currentTimeMillis();
+        if ((now - lastSaveResumeTime) >= SAVE_RESUME_RESOLUTION_MILLIS) {
+            lastSaveResumeTime = now;
+        } else {
+            // skip, too fast, see SAVE_RESUME_RESOLUTION_MILLIS
+            return;
+        }
+
         try {
             TorrentHandle th = alert.getHandle();
             if (th.isValid()) {
