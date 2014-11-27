@@ -51,24 +51,23 @@ public class DefaultDomainAliasManifestFetcher extends AbstractDomainAliasManife
         //TPB
         
         List<String> tpbAliases = new ArrayList<String>();
-        tpbAliases.add("pirateproxy.net"); //*
-        tpbAliases.add("proxybay.de"); //*
-        
+        tpbAliases.add("pirateproxy.ws");
+        tpbAliases.add("pirateproxy.net");
+        tpbAliases.add("proxybay.de");
+        tpbAliases.add("labaia.me");
+        tpbAliases.add("mybay.pw");
+        tpbAliases.add("ilikerainbows.co.uk");
+        tpbAliases.add("tpb.ovh");
+        tpbAliases.add("outlaw.is");
         tpbAliases.add("pirateproxy.se");
         tpbAliases.add("tpb.unblocked.co");
-        tpbAliases.add("thelitebay.com");
         tpbAliases.add("www.proxybay.eu");
-        
-        tpbAliases.add("proxybay.eu");
-        tpbAliases.add("pirateproxy.ca");
-        tpbAliases.add("tpbunion.com");
-        tpbAliases.add("quluxingba.info");
+        tpbAliases.add("8la2.com");
+        tpbAliases.add("proxybay.xyz");
         tpbAliases.add("tpb.pirati.cz");
-        tpbAliases.add("tpb.al");
-        tpbAliases.add("piratesniper.org.uk");
-        tpbAliases.add("tpb.rebootorrents.com");
+        tpbAliases.add("proxybay.ovh");
         tpbAliases.add("piratebay.io");
-        tpbAliases.add("thepirate.al");
+        tpbAliases.add("bayproxy.ovh");
         manifest.aliases.put("thepiratebay.se", tpbAliases);
         
         //TORRENTS
