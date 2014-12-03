@@ -92,7 +92,7 @@ public final class BTEngine {
             return 0;
         }
 
-        return session.getStatus().getDownloadRate();
+        return session.getStatus().getPayloadDownloadRate();
     }
 
     public long getUploadRate() {
@@ -100,7 +100,7 @@ public final class BTEngine {
             return 0;
         }
 
-        return session.getStatus().getUploadRate();
+        return session.getStatus().getPayloadUploadRate();
     }
 
     public long getTotalDownload() {
