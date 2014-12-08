@@ -22,10 +22,14 @@ import com.frostwire.jlibtorrent.FileStorage;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.search.torrent.TorrentCrawlableSearchResult;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
+import com.google.code.regexp.Matcher;
+import com.google.code.regexp.Pattern;
 import org.gudy.azureus2.core3.torrent.TOTorrentException;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.google.code.regexp.Pattern.compile;
 
 /**
  * @author gubatron
@@ -33,25 +37,34 @@ import java.util.List;
  */
 public final class PerformersHelper {
 
+    private static final Pattern MAGNET_HASH_PATTERN = Pattern.compile("magnet\\:\\?xt\\=urn\\:btih\\:([a-fA-F0-9]){40}");
+
     private PerformersHelper() {
     }
 
     public static List<? extends SearchResult> searchPageHelper(RegexSearchPerformer<?> performer, String page, int regexMaxResults) {
         List<SearchResult> result = new LinkedList<SearchResult>();
-
         SearchMatcher matcher = SearchMatcher.from(performer.getPattern().matcher(new MaxIterCharSequence(page, 2 * page.length())));
-
         int max = regexMaxResults;
-
         int i = 0;
+        boolean matcherFound = false;
 
-        while (matcher.find() && i < max && !performer.isStopped()) {
-            SearchResult sr = performer.fromMatcher(matcher);
-            if (sr != null) {
-                result.add(sr);
-                i++;
+        do {
+            try {
+                matcherFound = matcher.find();
+            } catch (Throwable t) {
+                matcherFound = false;
+                t.printStackTrace();
             }
-        }
+
+            if (matcherFound) {
+                SearchResult sr = performer.fromMatcher(matcher);
+                if (sr != null) {
+                    result.add(sr);
+                    i++;
+                }
+            }
+        } while (matcherFound && i < max && !performer.isStopped());
 
         return result;
     }
@@ -77,5 +90,19 @@ public final class PerformersHelper {
         }
 
         return list;
+    }
+
+    public static String parseInfoHash(String url) {
+        String result = null;
+        final Matcher matcher = MAGNET_HASH_PATTERN.matcher(url);
+        try {
+            if (matcher.find()) {
+                result = matcher.group(1);
+            }
+        } catch (Throwable t) {
+            System.out.println("Could not parse magnet out of " + url);
+            t.printStackTrace();
+        }
+        return result;
     }
 }
