@@ -38,7 +38,7 @@ public abstract class CrawlRegexSearchPerformer<T extends CrawlableSearchResult>
     }
 
     @Override
-    protected List<? extends SearchResult> searchPage(String page) {
+    protected final List<? extends SearchResult> searchPage(String page) {
         return PerformersHelper.searchPageHelper(this, page, regexMaxResults);
     }
 }
