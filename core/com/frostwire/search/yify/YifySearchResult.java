@@ -18,15 +18,15 @@
 
 package com.frostwire.search.yify;
 
+import com.frostwire.search.PerformersHelper;
+import com.frostwire.search.SearchMatcher;
+import com.frostwire.search.torrent.AbstractTorrentSearchResult;
+import org.apache.commons.io.FilenameUtils;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.commons.io.FilenameUtils;
-
-import com.frostwire.search.SearchMatcher;
-import com.frostwire.search.torrent.AbstractTorrentSearchResult;
 
 /**
  * @author gubatron
@@ -80,7 +80,7 @@ public class YifySearchResult extends AbstractTorrentSearchResult {
         //a magnet
         this.torrentUrl = matcher.group(7);
         this.displayName = matcher.group(2) + " ("+ matcher.group(4) +")";
-        this.infoHash = parseInfoHash(torrentUrl);
+        this.infoHash = PerformersHelper.parseInfoHash(torrentUrl);
     }
 
     private String parseFileName(String detailsUrl) {
@@ -154,10 +154,6 @@ public class YifySearchResult extends AbstractTorrentSearchResult {
             }
         }
         return result;
-    }
-
-    private String parseInfoHash(String url) {
-        return url.substring("magnet:?xt=urn:btih:".length(), url.indexOf("&"));
     }
 
     @Override

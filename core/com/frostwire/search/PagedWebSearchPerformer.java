@@ -54,6 +54,7 @@ public abstract class PagedWebSearchPerformer extends WebSearchPerformer {
                 result = searchPage(text);
             }
         } catch (Throwable e) {
+            e.printStackTrace();
             checkAccesibleDomains();
         }
         return result;

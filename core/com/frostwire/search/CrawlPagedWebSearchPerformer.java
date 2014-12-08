@@ -18,11 +18,11 @@
 
 package com.frostwire.search;
 
-import java.util.List;
-
 import com.frostwire.logging.Logger;
 import com.frostwire.search.domainalias.DomainAliasManager;
 import com.frostwire.util.OSUtils;
+
+import java.util.List;
 
 /**
  * @author gubatron

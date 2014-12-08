@@ -125,7 +125,7 @@ public final class DomainAliasManager {
 
     /**
      * Until it doesn't know the default domain name is not accesible
-     * it will keep returning the next domain cosidered to be online.
+     * it will keep returning the next domain considered to be online.
      * @return
      */
     public String getDomainNameToUse() {

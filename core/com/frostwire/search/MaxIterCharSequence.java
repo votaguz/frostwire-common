@@ -38,7 +38,7 @@ public class MaxIterCharSequence implements CharSequence {
     @Override
     public char charAt(int index) {
         if (counter < 0) {
-            throw new RuntimeException("Iteration over the string exhausted");
+            throw new RuntimeException("Iteration over the string exhausted (index:" + index + ")");
         }
         counter--;
         return inner.charAt(index);

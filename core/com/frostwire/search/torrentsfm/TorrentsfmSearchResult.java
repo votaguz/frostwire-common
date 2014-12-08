@@ -18,13 +18,14 @@
 
 package com.frostwire.search.torrentsfm;
 
+import com.frostwire.search.PerformersHelper;
+import com.frostwire.search.SearchMatcher;
+import com.frostwire.search.torrent.AbstractTorrentSearchResult;
+
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-
-import com.frostwire.search.SearchMatcher;
-import com.frostwire.search.torrent.AbstractTorrentSearchResult;
 
 /**
  * @author gubatron
@@ -67,7 +68,7 @@ public class TorrentsfmSearchResult extends AbstractTorrentSearchResult {
         //a magnet
         this.torrentUrl = matcher.group("magnet");//"http://" + domainName + "/tor/" + matcher.group(5) + ".torrent";
         this.displayName = filename;//HtmlManipulator.replaceHtmlEntities(FilenameUtils.getBaseName(filename));
-        this.infoHash = parseInfoHash(torrentUrl);
+        this.infoHash = PerformersHelper.parseInfoHash(torrentUrl);
     }
 
     private String parseThumbnailUrl(String domainName, String srcUrl) {
@@ -163,10 +164,5 @@ public class TorrentsfmSearchResult extends AbstractTorrentSearchResult {
         } catch (Throwable t) {
         }
         return result;
-    }
-
-    private String parseInfoHash(String url) {
-        //magnet:?xt=urn:btih:e3811b9539cacff680e418124272177c47477157&amp;
-        return url.substring("magnet:?xt=urn:btih:".length(), url.indexOf("&amp"));
     }
 }
