@@ -36,7 +36,6 @@ import static com.google.code.regexp.Pattern.compile;
  * @author aldenml
  */
 public final class PerformersHelper {
-
     private static final Pattern MAGNET_HASH_PATTERN = Pattern.compile("magnet\\:\\?xt\\=urn\\:btih\\:([a-fA-F0-9]){40}");
 
     private PerformersHelper() {
