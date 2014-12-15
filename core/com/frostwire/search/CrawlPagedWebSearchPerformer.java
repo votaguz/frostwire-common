@@ -20,7 +20,10 @@ package com.frostwire.search;
 
 import com.frostwire.logging.Logger;
 import com.frostwire.search.domainalias.DomainAliasManager;
+import com.frostwire.search.torrent.TorrentSearchResult;
+import com.frostwire.util.ByteUtils;
 import com.frostwire.util.OSUtils;
+import sun.misc.Perf;
 
 import java.util.List;
 
@@ -33,8 +36,9 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
 
     private static final Logger LOG = Logger.getLogger(CrawlPagedWebSearchPerformer.class);
 
-    private static final int DEFAULT_CRAWL_TIMEOUT = 10000; // 10 seconds
-    private static final int DEFAULT_MAGNET_DOWNLOAD_TIMEOUT = OSUtils.isAndroid() ? 4000 : 20000; // 4 seconds for android, 20 seconds for desktop
+    private static final int DEFAULT_CRAWL_TIMEOUT = 10000; // 10 seconds.
+    private static final int FAILED_CRAWL_URL_CACHE_LIFETIME = 900000; // 15 minutes.
+    private static final int DEFAULT_MAGNET_DOWNLOAD_TIMEOUT = OSUtils.isAndroid() ? 4000 : 20000; // 4 seconds for android, 20 seconds for desktop.
 
     private static CrawlCache cache = null;
     private static MagnetDownloader magnetDownloader = null;
@@ -68,8 +72,29 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
 
                 String url = getCrawlUrl(obj);
 
+                byte[] failed = cacheGet("failed:" + url);
+                if (failed != null) {
+                    long failedWhen = ByteUtils.byteArrayToLong(failed);
+                    if ((System.currentTimeMillis() - failedWhen) < FAILED_CRAWL_URL_CACHE_LIFETIME) {
+                        //if the failed request is still fresh we stop
+                        return;
+                    } else {
+                        cacheRemove("failed:" + url);
+                    }
+                }
+
                 if (url != null) {
                     byte[] data = cacheGet(url);
+
+                    if (sr instanceof TorrentSearchResult) {
+                        String infohash = ((TorrentSearchResult) sr).getHash();
+                        if (data == null) {
+                            // maybe we've already cached it by infohash (happens quite a bit)
+                            data = cacheGet(infohash);
+                        } else {
+                            cachePut(infohash, data);
+                        }
+                    }
 
                     if (data == null) { // not a big deal about synchronization here
                         LOG.debug("Downloading data for: " + url);
@@ -87,8 +112,15 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
                         //expense of performing another download.
                         if (data != null) {
                             cachePut(url, data);
+
+                            if (sr instanceof TorrentSearchResult) {
+                                // if the search result has an infohash we can use...
+                                String infohash = ((TorrentSearchResult) sr).getHash();
+                                cachePut(infohash, data);
+                            }
                         } else {
                             LOG.warn("Failed to download data: " + url);
+                            cachePut("failed:" + url, ByteUtils.longToByteArray(System.currentTimeMillis()));
                         }
                     }
 

@@ -18,6 +18,7 @@
 
 package com.frostwire.util;
 
+import java.nio.ByteBuffer;
 import java.util.Locale;
 import java.util.Random;
 import java.util.UUID;
@@ -74,4 +75,31 @@ public final class ByteUtils {
 
         return buffer;
     }
+
+    public static byte[] longToByteArray(long l) {
+        return ByteBuffer.allocate(Long.BYTES).putLong(l).array();
+    }
+
+    public static long byteArrayToLong(byte[] arr) {
+        return ByteBuffer.wrap(arr).getLong();
+    }
+
+    /*
+    private static void testLongByteArrayConversions() {
+        long l = 3212831239812l;
+        byte[] larr = longToByteArray(l);
+        long l2 = byteArrayToLong(larr);
+        System.out.println("testLongByteArrayConversions passed?" + (l == l2));
+        System.out.println("testLongByteArrayConversions Long.MAX_VALUE passed?" + (byteArrayToLong(longToByteArray(Long.MAX_VALUE)) == Long.MAX_VALUE));
+        System.out.println("testLongByteArrayConversions Long.MIN_VALUE passed?" + (byteArrayToLong(longToByteArray(Long.MIN_VALUE)) == Long.MIN_VALUE));
+        System.out.println("testLongByteArrayConversions 0 passed?" + (byteArrayToLong(longToByteArray(0)) == 0));
+        System.out.println("testLongByteArrayConversions 1 passed?" + (byteArrayToLong(longToByteArray(1)) == 1));
+    }
+    */
+
+    /*
+    public static void main(String[] args) {
+        testLongByteArrayConversions();
+    }
+    */
 }
