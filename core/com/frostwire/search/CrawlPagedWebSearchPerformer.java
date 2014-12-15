@@ -21,6 +21,7 @@ package com.frostwire.search;
 import com.frostwire.logging.Logger;
 import com.frostwire.search.domainalias.DomainAliasManager;
 import com.frostwire.search.torrent.TorrentSearchResult;
+import com.frostwire.util.ByteUtils;
 import com.frostwire.util.OSUtils;
 import sun.misc.Perf;
 
@@ -71,14 +72,14 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
 
                 String url = getCrawlUrl(obj);
 
-                byte[] failed = cacheGet("failed:"+url);
+                byte[] failed = cacheGet("failed:" + url);
                 if (failed != null) {
-                    long failedWhen = Long.parseLong(new String(failed));
+                    long failedWhen = ByteUtils.byteArrayToLong(failed);
                     if ((System.currentTimeMillis() - failedWhen) < FAILED_CRAWL_URL_CACHE_LIFETIME) {
                         //if the failed request is still fresh we stop
                         return;
                     } else {
-                        cacheRemove("failed:"+url);
+                        cacheRemove("failed:" + url);
                     }
                 }
 
@@ -119,7 +120,7 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
                             }
                         } else {
                             LOG.warn("Failed to download data: " + url);
-                            cachePut("failed:" + url, String.valueOf(System.currentTimeMillis()).getBytes());
+                            cachePut("failed:" + url, ByteUtils.longToByteArray(System.currentTimeMillis()));
                         }
                     }
 
