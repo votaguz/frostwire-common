@@ -23,7 +23,6 @@ import com.frostwire.search.domainalias.DomainAliasManager;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.util.ByteUtils;
 import com.frostwire.util.OSUtils;
-import sun.misc.Perf;
 
 import java.util.List;
 

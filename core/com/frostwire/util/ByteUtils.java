@@ -77,7 +77,7 @@ public final class ByteUtils {
     }
 
     public static byte[] longToByteArray(long l) {
-        return ByteBuffer.allocate(Long.BYTES).putLong(l).array();
+        return ByteBuffer.allocate(8).putLong(l).array();
     }
 
     public static long byteArrayToLong(byte[] arr) {
