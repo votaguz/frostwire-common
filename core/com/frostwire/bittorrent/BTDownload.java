@@ -175,6 +175,14 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         }
     }
 
+    /**
+     * If we have a torrent which is downloaded as a folder, this will return the parent of that folder.
+     * (e.g. default save location for torrents)
+     *
+     * If you want to have the folder where the torrent files are located you might want to concatenate the
+     * name of this download to the save path. (e.g. File torrentFolder = new File(dl.getSavePath(), dl.getName())
+     * @return
+     */
     @Override
     public File getSavePath() {
         return savePath;
@@ -235,6 +243,24 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
     public int getTotalSeeds() {
         return th.getStatus().getListSeeds();
+    }
+
+    @Override
+    public File getContentSavePath() {
+        try {
+            if (!th.isValid()) {
+                return null;
+            }
+
+            TorrentInfo ti = th.getTorrentInfo();
+            if (ti != null) {
+                return new File(getSavePath().getAbsolutePath(), (ti.getNumFiles() > 1) ? getName() : ti.getFileAt(0).getPath());
+            }
+        } catch (Throwable e) {
+            LOG.warn("Could not retrieve download content save path", e);
+        }
+
+        return null;
     }
 
     public String getInfoHash() {
@@ -480,7 +506,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         return getIncompleteFiles(false);
     }
 
-    private Set<File> getIncompleteFiles(boolean accurate) {
+    public Set<File> getIncompleteFiles(boolean accurate) {
         Set<File> s = new HashSet<File>();
 
         try {
@@ -495,8 +521,14 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
             for (int i = 0; i < progress.length; i++) {
                 FileEntry fe = ti.getFileAt(i);
-                if (progress[i] < fe.getSize()) {
-                    s.add(new File(prefix, fe.getPath()));
+                long feSize = fe.getSize();
+                if (progress[i] < feSize) {
+
+                    //is it really incomplete? (might be there from previous transfer)
+                    File f = new File(prefix, fe.getPath());
+                    if (f.exists() && f.length() < feSize) {
+                        s.add(f);
+                    }
                 }
             }
         } catch (Throwable e) {
