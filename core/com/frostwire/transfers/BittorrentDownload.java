@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2013, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,6 +39,7 @@ public interface BittorrentDownload extends DownloadTransfer, UploadTransfer {
     /**
      * For multi files torrents, returns the folder containing the files (savePath/torrentName)
      * For single file torrents, returns the path to the single file of the torrent (savePath/singleFile)
+     *
      * @return
      */
     public File getContentSavePath();
@@ -54,5 +55,4 @@ public interface BittorrentDownload extends DownloadTransfer, UploadTransfer {
     public void resume();
 
     public void remove(boolean deleteTorrent, boolean deleteData);
-
 }

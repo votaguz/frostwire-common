@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -178,9 +178,10 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     /**
      * If we have a torrent which is downloaded as a folder, this will return the parent of that folder.
      * (e.g. default save location for torrents)
-     *
+     * <p/>
      * If you want to have the folder where the torrent files are located you might want to concatenate the
      * name of this download to the save path. (e.g. File torrentFolder = new File(dl.getSavePath(), dl.getName())
+     *
      * @return
      */
     @Override
@@ -254,7 +255,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
             TorrentInfo ti = th.getTorrentInfo();
             if (ti != null) {
-                return new File(getSavePath().getAbsolutePath(), (ti.getNumFiles() > 1) ? getName() : ti.getFileAt(0).getPath());
+                return new File(savePath.getAbsolutePath(), ti.getNumFiles() > 1 ? th.getName() : ti.getFileAt(0).getPath());
             }
         } catch (Throwable e) {
             LOG.warn("Could not retrieve download content save path", e);
@@ -323,7 +324,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
         Session s = engine.getSession();
 
-        incompleteFilesToRemove = getIncompleteFiles(true);
+        incompleteFilesToRemove = getIncompleteFiles();
 
         if (th.isValid()) {
             if (deleteData) {
@@ -503,10 +504,6 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     }
 
     public Set<File> getIncompleteFiles() {
-        return getIncompleteFiles(false);
-    }
-
-    public Set<File> getIncompleteFiles(boolean accurate) {
         Set<File> s = new HashSet<File>();
 
         try {
@@ -514,19 +511,27 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
                 return s;
             }
 
-            long[] progress = accurate ? th.getFileProgress() : th.getFileProgress(TorrentHandle.FileProgressFlags.PIECE_GRANULARITY);
+            long[] progress = th.getFileProgress(TorrentHandle.FileProgressFlags.PIECE_GRANULARITY);
 
             TorrentInfo ti = th.getTorrentInfo();
             String prefix = savePath.getAbsolutePath();
 
+            long createdTime = created.getTime();
+
             for (int i = 0; i < progress.length; i++) {
                 FileEntry fe = ti.getFileAt(i);
                 long feSize = fe.getSize();
-                if (progress[i] < feSize) {
 
-                    //is it really incomplete? (might be there from previous transfer)
+                if (progress[i] < feSize) {
+                    // lets see if indeed the file is incomplete
                     File f = new File(prefix, fe.getPath());
-                    if (f.exists() && f.length() < feSize) {
+
+                    if (!f.exists()) {
+                        continue; // nothing to do here
+                    }
+
+                    if (f.lastModified() >= createdTime) {
+                        // we have a file modified (supposedly) by this transfer
                         s.add(f);
                     }
                 }
