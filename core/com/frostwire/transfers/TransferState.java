@@ -47,5 +47,6 @@ public enum TransferState {
     UPLOADING,
     UNCOMPRESSING,
     DEMUXING,
-    UNKNOWN
+    UNKNOWN,
+    ERROR_DISK_FULL
 }
