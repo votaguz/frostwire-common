@@ -13,9 +13,7 @@ import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static com.frostwire.jlibtorrent.alerts.AlertType.*;
@@ -40,6 +38,8 @@ public final class BTEngine {
     private final ReentrantLock sync;
     private final InnerListener innerListener;
 
+    private final Queue<RestoreDownloadTask> restoreDownloadsQueue;
+
     private Session session;
     private Downloader downloader;
     private SessionSettings defaultSettings;
@@ -50,6 +50,8 @@ public final class BTEngine {
     private BTEngine() {
         this.sync = new ReentrantLock();
         this.innerListener = new InnerListener();
+
+        this.restoreDownloadsQueue = new LinkedList<RestoreDownloadTask>();
     }
 
     private static class Loader {
@@ -445,13 +447,15 @@ public final class BTEngine {
                 String infoHash = FilenameUtils.getBaseName(t.getName());
                 File resumeFile = resumeDataFile(infoHash);
 
-                session.asyncAddTorrent(t, null, resumeFile);
+                restoreDownloadsQueue.add(new RestoreDownloadTask(t, null, null, resumeFile));
             } catch (Throwable e) {
                 LOG.error("Error restoring torrent download: " + t, e);
             }
         }
 
         migrateVuzeDownloads();
+
+        runNextRestoreDownloadTask();
     }
 
     File settingsFile() {
@@ -565,7 +569,7 @@ public final class BTEngine {
 
                         if (torrent.exists() && saveDir.exists()) {
                             LOG.info("Restored old vuze download: " + torrent);
-                            downloader.download(new TorrentInfo(torrent), saveDir, priorities, null);
+                            restoreDownloadsQueue.add(new RestoreDownloadTask(torrent, saveDir, priorities, null));
                             saveResumeTorrent(torrent);
                         }
                     } catch (Throwable e) {
@@ -606,6 +610,13 @@ public final class BTEngine {
         return result;
     }
 
+    private void runNextRestoreDownloadTask() {
+        RestoreDownloadTask task = restoreDownloadsQueue.poll();
+        if (task != null) {
+            task.run();
+        }
+    }
+
     private final class InnerListener implements AlertListener {
         @Override
         public int[] types() {
@@ -614,7 +625,6 @@ public final class BTEngine {
 
         @Override
         public void alert(Alert<?> alert) {
-            //LOG.info(a.message());
 
             AlertType type = alert.getType();
 
@@ -622,6 +632,7 @@ public final class BTEngine {
                 case TORRENT_ADDED:
                     fireDownloadAdded(new BTDownload(BTEngine.this, ((TorrentAlert<?>) alert).getHandle()));
                     doResumeData((TorrentAlert<?>) alert);
+                    runNextRestoreDownloadTask();
                     break;
                 case PIECE_FINISHED:
                     doResumeData((TorrentAlert<?>) alert);
@@ -633,6 +644,26 @@ public final class BTEngine {
                     firewalled = true;
                     break;
             }
+        }
+    }
+
+    private final class RestoreDownloadTask implements Runnable {
+
+        private final File torrent;
+        private final File saveDir;
+        private final Priority[] priorities;
+        private final File resume;
+
+        public RestoreDownloadTask(File torrent, File saveDir, Priority[] priorities, File resume) {
+            this.torrent = torrent;
+            this.saveDir = saveDir;
+            this.priorities = priorities;
+            this.resume = resume;
+        }
+
+        @Override
+        public void run() {
+            session.asyncAddTorrent(new TorrentInfo(torrent), saveDir, priorities, resume);
         }
     }
 
