@@ -50,7 +50,6 @@ public final class BTEngine {
     private BTEngine() {
         this.sync = new ReentrantLock();
         this.innerListener = new InnerListener();
-
         this.restoreDownloadsQueue = new LinkedList<RestoreDownloadTask>();
     }
 
