@@ -612,6 +612,6 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     }
 
     private boolean isPlayableExtension(String ext) {
-        return "mp3".equals(ext);
+        return "mp3".equalsIgnoreCase(ext);
     }
 }
