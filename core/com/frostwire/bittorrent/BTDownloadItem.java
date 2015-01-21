@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@
 package com.frostwire.bittorrent;
 
 import com.frostwire.jlibtorrent.FileEntry;
-import com.frostwire.jlibtorrent.FileStorage;
 import com.frostwire.jlibtorrent.Priority;
 import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.transfers.TransferItem;
@@ -30,7 +29,7 @@ import java.io.File;
  * @author gubatron
  * @author aldenml
  */
-public final class BTDownloadItem implements TransferItem {
+public class BTDownloadItem implements TransferItem {
 
     private final TorrentHandle th;
     private final int index;

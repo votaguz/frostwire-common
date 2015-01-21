@@ -495,7 +495,12 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
                 for (int i = 0; i < numFiles; i++) {
                     FileEntry fe = ti.getFileAt(i);
-                    items.add(new BTDownloadItem(th, i, fe));
+                    String ext = FilenameUtils.getExtension(fe.getPath());
+                    if (isPlayableExtension(ext)) {
+                        items.add(new BTPlayableItem(th, i, fe));
+                    } else {
+                        items.add(new BTDownloadItem(th, i, fe));
+                    }
                 }
             }
         }
@@ -604,5 +609,9 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
                 LOG.error("Error calling listener", e);
             }
         }
+    }
+
+    private boolean isPlayableExtension(String ext) {
+        return "mp3".equals(ext);
     }
 }
