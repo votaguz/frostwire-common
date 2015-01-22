@@ -47,7 +47,8 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
             AlertType.TORRENT_FINISHED.getSwig(),
             AlertType.TORRENT_REMOVED.getSwig(), AlertType.SAVE_RESUME_DATA.getSwig()};
 
-    public static final String WAS_PAUSED_EXTRA_KEY = "was_paused";
+    private static final String EXTRA_DATA_KEY = "extra_data";
+    private static final String WAS_PAUSED_EXTRA_KEY = "was_paused";
 
     private final BTEngine engine;
     private final TorrentHandle th;
@@ -55,6 +56,9 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     private final Date created;
 
     private final Map<String, String> extra;
+
+    // this is a mutable list to store the items when they become available
+    private final ArrayList<TransferItem> items;
 
     private BTDownloadListener listener;
 
@@ -70,6 +74,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         this.created = new Date(th.getStatus().getAddedTime());
 
         this.extra = createExtra();
+        this.items = new ArrayList<TransferItem>();
 
         engine.getSession().addListener(this);
     }
@@ -408,12 +413,29 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
                 File file = engine.resumeDataFile(infoHash);
 
                 Entry e = alert.getResumeData();
-                e.getSwig().dict().set("extra_data", Entry.fromMap(extra).getSwig());
+                e.getSwig().dict().set(EXTRA_DATA_KEY, Entry.fromMap(extra).getSwig());
 
                 FileUtils.writeByteArrayToFile(file, e.bencode());
             }
         } catch (Throwable e) {
             LOG.warn("Error saving resume data", e);
+        }
+    }
+
+    @Override
+    public void pieceFinished(PieceFinishedAlert alert) {
+        try {
+
+            TorrentHandle th = alert.getHandle();
+
+            if (th.isValid()) {
+                TorrentInfo ti = th.getTorrentInfo();
+                int pieceIndex = alert.getPieceIndex();
+                ArrayList<FileSlice> slices = ti.mapBlock(pieceIndex, 0, ti.getPieceSize(pieceIndex));
+            }
+
+        } catch (Throwable e) {
+            LOG.warn("Error handling piece finished logic", e);
         }
     }
 
@@ -484,14 +506,10 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
     @Override
     public List<TransferItem> getItems() {
-        List<TransferItem> items = Collections.emptyList();
-
         if (th.isValid()) {
             TorrentInfo ti = th.getTorrentInfo();
-            if (ti != null && ti.isValid()) {
+            if (ti != null && ti.isValid() && items.isEmpty()) {
                 int numFiles = ti.getNumFiles();
-
-                items = new ArrayList<TransferItem>(numFiles);
 
                 for (int i = 0; i < numFiles; i++) {
                     FileEntry fe = ti.getFileAt(i);
@@ -564,8 +582,8 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
                 entry e = entry.bdecode(Vectors.bytes2char_vector(arr));
                 string_entry_map d = e.dict();
 
-                if (d.has_key("extra_data")) {
-                    readExtra(d.get("extra_data").dict(), map);
+                if (d.has_key(EXTRA_DATA_KEY)) {
+                    readExtra(d.get(EXTRA_DATA_KEY).dict(), map);
                 }
             }
 
