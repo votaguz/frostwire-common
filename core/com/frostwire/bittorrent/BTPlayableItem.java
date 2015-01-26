@@ -39,6 +39,6 @@ public final class BTPlayableItem extends BTDownloadItem implements PlayableTran
 
     @Override
     public long getPlayableLength() {
-        return 0;
+        return getSequentialDownloaded();
     }
 }

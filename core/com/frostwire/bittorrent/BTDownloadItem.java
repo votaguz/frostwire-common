@@ -19,11 +19,15 @@
 package com.frostwire.bittorrent;
 
 import com.frostwire.jlibtorrent.FileEntry;
+import com.frostwire.jlibtorrent.FileSlice;
 import com.frostwire.jlibtorrent.Priority;
 import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.transfers.TransferItem;
 
 import java.io.File;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.PriorityQueue;
 
 /**
  * @author gubatron
@@ -38,6 +42,8 @@ public class BTDownloadItem implements TransferItem {
     private final String name;
     private final long size;
 
+    private final SortedSlices slices;
+
     public BTDownloadItem(TorrentHandle th, int index, FileEntry fe) {
         this.th = th;
         this.index = index;
@@ -45,6 +51,8 @@ public class BTDownloadItem implements TransferItem {
         this.file = new File(th.getSavePath(), fe.getPath());
         this.name = file.getName();
         this.size = fe.getSize();
+
+        this.slices = new SortedSlices();
     }
 
     @Override
@@ -103,5 +111,49 @@ public class BTDownloadItem implements TransferItem {
     @Override
     public boolean isComplete() {
         return getDownloaded() == size;
+    }
+
+    /**
+     * This method perform a linear search inside the stored slices, so should be used taking
+     * care of potential performance issues.
+     *
+     * @return
+     */
+    public long getSequentialDownloaded() {
+        Iterator<FileSlice> it = slices.iterator();
+
+        long downloaded = 0;
+        boolean done = false;
+
+        while (!done && it.hasNext()) {
+            FileSlice slice = it.next();
+
+            if (slice.getOffset() > downloaded) {
+                done = true;
+            } else {
+                downloaded = downloaded + slice.getSize();
+            }
+        }
+
+        return downloaded;
+    }
+
+    void updatePiece(FileSlice slice) {
+        slices.add(slice);
+    }
+
+    private static final class SortedSlices extends PriorityQueue<FileSlice> {
+
+        public SortedSlices() {
+            super(new FileSliceComparator());
+        }
+    }
+
+    private static final class FileSliceComparator implements Comparator<FileSlice> {
+
+        @Override
+        public int compare(FileSlice o1, FileSlice o2) {
+            return Long.compare(o1.getOffset(), o2.getOffset());
+        }
     }
 }

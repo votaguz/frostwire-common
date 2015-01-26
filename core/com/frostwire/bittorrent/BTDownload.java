@@ -432,6 +432,12 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
                 TorrentInfo ti = th.getTorrentInfo();
                 int pieceIndex = alert.getPieceIndex();
                 ArrayList<FileSlice> slices = ti.mapBlock(pieceIndex, 0, ti.getPieceSize(pieceIndex));
+
+                for (FileSlice slice : slices) {
+                    int fileIndex = slice.getFileIndex();
+                    BTDownloadItem item = (BTDownloadItem) items.get(fileIndex);
+                    item.updatePiece(slice);
+                }
             }
 
         } catch (Throwable e) {
@@ -506,9 +512,9 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
     @Override
     public List<TransferItem> getItems() {
-        if (th.isValid()) {
+        if (items.isEmpty() && th.isValid()) {
             TorrentInfo ti = th.getTorrentInfo();
-            if (ti != null && ti.isValid() && items.isEmpty()) {
+            if (ti != null && ti.isValid()) {
                 int numFiles = ti.getNumFiles();
 
                 for (int i = 0; i < numFiles; i++) {
