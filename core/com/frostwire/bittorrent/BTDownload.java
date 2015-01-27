@@ -463,7 +463,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
                 for (FileSlice slice : slices) {
                     int fileIndex = slice.getFileIndex();
                     BTDownloadItem item = (BTDownloadItem) items.get(fileIndex);
-                    item.getSliceTracker().setComplete(slice.getOffset(), true);
+                    item.getSliceTracker().setComplete(pieceIndex, true);
                 }
             }
 
@@ -546,7 +546,6 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
             if (ti != null && ti.isValid()) {
 
                 int numFiles = ti.getNumFiles();
-                FileSliceTracker[] sliceTrackers = new FileSliceTracker[numFiles];
 
                 for (int i = 0; i < numFiles; i++) {
                     FileEntry fe = ti.getFileAt(i);
@@ -568,10 +567,10 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
                         BTDownloadItem btItem = (BTDownloadItem) items.get(fileIndex);
                         FileSliceTracker slideTracker = btItem.getSliceTracker();
 
-                        slideTracker.addSlice(slice);
+                        slideTracker.addSlice(i, slice);
 
                         if (th.havePiece(i)) {
-                            slideTracker.setComplete(slice.getOffset(), true);
+                            slideTracker.setComplete(i, true);
                         }
                     }
                 }
@@ -623,6 +622,14 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         }
 
         return s;
+    }
+
+    public boolean isSequentialDownload() {
+        return th.getStatus().isSequentialDownload();
+    }
+
+    public void setSequentialDownload(boolean sequential) {
+        th.setSequentialDownload(sequential);
     }
 
     private Map<String, String> createExtra() {
