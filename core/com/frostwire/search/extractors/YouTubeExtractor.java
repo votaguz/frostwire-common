@@ -15,6 +15,7 @@
 
 package com.frostwire.search.extractors;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -23,6 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import jd.http.Browser;
@@ -53,6 +55,8 @@ public final class YouTubeExtractor {
 
     // using the signature decoding per running session (LruCache)
     private static LRUCacheMap<String, YouTubeSig> YT_SIG_MAP = new LRUCacheMap<String, YouTubeSig>(50);
+
+    private YouTubeSig currentYTSig;
 
     public List<LinkInfo> extract(String videoUrl, boolean testConnection) {
         try {
@@ -95,11 +99,34 @@ public final class YouTubeExtractor {
                 }
             }
 
+            // work with the DASH manifest
+            String dashmpd = br.getRegex("\"dashmpd\":\"([^\"]+)\"").getMatch(0);
+            if (dashmpd != null && currentYTSig != null) {
+                extractLinksFromDashManifest(dashmpd, currentYTSig);
+            }
+
             return infos;
 
         } catch (Throwable e) {
             throw new ExtractorException("General extractor error", e);
         }
+    }
+
+    private void extractLinksFromDashManifest(String dashManifestUrl, YouTubeSig ytSig) throws IOException {
+        dashManifestUrl = dashManifestUrl.replace("\\/", "/");
+        Pattern p = Pattern.compile("/s/([^/]*)/");
+        Matcher m = p.matcher(dashManifestUrl);
+        if (!m.find()) {
+            return;
+        }
+        String sig = m.group(1);
+        String signature = ytSig.calc(sig);
+
+        dashManifestUrl = dashManifestUrl.replaceAll("/s/([^/]*)/", "/signature/" + signature + "/");
+
+        HttpClient httpClient = HttpClientFactory.newInstance();
+        String dashDoc = httpClient.get(dashManifestUrl);
+        System.out.println(dashDoc);
     }
 
     private boolean testConnection(Browser br, String link) {
@@ -158,7 +185,7 @@ public final class YouTubeExtractor {
         br.setFollowRedirects(true);
         /* this cookie makes html5 available and skip controversy check */
         br.setCookie("youtube.com", "PREF", "f2=40100000&hl=en-US");
-        br.getHeaders().put("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.93 Safari/537.36");
+        br.getHeaders().put("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_2) AppleWebKit/600.3.18 (KHTML, like Gecko) Version/8.0.3 Safari/600.3.18");
         br.getPage(video);
 
         if (br.containsHTML("id=\"unavailable-submessage\" class=\"watch-unavailable-submessage\"")) {
@@ -221,6 +248,7 @@ public final class YouTubeExtractor {
 
         String html5player = br.getRegex("(?s)(html5player\\-.+?\\.js)").getMatch(0);
         YouTubeSig ytSig = getYouTubeSig("http://s.ytimg.com/yts/jsbin/" + html5player);
+        currentYTSig = ytSig;
 
         /* html5_fmt_map */
         if (br.getRegex(FILENAME_PATTERN).count() != 0 && fileNameFound == false) {
@@ -327,6 +355,7 @@ public final class YouTubeExtractor {
         if (filename != null && links != null && !links.isEmpty()) {
             links.put(-1, filename);
         }
+
         return links;
     }
 
