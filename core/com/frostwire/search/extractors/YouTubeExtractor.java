@@ -158,7 +158,7 @@ public final class YouTubeExtractor {
         br.setFollowRedirects(true);
         /* this cookie makes html5 available and skip controversy check */
         br.setCookie("youtube.com", "PREF", "f2=40100000&hl=en-US");
-        br.getHeaders().put("User-Agent", "Wget/1.12");
+        br.getHeaders().put("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.93 Safari/537.36");
         br.getPage(video);
 
         if (br.containsHTML("id=\"unavailable-submessage\" class=\"watch-unavailable-submessage\"")) {

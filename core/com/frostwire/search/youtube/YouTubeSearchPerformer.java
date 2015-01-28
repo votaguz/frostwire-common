@@ -59,6 +59,7 @@ public class YouTubeSearchPerformer extends CrawlPagedWebSearchPerformer<YouTube
         LinkInfo demuxVideo = null;
 
         for (LinkInfo inf : infos) {
+            System.out.println("inf.fmt = " + inf.fmt);
             if (!isDash(inf)) {
                 list.add(new YouTubeCrawledStreamableSearchResult(sr, inf, null));
             } else {

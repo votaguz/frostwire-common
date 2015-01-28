@@ -149,7 +149,7 @@ public final class JsFunction<T> {
             return jsl;
         }
 
-        Matcher m = Pattern.compile("^(?<var>[a-zA-Z0-9_]+)\\.(?<member>[^\\(]+)(\\((?<args>[^\\(\\)]*)\\))?$").matcher(expr);
+        Matcher m = Pattern.compile("^(?<var>[$a-zA-Z0-9_]+)\\.(?<member>[^\\(]+)(\\((?<args>[^\\(\\)]*)\\))?$").matcher(expr);
         if (m.find()) {
             String variable = m.group("var");
             String member = m.group("member");
