@@ -15,34 +15,35 @@
 
 package com.frostwire.search.extractors;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import com.frostwire.logging.Logger;
+import com.frostwire.search.FileSearchResult;
+import com.frostwire.util.HttpClient;
+import com.frostwire.util.HttpClientFactory;
 import jd.http.Browser;
 import jd.http.Request;
 import jd.nutils.encoding.Encoding;
 import jd.parser.Regex;
 import jd.parser.html.Form;
 import jd.parser.html.Form.MethodType;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
-import com.frostwire.logging.Logger;
-import com.frostwire.search.FileSearchResult;
-import com.frostwire.util.HttpClient;
-import com.frostwire.util.HttpClientFactory;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.io.StringReader;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public final class YouTubeExtractor {
 
@@ -102,7 +103,8 @@ public final class YouTubeExtractor {
             // work with the DASH manifest
             String dashmpd = br.getRegex("\"dashmpd\":\"([^\"]+)\"").getMatch(0);
             if (dashmpd != null && currentYTSig != null) {
-                extractLinksFromDashManifest(dashmpd, currentYTSig);
+                List<LinkInfo> dashInfos = extractLinksFromDashManifest(dashmpd, currentYTSig, filename, date, videoId, userName, channelName, thumbnailLinks);
+                infos.addAll(dashInfos);
             }
 
             return infos;
@@ -112,12 +114,13 @@ public final class YouTubeExtractor {
         }
     }
 
-    private void extractLinksFromDashManifest(String dashManifestUrl, YouTubeSig ytSig) throws IOException {
+    private List<LinkInfo> extractLinksFromDashManifest(String dashManifestUrl, YouTubeSig ytSig, String filename,
+                                                        Date date, String videoId, String userName, String channelName, ThumbnailLinks thumbnailLinks) throws IOException, ParserConfigurationException, SAXException {
         dashManifestUrl = dashManifestUrl.replace("\\/", "/");
         Pattern p = Pattern.compile("/s/([^/]*)/");
         Matcher m = p.matcher(dashManifestUrl);
         if (!m.find()) {
-            return;
+            return Collections.emptyList();
         }
         String sig = m.group(1);
         String signature = ytSig.calc(sig);
@@ -126,7 +129,36 @@ public final class YouTubeExtractor {
 
         HttpClient httpClient = HttpClientFactory.newInstance();
         String dashDoc = httpClient.get(dashManifestUrl);
-        System.out.println(dashDoc);
+
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        Document doc = db.parse(new InputSource(new StringReader(dashDoc)));
+
+        NodeList nodes = doc.getElementsByTagName("BaseURL");
+
+        List<LinkInfo> infos = new ArrayList<LinkInfo>();
+
+        for (int i = 0; i < nodes.getLength(); i++) {
+            Node item = nodes.item(i);
+            String url = item.getTextContent();
+            int contentLength = -1;
+            try {
+                contentLength = Integer.parseInt(item.getAttributes().item(0).getTextContent());
+            } catch (Throwable e) {
+                // ignore
+            }
+            int fmt = Integer.parseInt(new Regex(url, "itag=(\\d+)").getMatch(0));
+
+            Format format = FORMATS.get(fmt);
+            if (format == null) {
+                continue;
+            }
+
+            LinkInfo info = new LinkInfo(url, fmt, filename, contentLength, date, videoId, userName, channelName, thumbnailLinks, format);
+            infos.add(info);
+        }
+
+        return infos;
     }
 
     private boolean testConnection(Browser br, String link) {
@@ -412,7 +444,7 @@ public final class YouTubeExtractor {
         // concurrency issues are not important in this point
         YouTubeSig sig = null;
         if (!YT_SIG_MAP.containsKey(html5playerUrl)) {
-            String jscode="";
+            String jscode = "";
             try {
                 html5playerUrl = html5playerUrl.replace("\\", "");
                 HttpClient httpClient = HttpClientFactory.newInstance();
@@ -449,45 +481,45 @@ public final class YouTubeExtractor {
         for (i = 0; i < s.length(); i++) {
             ch = s.charAt(i);
             switch (ch) {
-            case '%':
-            case '\\':
-                ch2 = ch;
-                ch = s.charAt(++i);
-                StringBuilder sb2 = null;
-                switch (ch) {
-                case 'u':
+                case '%':
+                case '\\':
+                    ch2 = ch;
+                    ch = s.charAt(++i);
+                    StringBuilder sb2 = null;
+                    switch (ch) {
+                        case 'u':
                     /* unicode */
-                    sb2 = new StringBuilder();
-                    i++;
-                    ii = i + 4;
-                    for (; i < ii; i++) {
-                        ch = s.charAt(i);
-                        if (sb2.length() > 0 || ch != '0') {
-                            sb2.append(ch);
-                        }
-                    }
-                    i--;
-                    sb.append((char) Long.parseLong(sb2.toString(), 16));
-                    continue;
-                case 'x':
+                            sb2 = new StringBuilder();
+                            i++;
+                            ii = i + 4;
+                            for (; i < ii; i++) {
+                                ch = s.charAt(i);
+                                if (sb2.length() > 0 || ch != '0') {
+                                    sb2.append(ch);
+                                }
+                            }
+                            i--;
+                            sb.append((char) Long.parseLong(sb2.toString(), 16));
+                            continue;
+                        case 'x':
                     /* normal hex coding */
-                    sb2 = new StringBuilder();
-                    i++;
-                    ii = i + 2;
-                    for (; i < ii; i++) {
-                        ch = s.charAt(i);
-                        sb2.append(ch);
+                            sb2 = new StringBuilder();
+                            i++;
+                            ii = i + 2;
+                            for (; i < ii; i++) {
+                                ch = s.charAt(i);
+                                sb2.append(ch);
+                            }
+                            i--;
+                            sb.append((char) Long.parseLong(sb2.toString(), 16));
+                            continue;
+                        default:
+                            if (ch2 == '%') {
+                                sb.append(ch2);
+                            }
+                            sb.append(ch);
+                            continue;
                     }
-                    i--;
-                    sb.append((char) Long.parseLong(sb2.toString(), 16));
-                    continue;
-                default:
-                    if (ch2 == '%') {
-                        sb.append(ch2);
-                    }
-                    sb.append(ch);
-                    continue;
-                }
 
             }
             sb.append(ch);
