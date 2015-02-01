@@ -88,7 +88,7 @@ public final class YouTubeExtractor {
 
             List<LinkInfo> infos = new LinkedList<LinkInfo>();
 
-            if (!testConnection || testConnection(br, getFirstLink(LinksFound))) {
+            //if (!testConnection || testConnection(br, getFirstLink(LinksFound))) {
                 for (int fmt : LinksFound.keySet()) {
                     Format format = FORMATS.get(fmt);
                     if (format == null) {
@@ -98,7 +98,7 @@ public final class YouTubeExtractor {
                     LinkInfo info = new LinkInfo(link, fmt, filename, FileSearchResult.UNKNOWN_SIZE, date, videoId, userName, channelName, thumbnailLinks, format);
                     infos.add(info);
                 }
-            }
+            //}
 
             // work with the DASH manifest
             String dashmpd = br.getRegex("\"dashmpd\":\"([^\"]+)\"").getMatch(0);
@@ -119,13 +119,16 @@ public final class YouTubeExtractor {
         dashManifestUrl = dashManifestUrl.replace("\\/", "/");
         Pattern p = Pattern.compile("/s/([^/]*)/");
         Matcher m = p.matcher(dashManifestUrl);
-        if (!m.find()) {
+        if (m.find()) {
+            String sig = m.group(1);
+            String signature = ytSig.calc(sig);
+
+            dashManifestUrl = dashManifestUrl.replaceAll("/s/([^/]*)/", "/signature/" + signature + "/");
+        } else if (dashManifestUrl.contains("/signature/")) {
+            // dashManifestUrl as it is, empty block to review
+        } else {
             return Collections.emptyList();
         }
-        String sig = m.group(1);
-        String signature = ytSig.calc(sig);
-
-        dashManifestUrl = dashManifestUrl.replaceAll("/s/([^/]*)/", "/signature/" + signature + "/");
 
         HttpClient httpClient = HttpClientFactory.newInstance();
         String dashDoc = httpClient.get(dashManifestUrl);

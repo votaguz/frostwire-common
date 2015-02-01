@@ -52,7 +52,8 @@ public class YouTubeSearchPerformer extends CrawlPagedWebSearchPerformer<YouTube
     protected List<? extends SearchResult> crawlResult(YouTubeSearchResult sr, byte[] data) throws Exception {
         List<YouTubeCrawledSearchResult> list = new LinkedList<YouTubeCrawledSearchResult>();
 
-        List<LinkInfo> infos = new YouTubeExtractor().extract(sr.getDetailsUrl(), sr.testConnection());
+        String detailsUrl = sr.getDetailsUrl();
+        List<LinkInfo> infos = new YouTubeExtractor().extract(detailsUrl, sr.testConnection());
 
         LinkInfo dashVideo = null;
         LinkInfo dashAudio = null;
