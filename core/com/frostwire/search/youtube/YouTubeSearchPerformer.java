@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,10 +18,6 @@
 
 package com.frostwire.search.youtube;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-
 import com.frostwire.search.CrawlPagedWebSearchPerformer;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.domainalias.DomainAliasManager;
@@ -29,11 +25,15 @@ import com.frostwire.search.extractors.YouTubeExtractor;
 import com.frostwire.search.extractors.YouTubeExtractor.LinkInfo;
 import com.frostwire.util.JsonUtils;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+
+import static com.frostwire.search.youtube.YouTubeUtils.isDash;
+
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class YouTubeSearchPerformer extends CrawlPagedWebSearchPerformer<YouTubeSearchResult> {
 
@@ -59,9 +59,14 @@ public class YouTubeSearchPerformer extends CrawlPagedWebSearchPerformer<YouTube
         LinkInfo dashAudio = null;
         LinkInfo demuxVideo = null;
 
+        LinkInfo minQuality = null;
+
         for (LinkInfo inf : infos) {
             if (!isDash(inf)) {
-                list.add(new YouTubeCrawledStreamableSearchResult(sr, inf, null));
+                if (inf.fmt == 18) {
+                    minQuality = inf;
+                }
+                list.add(new YouTubeCrawledStreamableSearchResult(sr, inf, null, minQuality));
             } else {
                 if (inf.fmt == 137) {// 1080p
                     dashVideo = inf;
@@ -83,10 +88,10 @@ public class YouTubeSearchPerformer extends CrawlPagedWebSearchPerformer<YouTube
         }
 
         if (dashAudio != null) {
-            list.add(new YouTubeCrawledStreamableSearchResult(sr, null, dashAudio));
+            list.add(new YouTubeCrawledStreamableSearchResult(sr, null, dashAudio, minQuality));
         } else {
             if (demuxVideo != null) {
-                list.add(new YouTubeCrawledStreamableSearchResult(sr, null, demuxVideo));
+                list.add(new YouTubeCrawledStreamableSearchResult(sr, null, demuxVideo, minQuality));
             }
         }
 
@@ -110,7 +115,7 @@ public class YouTubeSearchPerformer extends CrawlPagedWebSearchPerformer<YouTube
             if (!isStopped()) {
                 YouTubeSearchResult sr = new YouTubeSearchResult(entry, testConnection);
                 result.add(sr);
-                
+
                 if (testConnection) {
                     testConnection = false;
                 }
@@ -125,21 +130,5 @@ public class YouTubeSearchPerformer extends CrawlPagedWebSearchPerformer<YouTube
                 replace("\"yt$userId\"", "\"ytuserId\"").
                 replace("\"media$group\"", "\"mediagroup\"").
                 replace("\"media$content\"", "\"mediacontent\"");
-    }
-
-    private boolean isDash(LinkInfo info) {
-        switch (info.fmt) {
-        case 133:
-        case 134:
-        case 135:
-        case 136:
-        case 137:
-        case 139:
-        case 140:
-        case 141:
-            return true;
-        default:
-            return false;
-        }
     }
 }

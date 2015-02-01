@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,19 +21,31 @@ package com.frostwire.search.youtube;
 import com.frostwire.search.StreamableSearchResult;
 import com.frostwire.search.extractors.YouTubeExtractor.LinkInfo;
 
+import static com.frostwire.search.youtube.YouTubeUtils.buildDownloadUrl;
+import static com.frostwire.search.youtube.YouTubeUtils.isDash;
+
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public final class YouTubeCrawledStreamableSearchResult extends YouTubeCrawledSearchResult implements StreamableSearchResult {
 
-    public YouTubeCrawledStreamableSearchResult(YouTubeSearchResult sr, LinkInfo video, LinkInfo audio) {
+    private final LinkInfo minQuality;
+    private final String streamUrl;
+
+    public YouTubeCrawledStreamableSearchResult(YouTubeSearchResult sr, LinkInfo video, LinkInfo audio, LinkInfo minQuality) {
         super(sr, video, audio);
+        this.minQuality = minQuality;
+
+        if (audio != null && isDash(audio)) {
+            streamUrl = buildDownloadUrl(null, minQuality);
+        } else {
+            streamUrl = getDownloadUrl();
+        }
     }
 
     @Override
     public String getStreamUrl() {
-        return getDownloadUrl();
+        return streamUrl;
     }
 }
