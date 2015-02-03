@@ -48,5 +48,6 @@ public enum TransferState {
     UNCOMPRESSING,
     DEMUXING,
     UNKNOWN,
-    ERROR_DISK_FULL
+    ERROR_DISK_FULL,
+    REDIRECTING
 }

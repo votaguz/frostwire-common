@@ -42,4 +42,7 @@ public interface CommonConstants {
     public static final int DEVICE_MAJOR_TYPE_DESKTOP = 0;
     public static final int DEVICE_MAJOR_TYPE_PHONE = 1;
     public static final int DEVICE_MAJOR_TYPE_TABLET = 2;
+
+    public static final String SOUNDCLOUD_CLIENTID = "c8ce5cbca9160b790311f06638a61037";
+    public static final String SOUNDCLOUD_APP_VERSION = "dd9d3970";
 }

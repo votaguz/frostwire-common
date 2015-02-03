@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,17 +18,17 @@
 
 package com.frostwire.search.youtube;
 
-import org.apache.commons.io.FilenameUtils;
-
 import com.frostwire.search.AbstractCrawledSearchResult;
 import com.frostwire.search.HttpSearchResult;
 import com.frostwire.search.extractors.YouTubeExtractor.LinkInfo;
 import com.frostwire.util.StringUtils;
+import org.apache.commons.io.FilenameUtils;
+
+import static com.frostwire.search.youtube.YouTubeUtils.buildDownloadUrl;
 
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public class YouTubeCrawledSearchResult extends AbstractCrawledSearchResult implements HttpSearchResult {
 
@@ -94,144 +94,130 @@ public class YouTubeCrawledSearchResult extends AbstractCrawledSearchResult impl
 
         return filename;
     }
-    
+
     /**
      * Upper guess to determine the duration in bytes, using highest bitrate of the stream.
+     *
      * @param durationInSeconds
      * @param linfo
-     * @return (([(video bitrate)] + [(audio bitrate)])*durationInSeconds)/8 
+     * @return (([(video bitrate)] + [(audio bitrate)])*durationInSeconds)/8
      */
     private long buildSize(int durationInSeconds, LinkInfo linfo) {
         long result = -1;
         double bitRateSum = 0;
-        
+
         switch (linfo.fmt) {
-        case 5:// new Format("flv", "H263", "MP3", "240p"));
-            bitRateSum = 0.25 +  64d/1024d;
-            break;
-        case 6://, new Format("flv", "H263", "MP3", "270p"));
-            bitRateSum = 0.8 + 64d/1024d;
-            break;
-        case 17://, new Format("3gp", "H264", "AAC", "144p"));
-            bitRateSum = 0.05 + 24d/1024d;
-            break;
-        case 18://, new Format("mp4", "H264", "AAC", "360p"));
-            bitRateSum = 0.5 + 96d/1024d;
-            break;
-        case 22://, new Format("mp4", "H264", "AAC", "720p"));
-            bitRateSum = 2.9 + 192d/1024d;
-            break;
-        case 34://, new Format("flv", "H264", "AAC", "360p"));
-            bitRateSum = 0.5 + 128d/1024d;
-            break;
-        case 35://, new Format("flv", "H264", "AAC", "480p"));
-            bitRateSum = 1 + 128d/1024d;
-            break;
-        case 36://, new Format("3gp", "H264", "AAC", "240p"));
-            bitRateSum = 0.17 + 38d/1024d;
-            break;
-        case 37://, new Format("mp4", "H264", "AAC", "1080p"));
-            bitRateSum = 5.9 + 192d/1024d;
-            break;
-        case 38://, new Format("mp4", "H264", "AAC", "3072p"));
-            bitRateSum = 5 + 192d/1024d;
-            break;
-        case 43://, new Format("webm", "VP8", "Vorbis", "360p"));
-            bitRateSum = 0.5 + 128d/1024d;
-            break;
-        case 44://, new Format("webm", "VP8", "Vorbis", "480p"));
-            bitRateSum = 1 + 128d/1024d;
-            break;
-        case 45://, new Format("webm", "VP8", "Vorbis", "720p"));
-            bitRateSum = 2 + 192d/1024d;
-            break;
-        case 46://, new Format("webm", "VP8", "Vorbis", "1080p"));
-            bitRateSum = 3 + 192d/1024d;
-            break;
-        case 82://, new Format("mp4", "H264", "AAC", "360p"));
-            bitRateSum = 0.5 + 96d/1024d;
-            break;
-        case 83://, new Format("mp4", "H264", "AAC", "240p"));
-            bitRateSum = 0.5 + 96d/1024d;
-            break;
-        case 84://, new Format("mp4", "H264", "AAC", "720p"));
-            bitRateSum = 2.9 + 152d/1024d;
-            break;
-        case 85://, new Format("mp4", "H264", "AAC", "520p"));
-            bitRateSum = 2.9 + 152d/1024d;
-            break;
-        case 100://, new Format("webm", "VP8", "Vorbis", "360p"));
-            bitRateSum = 0.5 + 128d/1024d;
-            break;
-        case 101://, new Format("webm", "VP8", "Vorbis", "360p"));
-            bitRateSum = 1 + 192d/1024d;
-            break;
-        case 102://, new Format("webm", "VP8", "Vorbis", "720p"));
-            bitRateSum = 2 + 192d/1024d;
-            break;
-        // dash video
-        case 133://, new Format("m4v", "H264", "", "240p"));
-            bitRateSum = 0.3 + 256d/1024d;
-            break;
-        case 134://, new Format("m4v", "H264", "", "360p"));
-            bitRateSum = 0.4 + 256d/1024d;
-            break;
-        case 135://, new Format("m4v", "H264", "", "480p"));
-            bitRateSum = 1 + 256d/1024d;
-            break;
-        case 136://, new Format("m4v", "H264", "", "720p"));
-            bitRateSum = 1.5 + 256d/1024d;
-            break;
-        case 137://, new Format("m4v", "H264", "", "1080p"));
-            bitRateSum = 2.9 + 256d/1024d;
-            break;
-        // dash audio
-        case 139://, new Format("m4a", "", "AAC", "48k"));
-            bitRateSum = 48d/1024d;
-            break;
-        case 140://, new Format("m4a", "", "AAC", "128k"));
-            bitRateSum = 128d/1024d;
-            break;
-        case 141://, new Format("m4a", "", "AAC", "256k"));        
-            bitRateSum = 256d/1024d;
-            break;
+            case 5:// new Format("flv", "H263", "MP3", "240p"));
+                bitRateSum = 0.25 + 64d / 1024d;
+                break;
+            case 6://, new Format("flv", "H263", "MP3", "270p"));
+                bitRateSum = 0.8 + 64d / 1024d;
+                break;
+            case 17://, new Format("3gp", "H264", "AAC", "144p"));
+                bitRateSum = 0.05 + 24d / 1024d;
+                break;
+            case 18://, new Format("mp4", "H264", "AAC", "360p"));
+                bitRateSum = 0.5 + 96d / 1024d;
+                break;
+            case 22://, new Format("mp4", "H264", "AAC", "720p"));
+                bitRateSum = 2.9 + 192d / 1024d;
+                break;
+            case 34://, new Format("flv", "H264", "AAC", "360p"));
+                bitRateSum = 0.5 + 128d / 1024d;
+                break;
+            case 35://, new Format("flv", "H264", "AAC", "480p"));
+                bitRateSum = 1 + 128d / 1024d;
+                break;
+            case 36://, new Format("3gp", "H264", "AAC", "240p"));
+                bitRateSum = 0.17 + 38d / 1024d;
+                break;
+            case 37://, new Format("mp4", "H264", "AAC", "1080p"));
+                bitRateSum = 5.9 + 192d / 1024d;
+                break;
+            case 38://, new Format("mp4", "H264", "AAC", "3072p"));
+                bitRateSum = 5 + 192d / 1024d;
+                break;
+            case 43://, new Format("webm", "VP8", "Vorbis", "360p"));
+                bitRateSum = 0.5 + 128d / 1024d;
+                break;
+            case 44://, new Format("webm", "VP8", "Vorbis", "480p"));
+                bitRateSum = 1 + 128d / 1024d;
+                break;
+            case 45://, new Format("webm", "VP8", "Vorbis", "720p"));
+                bitRateSum = 2 + 192d / 1024d;
+                break;
+            case 46://, new Format("webm", "VP8", "Vorbis", "1080p"));
+                bitRateSum = 3 + 192d / 1024d;
+                break;
+            case 82://, new Format("mp4", "H264", "AAC", "360p"));
+                bitRateSum = 0.5 + 96d / 1024d;
+                break;
+            case 83://, new Format("mp4", "H264", "AAC", "240p"));
+                bitRateSum = 0.5 + 96d / 1024d;
+                break;
+            case 84://, new Format("mp4", "H264", "AAC", "720p"));
+                bitRateSum = 2.9 + 152d / 1024d;
+                break;
+            case 85://, new Format("mp4", "H264", "AAC", "520p"));
+                bitRateSum = 2.9 + 152d / 1024d;
+                break;
+            case 100://, new Format("webm", "VP8", "Vorbis", "360p"));
+                bitRateSum = 0.5 + 128d / 1024d;
+                break;
+            case 101://, new Format("webm", "VP8", "Vorbis", "360p"));
+                bitRateSum = 1 + 192d / 1024d;
+                break;
+            case 102://, new Format("webm", "VP8", "Vorbis", "720p"));
+                bitRateSum = 2 + 192d / 1024d;
+                break;
+            // dash video
+            case 133://, new Format("m4v", "H264", "", "240p"));
+                bitRateSum = 0.3 + 256d / 1024d;
+                break;
+            case 134://, new Format("m4v", "H264", "", "360p"));
+                bitRateSum = 0.4 + 256d / 1024d;
+                break;
+            case 135://, new Format("m4v", "H264", "", "480p"));
+                bitRateSum = 1 + 256d / 1024d;
+                break;
+            case 136://, new Format("m4v", "H264", "", "720p"));
+                bitRateSum = 1.5 + 256d / 1024d;
+                break;
+            case 137://, new Format("m4v", "H264", "", "1080p"));
+                bitRateSum = 2.9 + 256d / 1024d;
+                break;
+            // dash audio
+            case 139://, new Format("m4a", "", "AAC", "48k"));
+                bitRateSum = 48d / 1024d;
+                break;
+            case 140://, new Format("m4a", "", "AAC", "128k"));
+                bitRateSum = 128d / 1024d;
+                break;
+            case 141://, new Format("m4a", "", "AAC", "256k"));
+                bitRateSum = 256d / 1024d;
+                break;
         }
-        
+
         bitRateSum = bitRateSum * 1024 * 1024; //Mbits to bits.
-        result = (long) (Math.ceil((bitRateSum * durationInSeconds)/8));
+        result = (long) (Math.ceil((bitRateSum * durationInSeconds) / 8));
         return result;
     }
 
     private long buildSize(int durationInSeconds, LinkInfo video, LinkInfo audio) {
         long size = UNKNOWN_SIZE;
-        
+
         if (durationInSeconds != UNKNOWN_SIZE) {
             if (video != null && audio == null) {
-                size = buildSize(durationInSeconds,video);
+                size = buildSize(durationInSeconds, video);
             } else if (video == null && audio != null) {
                 size = buildSize(durationInSeconds, audio);
             } else if (video != null && audio != null) {
-                size = buildSize(durationInSeconds,video);
+                size = buildSize(durationInSeconds, video);
             } else {
                 throw new IllegalArgumentException("No track defined");
             }
         }
         return size;
-    }
-
-    private String buildDownloadUrl(LinkInfo video, LinkInfo audio) {
-        String downloadUrl;
-        if (video != null && audio == null) {
-            downloadUrl = video.link;
-        } else if (video == null && audio != null) {
-            downloadUrl = audio.link;
-        } else if (video != null && audio != null) {
-            downloadUrl = video.link;
-        } else {
-            throw new IllegalArgumentException("No track defined");
-        }
-
-        return downloadUrl;
     }
 
     @Override

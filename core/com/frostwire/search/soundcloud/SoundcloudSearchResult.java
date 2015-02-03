@@ -44,8 +44,10 @@ public class SoundcloudSearchResult extends AbstractFileSearchResult implements 
     private final long date;
     private final String downloadUrl;
     private final long size;
+    private final SoundcloudItem item;
 
     public SoundcloudSearchResult(SoundcloudItem item, String clientId, String appVersion) {
+        this.item = item;
         this.displayName = item.title;
         this.username = buildUsername(item);
         this.trackUrl = item.permalink_url;
@@ -111,6 +113,10 @@ public class SoundcloudSearchResult extends AbstractFileSearchResult implements 
         return downloadUrl;
     }
 
+    public SoundcloudItem getSoundcloudItem() {
+        return item;
+    }
+
     private String buildUsername(SoundcloudItem item) {
         if (item.user != null && item.user.username != null) {
             return item.user.username;
@@ -155,7 +161,19 @@ public class SoundcloudSearchResult extends AbstractFileSearchResult implements 
     }
 
     private String buildDownloadUrl(SoundcloudItem item, String clientId, String appVersion) {
-        String downloadUrl = ((item.download_url != null) ? item.download_url : item.stream_url) + "?client_id=" + clientId + "&app_version=" + appVersion;
+        final String clientAppenderChar = (item.download_url != null && item.download_url.contains("?")) ? "&" : "?";
+        String downloadUrl = ((item.download_url != null) ? item.download_url : item.stream_url);
+
+        // direct download urls don't seem to need client_id & app_version, if passed to the url returns HTTP 404.
+        if (clientId != null && appVersion != null) {
+            downloadUrl += clientAppenderChar + "client_id=" + clientId + "&app_version=" + appVersion;
+        }
+
         return downloadUrl.replace("https://", "http://");
+    }
+
+    @Override
+    public String toString() {
+        return "SoundcloudSearchResult.downloadUrl: " + getDownloadUrl();
     }
 }

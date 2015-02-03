@@ -64,7 +64,9 @@ public class PropertyBoxParserImpl extends AbstractBoxParser {
             }
         } finally {
             try {
-                is.close();
+                if (is != null) {
+                    is.close();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
                 // ignore - I can't help
