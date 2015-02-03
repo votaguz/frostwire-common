@@ -19,7 +19,7 @@
 package com.frostwire.bittorrent;
 
 import com.frostwire.jlibtorrent.FileEntry;
-import com.frostwire.jlibtorrent.FileSliceTracker;
+import com.frostwire.jlibtorrent.PiecesTracker;
 import com.frostwire.jlibtorrent.Priority;
 import com.frostwire.jlibtorrent.TorrentHandle;
 import com.frostwire.transfers.TransferItem;
@@ -39,15 +39,17 @@ public class BTDownloadItem implements TransferItem {
     private final String name;
     private final long size;
 
-    private FileSliceTracker sliceTracker;
+    private PiecesTracker piecesTracker;
 
-    public BTDownloadItem(TorrentHandle th, int index, FileEntry fe) {
+    public BTDownloadItem(TorrentHandle th, int index, FileEntry fe, PiecesTracker piecesTracker) {
         this.th = th;
         this.index = index;
 
         this.file = new File(th.getSavePath(), fe.getPath());
         this.name = file.getName();
         this.size = fe.getSize();
+
+        this.piecesTracker = piecesTracker;
     }
 
     @Override
@@ -108,21 +110,10 @@ public class BTDownloadItem implements TransferItem {
         return getDownloaded() == size;
     }
 
-    public FileSliceTracker getSliceTracker() {
-        return sliceTracker;
-    }
-
-    public void setSliceTracker(FileSliceTracker sliceTracker) {
-        this.sliceTracker = sliceTracker;
-    }
-
     /**
-     * This method perform a linear search inside the stored slices, so should be used taking
-     * care of potential performance issues.
-     *
      * @return
      */
     public long getSequentialDownloaded() {
-        return sliceTracker != null ? sliceTracker.getSequentialDownloaded() : 0;
+        return piecesTracker.getSequentialDownloaded(index);
     }
 }

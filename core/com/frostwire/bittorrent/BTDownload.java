@@ -58,6 +58,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     private final TorrentHandle th;
     private final File savePath;
     private final Date created;
+    private final PiecesTracker piecesTracker;
 
     private final Map<String, String> extra;
 
@@ -76,6 +77,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         this.th = th;
         this.savePath = new File(th.getSavePath());
         this.created = new Date(th.getStatus().getAddedTime());
+        this.piecesTracker = new PiecesTracker(th.getTorrentInfo());
 
         this.extra = createExtra();
         this.items = new ArrayList<TransferItem>();
@@ -406,11 +408,8 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
             TorrentHandle th = alert.getHandle();
 
             if (th.isValid()) {
-
-                if (items.size() == 0) {
-                    // trigger items calculation
-                    getItems();
-                }
+                // trigger items calculation
+                getItems();
             }
 
         } catch (Throwable e) {
@@ -447,26 +446,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     @Override
     public void pieceFinished(PieceFinishedAlert alert) {
         try {
-            TorrentHandle th = alert.getHandle();
-
-            if (th.isValid()) {
-
-                if (items.size() == 0) {
-                    // trigger items calculation
-                    getItems();
-                }
-
-                TorrentInfo ti = th.getTorrentInfo();
-                int pieceIndex = alert.getPieceIndex();
-                ArrayList<FileSlice> slices = ti.mapBlock(pieceIndex, 0, ti.getPieceSize(pieceIndex));
-
-                for (FileSlice slice : slices) {
-                    int fileIndex = slice.getFileIndex();
-                    BTDownloadItem item = (BTDownloadItem) items.get(fileIndex);
-                    item.getSliceTracker().setComplete(pieceIndex, true);
-                }
-            }
-
+            piecesTracker.setComplete(alert.getPieceIndex(), true);
         } catch (Throwable e) {
             LOG.warn("Error handling piece finished logic", e);
         }
@@ -539,7 +519,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
     @Override
     public List<TransferItem> getItems() {
-        if (items.isEmpty() && th.isValid()) {
+        if (th.isValid()) {
 
             TorrentInfo ti = th.getTorrentInfo();
 
@@ -550,28 +530,17 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
                 for (int i = 0; i < numFiles; i++) {
                     FileEntry fe = ti.getFileAt(i);
 
-                    BTDownloadItem item = new BTDownloadItem(th, i, fe);
-                    item.setSliceTracker(new FileSliceTracker(i));
+                    BTDownloadItem item = new BTDownloadItem(th, i, fe, piecesTracker);
 
                     items.add(item);
                 }
 
                 int numPieces = ti.getNumPieces();
 
-                // perform piece map
+                // perform piece complete check
                 for (int i = 0; i < numPieces; i++) {
-                    ArrayList<FileSlice> slices = ti.mapBlock(i, 0, ti.getPieceSize(i));
-                    for (FileSlice slice : slices) {
-                        int fileIndex = slice.getFileIndex();
-
-                        BTDownloadItem btItem = (BTDownloadItem) items.get(fileIndex);
-                        FileSliceTracker slideTracker = btItem.getSliceTracker();
-
-                        slideTracker.addSlice(i, slice);
-
-                        if (th.havePiece(i)) {
-                            slideTracker.setComplete(i, true);
-                        }
+                    if (th.havePiece(i)) {
+                        piecesTracker.setComplete(i, true);
                     }
                 }
             }
