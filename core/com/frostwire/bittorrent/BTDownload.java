@@ -62,9 +62,6 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
     private final Map<String, String> extra;
 
-    // this is a mutable list to store the items when they become available
-    private final ArrayList<TransferItem> items;
-
     private BTDownloadListener listener;
 
     private Set<File> incompleteFilesToRemove;
@@ -80,7 +77,6 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         this.piecesTracker = new PiecesTracker(th.getTorrentInfo());
 
         this.extra = createExtra();
-        this.items = new ArrayList<TransferItem>();
 
         engine.getSession().addListener(this);
     }
@@ -519,6 +515,8 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
     @Override
     public List<TransferItem> getItems() {
+        ArrayList<TransferItem> items = new ArrayList<TransferItem>();
+
         if (th.isValid()) {
 
             TorrentInfo ti = th.getTorrentInfo();
