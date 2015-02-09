@@ -390,6 +390,8 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
                 LOG.error("Error calling listener", e);
             }
         }
+
+        th.saveResumeData();
     }
 
     @Override
@@ -416,27 +418,15 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     @Override
     public void saveResumeData(SaveResumeDataAlert alert) {
         long now = System.currentTimeMillis();
-        if ((now - lastSaveResumeTime) >= SAVE_RESUME_RESOLUTION_MILLIS) {
+        final TorrentStatus status = th.getStatus();
+        boolean forceSerialization = status.isFinished() || status.isPaused();
+        if (forceSerialization || (now - lastSaveResumeTime) >= SAVE_RESUME_RESOLUTION_MILLIS) {
             lastSaveResumeTime = now;
         } else {
             // skip, too fast, see SAVE_RESUME_RESOLUTION_MILLIS
             return;
         }
-
-        try {
-            TorrentHandle th = alert.getHandle();
-            if (th.isValid()) {
-                String infoHash = th.getInfoHash().toString();
-                File file = engine.resumeDataFile(infoHash);
-
-                Entry e = alert.getResumeData();
-                e.getSwig().dict().set(EXTRA_DATA_KEY, Entry.fromMap(extra).getSwig());
-
-                FileUtils.writeByteArrayToFile(file, e.bencode());
-            }
-        } catch (Throwable e) {
-            LOG.warn("Error saving resume data", e);
-        }
+        serializeResumeData(alert);
     }
 
     @Override
@@ -597,6 +587,23 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
     public void setSequentialDownload(boolean sequential) {
         th.setSequentialDownload(sequential);
+    }
+
+    private void serializeResumeData(SaveResumeDataAlert alert) {
+        try {
+            TorrentHandle th = alert.getHandle();
+            if (th.isValid()) {
+                String infoHash = th.getInfoHash().toString();
+                File file = engine.resumeDataFile(infoHash);
+
+                Entry e = alert.getResumeData();
+                e.getSwig().dict().set(EXTRA_DATA_KEY, Entry.fromMap(extra).getSwig());
+
+                FileUtils.writeByteArrayToFile(file, e.bencode());
+            }
+        } catch (Throwable e) {
+            LOG.warn("Error saving resume data", e);
+        }
     }
 
     private Map<String, String> createExtra() {
