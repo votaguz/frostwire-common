@@ -190,9 +190,8 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
      * If we have a torrent which is downloaded as a folder, this will return the parent of that folder.
      * (e.g. default save location for torrents)
      * <p/>
-     * If you want to have the folder where the torrent files are located you might want to concatenate the
-     * name of this download to the save path. (e.g. File torrentFolder = new File(dl.getSavePath(), dl.getName())
-     *
+     * If you want to have the folder where the torrent's data files are located you
+     * want to use getContentSavePath().
      * @return
      */
     @Override
