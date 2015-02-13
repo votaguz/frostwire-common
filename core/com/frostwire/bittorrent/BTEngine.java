@@ -305,12 +305,10 @@ public final class BTEngine {
         }
 
         if (stop) {
-            System.out.println("stopping the core.");
             BTEngine.getInstance().stop();
         }
 
         if (start) {
-            System.out.println("starting the core.");
             BTEngine.getInstance().start();
         }
 
@@ -326,7 +324,6 @@ public final class BTEngine {
         for (final String infohash : infohashes) {
             final TorrentHandle th = session.findTorrent(new Sha1Hash(infohash));
             if (th == null) {
-                System.out.println("Could not find torrent for hash " + infohash);
                 continue;
             }
             TorrentStatus.State state = sessionSnapshot.get(th.getInfoHash().toString());
@@ -355,7 +352,6 @@ public final class BTEngine {
 
         @Override
         public void alert(Alert<?> alert) {
-            System.out.println(alert.toString());
             if (alert.getType().getSwig() != AlertType.TORRENT_PAUSED.getSwig()) {
                 return;
             }
