@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.frostwire.search.tbp;
+package com.frostwire.search.tpb;
 
 import java.util.Calendar;
 import java.util.HashMap;
