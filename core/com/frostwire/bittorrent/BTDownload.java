@@ -74,7 +74,10 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         this.th = th;
         this.savePath = new File(th.getSavePath());
         this.created = new Date(th.getStatus().getAddedTime());
-        this.piecesTracker = new PiecesTracker(th.getTorrentInfo());
+
+        TorrentInfo ti = th.getTorrentInfo();
+
+        this.piecesTracker = ti != null ? new PiecesTracker(ti) : null;
 
         this.extra = createExtra();
 
@@ -192,6 +195,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
      * <p/>
      * If you want to have the folder where the torrent's data files are located you
      * want to use getContentSavePath().
+     *
      * @return
      */
     @Override
@@ -431,7 +435,9 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     @Override
     public void pieceFinished(PieceFinishedAlert alert) {
         try {
-            piecesTracker.setComplete(alert.getPieceIndex(), true);
+            if (piecesTracker != null) {
+                piecesTracker.setComplete(alert.getPieceIndex(), true);
+            }
         } catch (Throwable e) {
             LOG.warn("Error handling piece finished logic", e);
         }
@@ -522,12 +528,14 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
                     items.add(item);
                 }
 
-                int numPieces = ti.getNumPieces();
+                if (piecesTracker != null) {
+                    int numPieces = ti.getNumPieces();
 
-                // perform piece complete check
-                for (int i = 0; i < numPieces; i++) {
-                    if (th.havePiece(i)) {
-                        piecesTracker.setComplete(i, true);
+                    // perform piece complete check
+                    for (int i = 0; i < numPieces; i++) {
+                        if (th.havePiece(i)) {
+                            piecesTracker.setComplete(i, true);
+                        }
                     }
                 }
             }

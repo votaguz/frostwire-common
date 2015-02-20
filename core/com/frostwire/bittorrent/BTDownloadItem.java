@@ -114,6 +114,6 @@ public class BTDownloadItem implements TransferItem {
      * @return
      */
     public long getSequentialDownloaded() {
-        return piecesTracker.getSequentialDownloadedBytes(index);
+        return piecesTracker != null ? piecesTracker.getSequentialDownloadedBytes(index) : 0;
     }
 }
