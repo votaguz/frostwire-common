@@ -67,12 +67,12 @@ public class MonovaSearchResult extends AbstractTorrentSearchResult {
          * 4 -> SIZE (B|KiB|MiBGiB)
          */
         this.detailsUrl = detailsUrl;
-        this.filename = parseFileName(FilenameUtils.getName(matcher.group(1)));
+        this.filename = parseFileName(FilenameUtils.getName(matcher.group("filename")));
         this.displayName = parseDisplayName(HtmlManipulator.replaceHtmlEntities(FilenameUtils.getBaseName(filename)));
-        this.infoHash = matcher.group(5);
-        this.creationTime = parseCreationTime(matcher.group(2));
-        this.size = parseSize(matcher.group(4));
-        this.seeds = parseSeeds(matcher.group(3));
+        this.infoHash = matcher.group("infohash");
+        this.creationTime = parseCreationTime(matcher.group("creationtime"));
+        this.size = parseSize(matcher.group("size"));
+        this.seeds = parseSeeds(matcher.group("seeds"));
 
         // Monova can't handle direct download of torrents without some sort of cookie
         //the torcache url wont resolve into direct .torrent

@@ -19,6 +19,10 @@
 package com.frostwire.search.monova;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.search.SearchMatcher;
@@ -35,7 +39,17 @@ public class MonovaSearchPerformer extends TorrentRegexSearchPerformer<MonovaSea
 
     private static final int MAX_RESULTS = 10;
     private static final String REGEX = "(?is)<a href=\"http://www.monova.org/torrent/([0-9]*?)/(.*?).html";
-    private static final String HTML_REGEX = "(?is)<div id=\"downloadbox\" .*?Zoink</a>.*?<a href=\"(.*?)\" alt=\"Download!\" rel=\"nofollow\">Torcache<.*?<strong>Added:</strong>(.*?)<div class=\"clear-both\">.*?<font color=\"[A-Za-z]*?\">(.*?)</font> seeds.*?<strong>Total size:</strong><div .*?>(.*?)</div><div class=\"clear-both\">.*?Hash:</strong><div .*?>(.*?)</div><div class=\"clear-both\">";
+    private static final String HTML_REGEX =
+            // filename
+            "(?is).*?<div .*? class=\"pos-star16.*?\".*?><h1>(?<filename>.*?)</h1></div>.*" +
+            // creationtime
+            "<strong>Added:</strong>(?<creationtime>.*?)ago <div class=\"clear-both\">.*" +
+            // seeds
+            "<strong>Peers:</strong><font color=\"green\">(?<seeds>\\d+)</font> seeds.*" +
+            // size
+            "<strong>Total size:</strong><div class=\"pull-left pos-text-c\">(?<size>.*?)</div><div class=\"clear-both\">.*" +
+            // infohash
+            "<strong>Hash:</strong><div class=\"pull-left pos-text-c\">(?<infohash>[A-Fa-f0-9]{40})</div><div class=\"clear-both\">";
 
     public MonovaSearchPerformer(DomainAliasManager domainAliasManager, long token, String keywords, int timeout) {
         super(domainAliasManager, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, REGEX, HTML_REGEX);
@@ -68,22 +82,28 @@ public class MonovaSearchPerformer extends TorrentRegexSearchPerformer<MonovaSea
         }
         return candidate;
     }
-    
-    /**
+
     public static void main(String[] args) throws Throwable {
 
-        byte[] readAllBytes = Files.readAllBytes(Paths.get("/Users/gubatron/Desktop/monova_input.txt"));
-        String fileStr = new String(readAllBytes,"utf-8");
-        Pattern pattern = Pattern.compile(HTML_REGEX);
-        Matcher matcher = pattern.matcher(fileStr);
-        
-        System.out.println("find? : " + matcher.find());
-        
-        System.out.println("group 1: " + matcher.group(1));
-        System.out.println("group 2: " + matcher.group(2));
-        System.out.println("group 3: " + matcher.group(3));
-        System.out.println("group 4: " + matcher.group(4));
-        System.out.println("group 5: " + matcher.group(5));
+        for (int i=1; i <= 10; i++) {
+            byte[] readAllBytes = Files.readAllBytes(Paths.get("/Users/gubatron/Desktop/monova_input"+i+".html"));
+            String fileStr = new String(readAllBytes, "utf-8");
+            Pattern pattern = Pattern.compile(HTML_REGEX);
+            Matcher matcher = pattern.matcher(fileStr);
+
+            boolean matcherFind = matcher.find();
+            System.out.println("find? : " + matcherFind);
+
+            if (matcherFind) {
+                System.out.println("group filename: [" + matcher.group("filename") + "]");
+                System.out.println("group creationtime: [" + matcher.group("creationtime") + "]");
+                System.out.println("group seeds: [" + matcher.group("seeds") + "]");
+                System.out.println("group size: [" + matcher.group("size") + "]");
+                System.out.println("group infohash: [" + matcher.group("infohash") + "]");
+                System.out.println("\n========================");
+            }
+            System.out.println("");
+        }
     }
-    */
+
 }
