@@ -51,23 +51,6 @@ public class DefaultDomainAliasManifestFetcher extends AbstractDomainAliasManife
         //TPB
         
         List<String> tpbAliases = new ArrayList<String>();
-        tpbAliases.add("pirateproxy.ws");
-        tpbAliases.add("pirateproxy.net");
-        tpbAliases.add("proxybay.de");
-        tpbAliases.add("labaia.me");
-        tpbAliases.add("mybay.pw");
-        tpbAliases.add("ilikerainbows.co.uk");
-        tpbAliases.add("tpb.ovh");
-        tpbAliases.add("outlaw.is");
-        tpbAliases.add("pirateproxy.se");
-        tpbAliases.add("tpb.unblocked.co");
-        tpbAliases.add("www.proxybay.eu");
-        tpbAliases.add("8la2.com");
-        tpbAliases.add("proxybay.xyz");
-        tpbAliases.add("tpb.pirati.cz");
-        tpbAliases.add("proxybay.ovh");
-        tpbAliases.add("piratebay.io");
-        tpbAliases.add("bayproxy.ovh");
         manifest.aliases.put("thepiratebay.se", tpbAliases);
         
         //TORRENTS

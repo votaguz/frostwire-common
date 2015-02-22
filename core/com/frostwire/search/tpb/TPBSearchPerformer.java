@@ -60,7 +60,7 @@ public class TPBSearchPerformer extends CrawlRegexSearchPerformer<TPBSearchResul
 
     @Override
     protected String getUrl(int page, String encodedKeywords) {
-        return "http://"+getDomainNameToUse()+"/search/" + encodedKeywords + "/0/7/0";
+        return "https://"+getDomainNameToUse()+"/search/" + encodedKeywords + "/0/7/0";
     }
 
     @Override
