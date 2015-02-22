@@ -123,7 +123,7 @@ public class MonovaSearchResult extends AbstractTorrentSearchResult {
 
     private long parseCreationTime(String addedWhenString) {
 
-        String[] arr = addedWhenString.split(" ");
+        String[] arr = addedWhenString.trim().split(" ");
         int unit = Integer.parseInt(arr[0]);
         
         String period = arr[1];

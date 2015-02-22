@@ -18,16 +18,12 @@
 
 package com.frostwire.search.monova;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.domainalias.DomainAliasManager;
 import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
+
+import java.io.IOException;
 
 /**
  * 
@@ -39,15 +35,15 @@ public class MonovaSearchPerformer extends TorrentRegexSearchPerformer<MonovaSea
 
     private static final int MAX_RESULTS = 10;
     private static final String REGEX = "(?is)<a href=\"http://www.monova.org/torrent/([0-9]*?)/(.*?).html";
-    private static final String HTML_REGEX =
+    private static final String HTML_REGEX = "(?is).*?" +
             // filename
-            "(?is).*?<div .*? class=\"pos-star16.*?\".*?><h1>(?<filename>.*?)</h1></div>.*" +
+            "<a id=\"tab1\" title=\"Download (?<filename>.*?) torrent.\" class=\"selected\".*?" +
             // creationtime
-            "<strong>Added:</strong>(?<creationtime>.*?)ago <div class=\"clear-both\">.*" +
+            "<strong>Added:</strong>(?<creationtime>.*?)ago <div class=\"clear-both\">.*?" +
             // seeds
-            "<strong>Peers:</strong><font color=\"green\">(?<seeds>\\d+)</font> seeds.*" +
+            "<strong>Peers:</strong><font color=\"green\">(?<seeds>\\d+)</font> seeds.*?" +
             // size
-            "<strong>Total size:</strong><div class=\"pull-left pos-text-c\">(?<size>.*?)</div><div class=\"clear-both\">.*" +
+            "<strong>Total size:</strong><div class=\"pull-left pos-text-c\">(?<size>.*?)</div><div class=\"clear-both\">.*?" +
             // infohash
             "<strong>Hash:</strong><div class=\"pull-left pos-text-c\">(?<infohash>[A-Fa-f0-9]{40})</div><div class=\"clear-both\">";
 
@@ -83,6 +79,7 @@ public class MonovaSearchPerformer extends TorrentRegexSearchPerformer<MonovaSea
         return candidate;
     }
 
+    /**
     public static void main(String[] args) throws Throwable {
 
         for (int i=1; i <= 10; i++) {
@@ -105,5 +102,6 @@ public class MonovaSearchPerformer extends TorrentRegexSearchPerformer<MonovaSea
             System.out.println("");
         }
     }
+     */
 
 }

@@ -92,7 +92,7 @@ public abstract class TorrentRegexSearchPerformer<T extends CrawlableSearchResul
                         LOG.error("Update Necessary:  Search broken for " + sr.getClass().getPackage().getName() + " (please notify dev-team on twitter @frostwire or write to contact@frostwire.com if you keep seeing this message.)");
                     }
                 } catch (Exception e) {
-                    throw new Exception("URL:" + sr.getDetailsUrl(), e);
+                    throw new Exception("URL:" + sr.getDetailsUrl() + " ("+ e.getMessage()+")", e);
                 }
             } else {
                 LOG.error("Update Necessary: HTML could not be reduced for optimal search. Search broken for " + sr.getClass().getPackage().getName() + " (please notify dev-team on twitter @frostwire or write to contact@frostwire.com if you keep seeing this message.)");
