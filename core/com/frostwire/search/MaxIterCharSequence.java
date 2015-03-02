@@ -18,6 +18,18 @@
 package com.frostwire.search;
 
 /**
+ *
+ * This works only on the real Java Runtime.
+ *
+ * The geniuses at Google, decided to use a moronic native implementation of
+ * java.regex.Matcher.find() method (findImpl) which takes a String takes it to
+ * C-land and gives no fucks about the CharSequence passed to the matcher.
+ *
+ * Possible solutions for Android would be:
+ * - Using Pure Java Matcher implementation (might be slower)
+ * - Using a better native implementation than Google's.
+ * - Find some other way to stop the execution of matcher.find()
+ *
  * Private class, only public to be able to share with other
  * search packages.
  * 
