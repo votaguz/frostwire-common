@@ -39,19 +39,19 @@ import com.google.code.regexp.Pattern;
  */
 public abstract class TorrentRegexSearchPerformer<T extends CrawlableSearchResult> extends CrawlRegexSearchPerformer<CrawlableSearchResult> {
 
-    private final Pattern preliminarSearchResultspattern;
+    private final Pattern preliminarySearchResultspattern;
     private final Pattern htmlDetailPagePattern;
     private final static Logger LOG = Logger.getLogger(TorrentRegexSearchPerformer.class);
 
     public TorrentRegexSearchPerformer(DomainAliasManager domainAliasManager, long token, String keywords, int timeout, int pages, int numCrawls, int regexMaxResults, String preliminarSearchResultsRegex, String htmlDetailPagePatternRegex) {
         super(domainAliasManager, token, keywords, timeout, pages, numCrawls, regexMaxResults);
-        this.preliminarSearchResultspattern = Pattern.compile(preliminarSearchResultsRegex);
+        this.preliminarySearchResultspattern = Pattern.compile(preliminarSearchResultsRegex);
         this.htmlDetailPagePattern = Pattern.compile(htmlDetailPagePatternRegex);
     }
 
     @Override
     public Pattern getPattern() {
-        return preliminarSearchResultspattern;
+        return preliminarySearchResultspattern;
     }
 
     @Override
@@ -77,7 +77,8 @@ public abstract class TorrentRegexSearchPerformer<T extends CrawlableSearchResul
             //in case we fetched a torrent's info (magnet, or the .torrent itself) to obtain 
             list.addAll(PerformersHelper.crawlTorrent(this, (TorrentCrawlableSearchResult) sr, data));
         } else {
-            String html = reduceHtml(new String(data, "UTF-8"));
+            String unreducedHtml = new String(data, "UTF-8");
+            String html = PerformersHelper.reduceHtml(unreducedHtml, htmlPrefixOffset(unreducedHtml), htmlSuffixOffset(unreducedHtml));
 
             if (html != null) {
                 Matcher matcher = htmlDetailPagePattern.matcher(new MaxIterCharSequence(html, 2 * html.length()));
@@ -108,7 +109,7 @@ public abstract class TorrentRegexSearchPerformer<T extends CrawlableSearchResul
      * override this methods to specify what offsets of the HTML file our
      * REGEX should be focusing on.
      */
-    protected int prefixOffset(String html) {
+    protected int htmlPrefixOffset(String html) {
         return 0;
     }
     
@@ -118,19 +119,8 @@ public abstract class TorrentRegexSearchPerformer<T extends CrawlableSearchResul
      * override this methods to specify what offsets of the HTML file our
      * REGEX should be focusing on.
      */
-    protected int suffixOffset(String html) {
+    protected int htmlSuffixOffset(String html) {
         return html.length();
-    }
-
-    private String reduceHtml(String html) {
-        int preOffset = prefixOffset(html);
-        int sufOffset = suffixOffset(html);
-        if (preOffset == -1 || sufOffset == -1) {
-            html = null;
-        } else if (preOffset > 0 || sufOffset < html.length()) {
-            html = new String(html.substring(preOffset, sufOffset).toCharArray());
-        }
-        return html;
     }
 
     protected abstract T fromHtmlMatcher(CrawlableSearchResult sr, SearchMatcher matcher);
