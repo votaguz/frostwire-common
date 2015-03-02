@@ -18,7 +18,6 @@
 
 package com.frostwire.bittorrent;
 
-import com.frostwire.jlibtorrent.FileEntry;
 import com.frostwire.jlibtorrent.PiecesTracker;
 import com.frostwire.jlibtorrent.Priority;
 import com.frostwire.jlibtorrent.TorrentHandle;
@@ -41,13 +40,13 @@ public class BTDownloadItem implements TransferItem {
 
     private PiecesTracker piecesTracker;
 
-    public BTDownloadItem(TorrentHandle th, int index, FileEntry fe, PiecesTracker piecesTracker) {
+    public BTDownloadItem(TorrentHandle th, int index, String filePath, long fileSize, PiecesTracker piecesTracker) {
         this.th = th;
         this.index = index;
 
-        this.file = new File(th.getSavePath(), fe.getPath());
+        this.file = new File(th.getSavePath(), filePath);
         this.name = file.getName();
-        this.size = fe.getSize();
+        this.size = fileSize;
 
         this.piecesTracker = piecesTracker;
     }
