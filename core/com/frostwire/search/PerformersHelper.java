@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014,, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
  
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 
 package com.frostwire.search;
 
-import com.frostwire.jlibtorrent.FileEntry;
 import com.frostwire.jlibtorrent.FileStorage;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.search.torrent.TorrentCrawlableSearchResult;
@@ -28,8 +27,6 @@ import org.gudy.azureus2.core3.torrent.TOTorrentException;
 
 import java.util.LinkedList;
 import java.util.List;
-
-import static com.google.code.regexp.Pattern.compile;
 
 /**
  * @author gubatron
@@ -77,15 +74,15 @@ public final class PerformersHelper {
         TorrentInfo ti = TorrentInfo.bdecode(data);
 
         int numFiles = ti.getNumFiles();
+        FileStorage fs = ti.getFiles();
 
         for (int i = 0; !performer.isStopped() && i < numFiles; i++) {
-            FileEntry fe = ti.getFileAt(i);
-
-            if (fe.isPadFile() || fe.hasHiddenAttribute()) {
+            // TODO: Check for the hidden attribute
+            if (fs.isPadFileAt(i)) {
                 continue;
             }
 
-            list.add(new TorrentCrawledSearchResult(sr, ti, i, fe));
+            list.add(new TorrentCrawledSearchResult(sr, ti, i, fs.getFilePath(i), fs.getFileSize(i)));
         }
 
         return list;

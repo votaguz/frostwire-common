@@ -18,7 +18,6 @@
 
 package com.frostwire.search.torrent;
 
-import com.frostwire.jlibtorrent.FileEntry;
 import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.search.AbstractCrawledSearchResult;
 import org.apache.commons.io.FilenameUtils;
@@ -36,13 +35,13 @@ public final class TorrentCrawledSearchResult extends AbstractCrawledSearchResul
     private final String filename;
     private final long size;
 
-    public TorrentCrawledSearchResult(TorrentCrawlableSearchResult sr, TorrentInfo ti, int fileIndex, FileEntry fe) {
+    public TorrentCrawledSearchResult(TorrentCrawlableSearchResult sr, TorrentInfo ti, int fileIndex, String filePath, long fileSize) {
         super(sr);
         this.ti = ti;
         this.fileIndex = fileIndex;
-        this.filePath = fe.getPath();
+        this.filePath = filePath;
         this.filename = FilenameUtils.getName(this.filePath);
-        this.size = fe.getSize();
+        this.size = fileSize;
         this.displayName = FilenameUtils.getBaseName(this.filename);
     }
 

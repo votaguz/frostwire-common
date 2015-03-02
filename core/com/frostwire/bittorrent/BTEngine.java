@@ -131,7 +131,7 @@ public final class BTEngine {
             return 0;
         }
 
-        return session.getStats()..getStatus().getTotalDownload();
+        return session.getStats().getStatus().getTotalDownload();
     }
 
     public long getTotalUpload() {
