@@ -23,8 +23,7 @@ import com.frostwire.jlibtorrent.alerts.Alert;
 import com.frostwire.jlibtorrent.alerts.AlertType;
 import com.frostwire.jlibtorrent.alerts.TorrentAlert;
 import com.frostwire.jlibtorrent.alerts.TorrentPausedAlert;
-import com.frostwire.jlibtorrent.swig.entry;
-import com.frostwire.jlibtorrent.swig.torrent_handle;
+import com.frostwire.jlibtorrent.swig.*;
 import com.frostwire.logging.Logger;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
 import com.frostwire.util.OSUtils;
@@ -441,33 +440,31 @@ public final class BTEngine {
             return;
         }
 
-        session.setSettings(defaultSettings);
-
-        SessionSettings s = session.getSettings(); // working with a copy?
+        SettingsPack p = settingsToPack(defaultSettings);
+        SessionSettings s = defaultSettings;
 
         if (ctx.optimizeMemory) {
 
             int maxQueuedDiskBytes = s.getMaxQueuedDiskBytes();
-            s.setMaxQueuedDiskBytes(maxQueuedDiskBytes / 2);
+            p.setMaxQueuedDiskBytes(maxQueuedDiskBytes / 2);
             int sendBufferWatermark = s.getSendBufferWatermark();
-            s.setSendBufferWatermark(sendBufferWatermark / 2);
-            s.setCacheSize(256);
-            s.setActiveDownloads(4);
-            s.setActiveSeeds(4);
-            s.setMaxPeerlistSize(200);
-            s.setUtpDynamicSockBuf(false);
-            s.setGuidedReadCache(true);
-            s.setTickInterval(1000);
-            s.setInactivityTimeout(60);
-            s.optimizeHashingForSpeed(false);
-            s.setSeedingOutgoingConnections(false);
-            s.setConnectionsLimit(200);
+            p.setSendBufferWatermark(sendBufferWatermark / 2);
+            p.setCacheSize(256);
+            p.setActiveDownloads(4);
+            p.setActiveSeeds(4);
+            p.setMaxPeerlistSize(200);
+            p.setUtpDynamicSockBuf(false);
+            p.setGuidedReadCache(true);
+            p.setTickInterval(1000);
+            p.setInactivityTimeout(60);
+            p.setSeedingOutgoingConnections(false);
+            p.setConnectionsLimit(200);
         } else {
-            s.setActiveDownloads(10);
-            s.setActiveSeeds(10);
+            p.setActiveDownloads(10);
+            p.setActiveSeeds(10);
         }
 
-        session.setSettings(s);
+        session.applySettings(p);
         saveSettings();
     }
 
@@ -782,6 +779,20 @@ public final class BTEngine {
         if (task != null) {
             task.run();
         }
+    }
+
+    private static SettingsPack settingsToPack(SessionSettings s) {
+        string_entry_map map = new string_entry_map();
+        libtorrent.save_settings_to_dict(s.getSwig(), map);
+        entry e = new entry(map);
+        lazy_entry le = new lazy_entry();
+        error_code ec = new error_code();
+        lazy_entry.bdecode(e.bencode(), le, ec);
+        if (ec.value() != 0) {
+            throw new IllegalStateException("Can't create settings pack");
+        }
+
+        return new SettingsPack(libtorrent.load_pack_from_dict(le));
     }
 
     private final class InnerListener implements AlertListener {
