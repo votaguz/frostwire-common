@@ -851,7 +851,7 @@ public final class BTEngine {
             return;
         }
 
-        SessionSettings s = getSettings();
+        SettingsPack s = new SettingsPack();
         s.setDownloadRateLimit(limit);
         saveSettings(s);
     }
@@ -869,7 +869,7 @@ public final class BTEngine {
             return;
         }
 
-        SessionSettings s = getSettings();
+        SettingsPack s = new SettingsPack();
         s.setUploadRateLimit(limit);
         saveSettings(s);
     }
@@ -887,7 +887,7 @@ public final class BTEngine {
             return;
         }
 
-        SessionSettings s = getSettings();
+        SettingsPack s = new SettingsPack();
         s.setActiveDownloads(limit);
         saveSettings(s);
     }
@@ -905,7 +905,7 @@ public final class BTEngine {
             return;
         }
 
-        SessionSettings s = getSettings();
+        SettingsPack s = new SettingsPack();
         s.setActiveSeeds(limit);
         saveSettings(s);
     }
@@ -923,7 +923,7 @@ public final class BTEngine {
             return;
         }
 
-        SessionSettings s = getSettings();
+        SettingsPack s = new SettingsPack();
         s.setConnectionsLimit(limit);
         saveSettings(s);
     }
@@ -941,7 +941,7 @@ public final class BTEngine {
             return;
         }
 
-        SessionSettings s = getSettings();
+        SettingsPack s = new SettingsPack();
         s.setMaxPeerlistSize(limit);
         saveSettings(s);
     }
