@@ -23,7 +23,6 @@ import com.frostwire.jlibtorrent.alerts.Alert;
 import com.frostwire.jlibtorrent.alerts.AlertType;
 import com.frostwire.jlibtorrent.alerts.TorrentAlert;
 import com.frostwire.jlibtorrent.alerts.TorrentPausedAlert;
-import com.frostwire.jlibtorrent.swig.add_torrent_params;
 import com.frostwire.jlibtorrent.swig.entry;
 import com.frostwire.jlibtorrent.swig.torrent_handle;
 import com.frostwire.logging.Logger;
@@ -155,7 +154,7 @@ public final class BTEngine {
             return 0;
         }
 
-        return session.getSettings().getDownloadRateLimit();
+        return session.getSettings().getUploadRateLimit();
     }
 
     public boolean isStarted() {
@@ -276,12 +275,12 @@ public final class BTEngine {
         }
     }
 
-    private void saveSettings(SessionSettings s) {
+    private void saveSettings(SettingsPack s) {
         if (session == null) {
             return;
         }
 
-        session.setSettings(s);
+        session.applySettings(s);
         saveSettings();
     }
 
@@ -331,9 +330,9 @@ public final class BTEngine {
         }
 
         // now let's manually restart the ones that were paused.
-         if (session != null && snapshot != null) {
-             restartTorrents(session, snapshot);
-         }
+        if (session != null && snapshot != null) {
+            restartTorrents(session, snapshot);
+        }
 
     }
 
@@ -441,8 +440,6 @@ public final class BTEngine {
         if (session == null) {
             return;
         }
-
-        defaultSettings.broadcastLSD(true);
 
         session.setSettings(defaultSettings);
 
