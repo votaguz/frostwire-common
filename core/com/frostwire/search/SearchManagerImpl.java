@@ -138,7 +138,7 @@ public class SearchManagerImpl implements SearchManager {
             while (it.hasNext()) {
                 SearchTask task = it.next();
                 if (token == -1L || task.getToken() == token) {
-                    task.stop();
+                    task.stopSearch();
                 }
             }
         }
@@ -193,7 +193,7 @@ public class SearchManagerImpl implements SearchManager {
         return order;
     }
 
-    private static abstract class SearchTask implements Runnable, Comparable<SearchTask> {
+    private static abstract class SearchTask extends Thread implements Comparable<SearchTask> {
 
         protected final SearchManagerImpl manager;
         protected final SearchPerformer performer;
@@ -203,6 +203,7 @@ public class SearchManagerImpl implements SearchManager {
             this.manager = manager;
             this.performer = performer;
             this.order = order;
+            this.setName(performer.getClass().getName() + "-SearchTask");
         }
 
         public long getToken() {
@@ -213,7 +214,7 @@ public class SearchManagerImpl implements SearchManager {
             return performer.isStopped();
         }
 
-        public void stop() {
+        public void stopSearch() {
             performer.stop();
         }
 

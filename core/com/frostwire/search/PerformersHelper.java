@@ -19,11 +19,10 @@ package com.frostwire.search;
 
 import com.frostwire.jlibtorrent.FileStorage;
 import com.frostwire.jlibtorrent.TorrentInfo;
+import com.frostwire.logging.Logger;
 import com.frostwire.search.torrent.TorrentCrawlableSearchResult;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
-import com.google.code.regexp.Matcher;
 import com.google.code.regexp.Pattern;
-import org.gudy.azureus2.core3.torrent.TOTorrentException;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -35,11 +34,19 @@ import java.util.List;
 public final class PerformersHelper {
     private static final Pattern MAGNET_HASH_PATTERN = Pattern.compile("magnet\\:\\?xt\\=urn\\:btih\\:([a-fA-F0-9]){40}");
 
+    private static final Logger LOG = Logger.getLogger(PerformersHelper.class);
+
     private PerformersHelper() {
     }
 
     public static List<? extends SearchResult> searchPageHelper(RegexSearchPerformer<?> performer, String page, int regexMaxResults) {
         List<SearchResult> result = new LinkedList<SearchResult>();
+
+        if (page == null) {
+            LOG.warn(performer.getClass().getSimpleName() + " returning null page. Issue fetching page or issue getting page prefix/suffix offsets. Notify developers at contact@frostwire.com");
+            return result;
+        }
+
         SearchMatcher matcher = SearchMatcher.from(performer.getPattern().matcher(new MaxIterCharSequence(page, 2 * page.length())));
         int max = regexMaxResults;
         int i = 0;
@@ -50,7 +57,7 @@ public final class PerformersHelper {
                 matcherFound = matcher.find();
             } catch (Throwable t) {
                 matcherFound = false;
-                t.printStackTrace();
+                LOG.error(t.getMessage(), t);
             }
 
             if (matcherFound) {
@@ -68,7 +75,7 @@ public final class PerformersHelper {
     /**
      * This method is only public allow reuse inside the package search, consider it a private API
      */
-    public static List<? extends SearchResult> crawlTorrent(SearchPerformer performer, TorrentCrawlableSearchResult sr, byte[] data) throws TOTorrentException {
+    public static List<? extends SearchResult> crawlTorrent(SearchPerformer performer, TorrentCrawlableSearchResult sr, byte[] data) {
         List<TorrentCrawledSearchResult> list = new LinkedList<TorrentCrawledSearchResult>();
 
         TorrentInfo ti = TorrentInfo.bdecode(data);
@@ -90,15 +97,25 @@ public final class PerformersHelper {
 
     public static String parseInfoHash(String url) {
         String result = null;
-        final Matcher matcher = MAGNET_HASH_PATTERN.matcher(url);
+        final SearchMatcher matcher = SearchMatcher.from(MAGNET_HASH_PATTERN.matcher(new MaxIterCharSequence(url, url.length() * 2)));
         try {
             if (matcher.find()) {
                 result = matcher.group(1);
             }
         } catch (Throwable t) {
-            System.out.println("Could not parse magnet out of " + url);
-            t.printStackTrace();
+            LOG.error("Could not parse magnet out of " + url, t);
         }
         return result;
+    }
+
+    public static String reduceHtml(String html, int prefixOffset, int suffixOffset) {
+        int preOffset = prefixOffset;
+        int sufOffset = suffixOffset;
+        if (preOffset == -1 || sufOffset == -1) {
+            html = null;
+        } else if (preOffset > 0 || sufOffset < html.length()) {
+            html = new String(html.substring(preOffset, sufOffset).toCharArray());
+        }
+        return html;
     }
 }

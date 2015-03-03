@@ -18,10 +18,7 @@
 
 package com.frostwire.search.btjunkie;
 
-import com.frostwire.search.CrawlRegexSearchPerformer;
-import com.frostwire.search.PerformersHelper;
-import com.frostwire.search.SearchMatcher;
-import com.frostwire.search.SearchResult;
+import com.frostwire.search.*;
 import com.frostwire.search.domainalias.DomainAliasManager;
 import com.google.code.regexp.Pattern;
 
@@ -29,22 +26,20 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-
 
 public class BtjunkieSearchPerformer extends CrawlRegexSearchPerformer<BtjunkieSearchResult> {
     private static final int MAX_PAGES = 2;
     private static final int MAX_SEARCH_RESULTS = 20;
 
     private static Pattern YEAR_MONTH_DATE_PATTERN = Pattern.compile("([\\d]{4})-([\\d]{2})-([\\d]{2})");
-    private static final String HTML_REGEX = "(?is)<tr>.*?<td data-href=\".*?\" class=\"type_td\">.*?<td data-href=\"(?<detailsUrl>.*?)\" class=\"title_td\"><a title=\"View details for [\\d]+ - (?<title>.*?)\" href=\".*?\"><h2>.*?<td data-href=\"(?<magnet>.*?)\" class=\"magnet_td\">.*?<td class=\"size_td\">(?<size>.*?)</td>.*?<td class=\"date_td\">(?<date>.*?)</td>.*?<td class=\"seed_td\">(?<seeds>.*?)</td>.*?</tr>";
+    private static final String HTML_REGEX = "(?is)<tr>.*?<td data-href=\"(?<detailsUrl>.*?)\" class=\"type_td\"><a title=\".*?<a title=\"View details for [\\d]+ - (?<title>.*?)\" href=\".*?\"><h2>.*?<td data-href=\"(?<magnet>.*?)\" class=\"magnet_td\">.*?<td class=\"size_td\">(?<size>.*?)</td>.*?<td class=\"date_td\">(?<date>.*?)</td>.*?<td class=\"seed_td\">(?<seeds>.*?)</td>.*?</tr>";
     private static final Pattern PATTERN = Pattern.compile(HTML_REGEX);
 
     private final static long[] BYTE_MULTIPLIERS = new long[]{1, 2 << 9, 2 << 19, 2 << 29, 2 << 39, 2 << 49};
 
     private static final Map<String, Integer> UNIT_TO_BYTE_MULTIPLIERS_MAP;
 
-    private static final java.util.regex.Pattern sizePattern;
+    private static final Pattern sizePattern;
 
     static {
         UNIT_TO_BYTE_MULTIPLIERS_MAP = new HashMap<String, Integer>();
@@ -54,7 +49,7 @@ public class BtjunkieSearchPerformer extends CrawlRegexSearchPerformer<BtjunkieS
         UNIT_TO_BYTE_MULTIPLIERS_MAP.put("GB", 3);
         UNIT_TO_BYTE_MULTIPLIERS_MAP.put("TB", 4);
         UNIT_TO_BYTE_MULTIPLIERS_MAP.put("PB", 5);
-        sizePattern = java.util.regex.Pattern.compile("([\\d+\\.]+)([BKMGTP])");
+        sizePattern = Pattern.compile("([\\d+\\.]+) ([BKMGTP]+)");
     }
 
     public BtjunkieSearchPerformer(DomainAliasManager domainAliasManager, long token, String keywords, int timeout) {
@@ -73,14 +68,14 @@ public class BtjunkieSearchPerformer extends CrawlRegexSearchPerformer<BtjunkieS
 
     @Override
     public BtjunkieSearchResult fromMatcher(SearchMatcher matcher) {
-        final String domainName = getDomainNameToUse() ;
+        final String domainName = getDomainNameToUse();
 
         BtjunkieSearchResult sr = new BtjunkieSearchResult(
                 domainName,
                 "http://" + domainName + matcher.group("detailsUrl"),
                 parseFileName(matcher.group("title")),
                 parseDisplayName(matcher.group("title")),
-                matcher.group(3),
+                matcher.group("magnet"),
                 PerformersHelper.parseInfoHash(matcher.group("magnet")),
                 parseSize(matcher.group("size")),
                 parseDate(matcher.group("date")),
@@ -89,11 +84,11 @@ public class BtjunkieSearchPerformer extends CrawlRegexSearchPerformer<BtjunkieS
         return sr;
     }
 
-    private long parseDate(String group) {
+    private long parseDate(String dateString) {
         Calendar instance = Calendar.getInstance();
         long result = instance.getTimeInMillis();
-        com.google.code.regexp.Matcher matcher = YEAR_MONTH_DATE_PATTERN.matcher(group);
-        if (matcher.matches()) {
+        SearchMatcher matcher = SearchMatcher.from(YEAR_MONTH_DATE_PATTERN.matcher(new MaxIterCharSequence(dateString, dateString.length() * 2)));
+        if (matcher.find()) {
             try {
                 instance.clear();
                 int year = Integer.valueOf(matcher.group(1));
@@ -125,9 +120,10 @@ public class BtjunkieSearchPerformer extends CrawlRegexSearchPerformer<BtjunkieS
         return filename.replaceAll("[\\\\/:*?\"<>|\\[\\]]+", "_") + ".torrent";
     }
 
-    private long parseSize(String group) {
+    private long parseSize(String sizeString) {
+        System.out.println("parseSize of ["+ sizeString+"]");
         long result = 0;
-        Matcher matcher = sizePattern.matcher(group);
+        SearchMatcher matcher = SearchMatcher.from(sizePattern.matcher(new MaxIterCharSequence(sizeString, sizeString.length()*2)));
         if (matcher.find()) {
             String amount = matcher.group(1);
             String unit = matcher.group(2);
@@ -158,14 +154,21 @@ public class BtjunkieSearchPerformer extends CrawlRegexSearchPerformer<BtjunkieS
         return PerformersHelper.crawlTorrent(this, sr, data);
     }
 
+    @Override
+    protected int preliminaryHtmlPrefixOffset(String page) {
+        return 18000;
+    }
+
+    @Override
+    protected int preliminaryHtmlSuffixOffset(String page) {
+        return page.length() - 5000;
+    }
+
     /**
     public static void main(String[] args) throws IOException {
         System.out.println(HTML_REGEX);
 
-        byte[] readAllBytes = Files.readAllBytes(Paths.get("/Users/gubatron/tmp/test.html"));
-        String fileStr = new String(readAllBytes,"utf-8");
-
-
+        String fileStr = IOUtils.toString(new FileInputStream("/Users/gubatron/Desktop/btjunkie.html"),"utf-8");
         com.google.code.regexp.Matcher matcher = PATTERN.matcher(fileStr);
 
         int found = 0;
@@ -173,15 +176,15 @@ public class BtjunkieSearchPerformer extends CrawlRegexSearchPerformer<BtjunkieS
             found++;
             System.out.println("\nfound " + found);
 
-            System.out.println("group 1: " + matcher.group(1));
-            System.out.println("group 2: " + matcher.group(2));
-            System.out.println("group 3: " + matcher.group(3));
-            System.out.println("group 4: " + matcher.group(4));
-            System.out.println("group 5: " + matcher.group(5));
-            System.out.println("group 6: " + matcher.group(6));
+            System.out.println("group detailsUrl: " + matcher.group("detailsUrl"));
+            System.out.println("group title: " + matcher.group("title"));
+            System.out.println("group magnet: " + matcher.group("magnet"));
+            System.out.println("group size: " + matcher.group("size"));
+            System.out.println("group date: " + matcher.group("date"));
+            System.out.println("group seeds: " + matcher.group("seeds"));
         }
-    }*/
 
-
-
+        System.out.println("Ended.");
+    }
+     */
 }
