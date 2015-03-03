@@ -46,7 +46,7 @@ public class DefaultDomainAliasManifestFetcher extends AbstractDomainAliasManife
         //KAT
         List<String> katAliases = new ArrayList<String>();
         katAliases.add("kasssto.come.in");
-        manifest.aliases.put("kickass.so", katAliases);
+        manifest.aliases.put("kickass.to", katAliases);
         
         //TPB
         
