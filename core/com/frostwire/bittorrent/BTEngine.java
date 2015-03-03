@@ -115,7 +115,7 @@ public final class BTEngine {
             return 0;
         }
 
-        return session.getStatus().getPayloadDownloadRate();
+        return session.getStats().getPayloadDownloadRate();
     }
 
     public long getUploadRate() {
@@ -123,7 +123,7 @@ public final class BTEngine {
             return 0;
         }
 
-        return session.getStatus().getPayloadUploadRate();
+        return session.getStats().getPayloadUploadRate();
     }
 
     public long getTotalDownload() {
@@ -131,7 +131,7 @@ public final class BTEngine {
             return 0;
         }
 
-        return session.getStats().getStatus().getTotalDownload();
+        return session.getStats().getTotalDownload();
     }
 
     public long getTotalUpload() {
@@ -139,7 +139,7 @@ public final class BTEngine {
             return 0;
         }
 
-        return session.getStatus().getTotalUpload();
+        return session.getStats().getTotalUpload();
     }
 
     public int getDownloadRateLimit() {
