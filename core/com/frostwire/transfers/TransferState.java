@@ -49,5 +49,6 @@ public enum TransferState {
     DEMUXING,
     UNKNOWN,
     ERROR_DISK_FULL,
-    REDIRECTING
+    REDIRECTING,
+    STREAMING
 }
