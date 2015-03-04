@@ -43,34 +43,15 @@ public class DefaultDomainAliasManifestFetcher extends AbstractDomainAliasManife
         manifest.version = 0;
         manifest.aliases = new HashMap<String, List<String>>();
 
-        //KAT
         List<String> katAliases = new ArrayList<String>();
-        katAliases.add("kasssto.come.in");
         manifest.aliases.put("kickass.to", katAliases);
-        
-        //TPB
         
         List<String> tpbAliases = new ArrayList<String>();
         manifest.aliases.put("thepiratebay.se", tpbAliases);
-        
-        //TORRENTS
-        /*
-        List<String> torrentsAliases = new ArrayList<String>();
-        torrentsAliases.add("torrents.fm");
-        manifest.aliases.put("torrents.com", torrentsAliases);
-        */
-        
-        //ISOHUNT
-        /*
-        List<String> isoHuntAliases = new ArrayList<String>();
-        isoHuntAliases.add("isohunt.come.in");
-        manifest.aliases.put("isohunt.to",isoHuntAliases);
-        */
-        
+
         List<String> extraTorrentAliases = new ArrayList<String>();
-        extraTorrentAliases.add("extratorrent.cc.prx.websiteproxy.co.uk");
-        
         manifest.aliases.put("extratorrent.cc", extraTorrentAliases);//Collections.<String> emptyList());
+
         notifyManifestFetched(manifest);
     }
 }
