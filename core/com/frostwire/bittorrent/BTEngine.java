@@ -44,14 +44,16 @@ import static com.frostwire.jlibtorrent.alerts.AlertType.*;
  */
 public final class BTEngine {
 
+    private static final Logger LOG = Logger.getLogger(BTEngine.class);
+
     private static final int[] INNER_LISTENER_TYPES = new int[]{TORRENT_ADDED.getSwig(),
             PIECE_FINISHED.getSwig(),
             PORTMAP.getSwig(),
             PORTMAP_ERROR.getSwig()};
 
-    private static final Logger LOG = Logger.getLogger(BTEngine.class);
-
     private static final String TORRENT_ORIG_PATH_KEY = "torrent_orig_path";
+
+    private static final int SPEED_AVERAGE_CALCULATION_INTERVAL_MILLISECONDS = 2000;
 
     public static BTContext ctx;
 
@@ -66,6 +68,16 @@ public final class BTEngine {
 
     private boolean firewalled;
     private BTEngineListener listener;
+
+    private long bytesRecv;
+    private long bytesSent;
+    private long averageRecvSpeed;
+    private long averageSentSpeed;
+
+    // variables to keep the upload rate of this transfer
+    private long speedMarkTimestamp;
+    private long totalRecvSinceLastSpeedStamp;
+    private long totalSentSinceLastSpeedStamp;
 
     private BTEngine() {
         this.sync = new ReentrantLock();
@@ -113,7 +125,9 @@ public final class BTEngine {
             return 0;
         }
 
-        return session.getStats().getPayloadDownloadRate();
+        updateAverageSpeeds();
+
+        return averageRecvSpeed;
     }
 
     public long getUploadRate() {
@@ -121,7 +135,9 @@ public final class BTEngine {
             return 0;
         }
 
-        return session.getStats().getPayloadUploadRate();
+        updateAverageSpeeds();
+
+        return averageSentSpeed;
     }
 
     public long getTotalDownload() {
@@ -793,6 +809,21 @@ public final class BTEngine {
         }
 
         return new SettingsPack(libtorrent.load_pack_from_dict(le));
+    }
+
+    private void updateAverageSpeeds() {
+        long now = System.currentTimeMillis();
+
+        bytesRecv = session.getStats().getPayloadDownload();
+        bytesSent = session.getStats().getPayloadUpload();
+
+        if (now - speedMarkTimestamp > SPEED_AVERAGE_CALCULATION_INTERVAL_MILLISECONDS) {
+            averageRecvSpeed = ((bytesRecv - totalRecvSinceLastSpeedStamp) * 1000) / (now - speedMarkTimestamp);
+            averageSentSpeed = ((bytesSent - totalSentSinceLastSpeedStamp) * 1000) / (now - speedMarkTimestamp);
+            speedMarkTimestamp = now;
+            totalRecvSinceLastSpeedStamp = bytesRecv;
+            totalSentSinceLastSpeedStamp = bytesSent;
+        }
     }
 
     private final class InnerListener implements AlertListener {
