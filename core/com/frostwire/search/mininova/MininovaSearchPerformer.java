@@ -18,11 +18,11 @@
 
 package com.frostwire.search.mininova;
 
-import java.util.List;
-
 import com.frostwire.search.domainalias.DomainAliasManager;
 import com.frostwire.search.torrent.TorrentJsonSearchPerformer;
 import com.frostwire.util.JsonUtils;
+
+import java.util.List;
 
 /**
  * @author gubatron
@@ -43,7 +43,9 @@ public class MininovaSearchPerformer extends TorrentJsonSearchPerformer<Mininova
     @Override
     protected List<MininovaVuzeItem> parseJson(String json) {
         //fix what seems to be an intentional JSON syntax typo put ther by mininova
+        json = json.replace("\\n", " ");
         json = json.replace("\"hash\":", ", \"hash\":");
+        json = json.replace("\"\"hash", "\", \"hash");
         MininovaVuzeResponse response = JsonUtils.toObject(json, MininovaVuzeResponse.class);
         return response.results;
     }
