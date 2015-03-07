@@ -13,7 +13,6 @@
       <sourceFolder url="file://$MODULE_DIR$/libtorrent" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/mp4parser" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/okhttp" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/vuze" isTestSource="false" />
     </content>
     <content url="file://$MODULE_DIR$/../frostwire-jlibtorrent">
       <sourceFolder url="file://$MODULE_DIR$/../frostwire-jlibtorrent/src" isTestSource="false" />
