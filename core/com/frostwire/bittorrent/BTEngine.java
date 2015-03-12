@@ -801,9 +801,9 @@ public final class BTEngine {
         string_entry_map map = new string_entry_map();
         libtorrent.save_settings_to_dict(s.getSwig(), map);
         entry e = new entry(map);
-        lazy_entry le = new lazy_entry();
+        bdecode_node le = new bdecode_node();
         error_code ec = new error_code();
-        lazy_entry.bdecode(e.bencode(), le, ec);
+        bdecode_node.bdecode(e.bencode(), le, ec);
         if (ec.value() != 0) {
             throw new IllegalStateException("Can't create settings pack");
         }
