@@ -618,16 +618,17 @@ public final class BTEngine {
         File[] torrents = ctx.homeDir.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
-                return FilenameUtils.getExtension(name).equals("torrent");
+                return name != null && FilenameUtils.getExtension(name).equals("torrent");
             }
         });
 
         for (File t : torrents) {
             try {
                 String infoHash = FilenameUtils.getBaseName(t.getName());
-                File resumeFile = resumeDataFile(infoHash);
-
-                restoreDownloadsQueue.add(new RestoreDownloadTask(t, null, null, resumeFile));
+                if (infoHash != null) {
+                    File resumeFile = resumeDataFile(infoHash);
+                    restoreDownloadsQueue.add(new RestoreDownloadTask(t, null, null, resumeFile));
+                }
             } catch (Throwable e) {
                 LOG.error("Error restoring torrent download: " + t, e);
             }
