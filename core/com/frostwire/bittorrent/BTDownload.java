@@ -18,12 +18,14 @@
 
 package com.frostwire.bittorrent;
 
+import com.frostwire.gui.bittorrent.BTInfoAdditionalMetadataHolder;
 import com.frostwire.jlibtorrent.*;
 import com.frostwire.jlibtorrent.alerts.*;
 import com.frostwire.jlibtorrent.swig.entry;
 import com.frostwire.jlibtorrent.swig.string_entry_map;
 import com.frostwire.jlibtorrent.swig.string_vector;
 import com.frostwire.logging.Logger;
+import com.frostwire.torrent.PaymentOptions;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;
@@ -67,6 +69,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     private Set<File> incompleteFilesToRemove;
 
     private long lastSaveResumeTime;
+    private final PaymentOptions paymentOptions;
 
     public BTDownload(BTEngine engine, TorrentHandle th) {
         super(th);
@@ -74,13 +77,10 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         this.th = th;
         this.savePath = new File(th.getSavePath());
         this.created = new Date(th.getStatus().getAddedTime());
-
         TorrentInfo ti = th.getTorrentInfo();
-
         this.piecesTracker = ti != null ? new PiecesTracker(ti) : null;
-
         this.extra = createExtra();
-
+        this.paymentOptions = loadPaymentOptions(ti);
         engine.getSession().addListener(this);
     }
 
@@ -112,6 +112,10 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     public long getSize() {
         TorrentInfo ti = th.getTorrentInfo();
         return ti != null ? ti.getTotalSize() : 0;
+    }
+
+    public PaymentOptions getPaymentOptions() {
+        return paymentOptions;
     }
 
     public boolean isPaused() {
@@ -592,6 +596,15 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
     public void setSequentialDownload(boolean sequential) {
         th.setSequentialDownload(sequential);
+    }
+
+    private PaymentOptions loadPaymentOptions(TorrentInfo ti) {
+        try {
+            BTInfoAdditionalMetadataHolder holder = new BTInfoAdditionalMetadataHolder(ti, getDisplayName());
+            return holder.getPaymentOptions();
+        } catch (RuntimeException e) {
+            return null;
+        }
     }
 
     private void serializeResumeData(SaveResumeDataAlert alert) {
