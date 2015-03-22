@@ -50,7 +50,7 @@ public final class ByteUtils {
         return data;
     }
 
-    public static String encodeHex(byte[] data) {
+    public static String  encodeHex(byte[] data) {
         int l = data.length;
         char[] out = new char[l << 1];
         // two characters form the hex value.

@@ -18,14 +18,12 @@
 
 package com.frostwire.bittorrent;
 
-import com.frostwire.gui.bittorrent.BTInfoAdditionalMetadataHolder;
 import com.frostwire.jlibtorrent.*;
 import com.frostwire.jlibtorrent.alerts.*;
 import com.frostwire.jlibtorrent.swig.entry;
 import com.frostwire.jlibtorrent.swig.string_entry_map;
 import com.frostwire.jlibtorrent.swig.string_vector;
 import com.frostwire.logging.Logger;
-import com.frostwire.torrent.PaymentOptions;
 import com.frostwire.transfers.BittorrentDownload;
 import com.frostwire.transfers.TransferItem;
 import com.frostwire.transfers.TransferState;

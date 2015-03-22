@@ -16,12 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.frostwire.gui.bittorrent;
+package com.frostwire.bittorrent;
 
 import com.frostwire.jlibtorrent.Entry;
 import com.frostwire.jlibtorrent.TorrentInfo;
-import com.frostwire.torrent.CopyrightLicenseBroker;
-import com.frostwire.torrent.PaymentOptions;
 
 import java.io.File;
 import java.util.Map;
