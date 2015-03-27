@@ -23,7 +23,7 @@ import java.util.BitSet;
 import java.util.Collection;
 
 /**
- * Implementation of a Bloom-filter, as described here:
+ * Thread-safe Implementation of a Bloom-filter, as described here:
  * http://en.wikipedia.org/wiki/Bloom_filter
  *
  * For updates and bugfixes, see http://github.com/magnuss/java-bloomfilter
@@ -36,6 +36,8 @@ import java.util.Collection;
  *
  * @param <E> Object type that is to be inserted into the Bloom filter, e.g. String or Integer.
  * @author Magnus Skjegstad <magnus@skjegstad.com>
+ * @author Angel Leon <@gubatron>
+ * @author Alden Torres <@aldenml>
  */
 public class BloomFilter<E> implements Serializable {
     private BitSet bitset;
