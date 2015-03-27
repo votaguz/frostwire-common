@@ -86,7 +86,7 @@ public class BloomFilter<E> implements Serializable {
     public BloomFilter(int bitSetSize, int expectedNumberOElements) {
         this(bitSetSize / (double)expectedNumberOElements,
                 expectedNumberOElements,
-                (int) Math.round((bitSetSize / (double)expectedNumberOElements) * Math.log(2.0)));
+                (int) Math.round((bitSetSize / (double) expectedNumberOElements) * Math.log(2.0)));
     }
 
     /**
@@ -440,7 +440,7 @@ public class BloomFilter<E> implements Serializable {
     }
 
     public static void main(String[] args) {
-        BloomFilter<String> bf = new BloomFilter<String>(320,10000,1);
+        BloomFilter<String> bf = new BloomFilter<String>(3200000,10000);
 
         System.out.println("Has b20789734afd63a6bd82208b38f9fe3fb2eb0be6 " + bf.contains("b20789734afd63a6bd82208b38f9fe3fb2eb0be6"));
         System.out.println("Has bfb6379af528df67c2b1b2d105d2e20a94f0589a " + bf.contains("bfb6379af528df67c2b1b2d105d2e20a94f0589a"));
@@ -464,9 +464,22 @@ public class BloomFilter<E> implements Serializable {
         bf.add("5360bda4c6d1da74492ba4c9ff8ca980724ce46d");
 
         System.out.println("==");
+        System.out.println("Has aaa789734afd63a6bd82208b38f9fe3fb2eb0bea " + bf.contains("aaa789734afd63a6bd82208b38f9fe3fb2eb0bea"));
         System.out.println("Has b20789734afd63a6bd82208b38f9fe3fb2eb0be6 " + bf.contains("b20789734afd63a6bd82208b38f9fe3fb2eb0be6"));
         System.out.println("Has bfb6379af528df67c2b1b2d105d2e20a94f0589a " + bf.contains("bfb6379af528df67c2b1b2d105d2e20a94f0589a"));
         System.out.println("Has 5360bda4c6d1da74492ba4c9ff8ca980724ce46d " + bf.contains("5360bda4c6d1da74492ba4c9ff8ca980724ce46d"));
+
+        BitSet bs = bf.getBitSet();
+
+        // Now let's instantiate a new BloomFilter instance from these ByteArrays.
+
+        BloomFilter<String> bf2 = new BloomFilter<String>(3200000,10000, 3, bs);
+        System.out.println("Test on BloomFilter from byte array.");
+        System.out.println("==");
+        System.out.println("Has aaa789734afd63a6bd82208b38f9fe3fb2eb0bea " + bf2.contains("aaa789734afd63a6bd82208b38f9fe3fb2eb0bea"));
+        System.out.println("Has b20789734afd63a6bd82208b38f9fe3fb2eb0be6 " + bf2.contains("b20789734afd63a6bd82208b38f9fe3fb2eb0be6"));
+        System.out.println("Has bfb6379af528df67c2b1b2d105d2e20a94f0589a " + bf2.contains("bfb6379af528df67c2b1b2d105d2e20a94f0589a"));
+        System.out.println("Has 5360bda4c6d1da74492ba4c9ff8ca980724ce46d " + bf2.contains("5360bda4c6d1da74492ba4c9ff8ca980724ce46d"));
 
     }
 }
