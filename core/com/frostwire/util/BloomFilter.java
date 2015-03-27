@@ -44,20 +44,10 @@ public class BloomFilter<E> implements Serializable {
     private int expectedNumberOfFilterElements; // expected (maximum) number of elements to be added
     private int numberOfAddedElements; // number of elements actually added to the Bloom filter
     private int k; // number of hash functions
+    private final MessageDigest digestFunction; // hash function to be used
 
     static final Charset charset = Charset.forName("UTF-8"); // encoding used for storing hash values as strings
-
     static final String hashName = "MD5"; // MD5 gives good enough accuracy in most circumstances. Change to SHA1 if it's needed
-    static final MessageDigest digestFunction;
-    static { // The digest method is reused between instances
-        MessageDigest tmp;
-        try {
-            tmp = java.security.MessageDigest.getInstance(hashName);
-        } catch (NoSuchAlgorithmException e) {
-            tmp = null;
-        }
-        digestFunction = tmp;
-    }
 
     /**
      * Constructs an empty Bloom filter. The total length of the Bloom filter will be
@@ -74,6 +64,14 @@ public class BloomFilter<E> implements Serializable {
         this.bitSetSize = (int)Math.ceil(c * n);
         numberOfAddedElements = 0;
         this.bitset = new BitSet(bitSetSize);
+
+        MessageDigest tmp;
+        try {
+            tmp = java.security.MessageDigest.getInstance(hashName);
+        } catch (NoSuchAlgorithmException e) {
+            tmp = null;
+        }
+        digestFunction = tmp;
     }
 
     /**
@@ -124,8 +122,8 @@ public class BloomFilter<E> implements Serializable {
      * @param charset specifies the encoding of the input data.
      * @return digest as long.
      */
-    public static int createHash(String val, Charset charset) {
-        return createHash(val.getBytes(charset));
+    public static int createHash(String val, Charset charset, MessageDigest digestFunction) {
+        return createHash(val.getBytes(charset), digestFunction);
     }
 
     /**
@@ -134,8 +132,8 @@ public class BloomFilter<E> implements Serializable {
      * @param val specifies the input data. The encoding is expected to be UTF-8.
      * @return digest as long.
      */
-    public static int createHash(String val) {
-        return createHash(val, charset);
+    public static int createHash(String val, MessageDigest digestFunction) {
+        return createHash(val, charset, digestFunction);
     }
 
     /**
@@ -144,8 +142,8 @@ public class BloomFilter<E> implements Serializable {
      * @param data specifies input data.
      * @return digest as long.
      */
-    public static int createHash(byte[] data) {
-        return createHashes(data, 1)[0];
+    public static int createHash(byte[] data, MessageDigest digestFunction) {
+        return createHashes(data, 1, digestFunction)[0];
     }
 
     /**
@@ -157,18 +155,16 @@ public class BloomFilter<E> implements Serializable {
      * @param hashes number of hashes/int's to produce.
      * @return array of int-sized hashes
      */
-    public static int[] createHashes(byte[] data, int hashes) {
+    public static int[] createHashes(byte[] data, int hashes, MessageDigest digestFunction) {
         int[] result = new int[hashes];
 
         int k = 0;
         byte salt = 0;
         while (k < hashes) {
             byte[] digest;
-            synchronized (digestFunction) {
-                digestFunction.update(salt);
-                salt++;
-                digest = digestFunction.digest(data);
-            }
+            digestFunction.update(salt);
+            salt++;
+            digest = digestFunction.digest(data);
 
             for (int i = 0; i < digest.length/4 && k < hashes; i++) {
                 int h = 0;
@@ -304,7 +300,7 @@ public class BloomFilter<E> implements Serializable {
      * @param bytes array of bytes to add to the Bloom filter.
      */
     public void add(byte[] bytes) {
-        int[] hashes = createHashes(bytes, k);
+        int[] hashes = createHashes(bytes, k, digestFunction);
         for (int hash : hashes)
             bitset.set(Math.abs(hash % bitSetSize), true);
         numberOfAddedElements ++;
@@ -340,7 +336,7 @@ public class BloomFilter<E> implements Serializable {
      * @return true if the array could have been inserted into the Bloom filter.
      */
     public boolean contains(byte[] bytes) {
-        int[] hashes = createHashes(bytes, k);
+        int[] hashes = createHashes(bytes, k, digestFunction);
         for (int hash : hashes) {
             if (!bitset.get(Math.abs(hash % bitSetSize))) {
                 return false;
@@ -480,6 +476,5 @@ public class BloomFilter<E> implements Serializable {
         System.out.println("Has b20789734afd63a6bd82208b38f9fe3fb2eb0be6 " + bf2.contains("b20789734afd63a6bd82208b38f9fe3fb2eb0be6"));
         System.out.println("Has bfb6379af528df67c2b1b2d105d2e20a94f0589a " + bf2.contains("bfb6379af528df67c2b1b2d105d2e20a94f0589a"));
         System.out.println("Has 5360bda4c6d1da74492ba4c9ff8ca980724ce46d " + bf2.contains("5360bda4c6d1da74492ba4c9ff8ca980724ce46d"));
-
     }
 }
