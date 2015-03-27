@@ -23,7 +23,7 @@ import java.util.BitSet;
 import java.util.Collection;
 
 /**
- * Thread-safe Implementation of a Bloom-filter, as described here:
+ * Implementation of a Bloom-filter, as described here:
  * http://en.wikipedia.org/wiki/Bloom_filter
  *
  * For updates and bugfixes, see http://github.com/magnuss/java-bloomfilter
