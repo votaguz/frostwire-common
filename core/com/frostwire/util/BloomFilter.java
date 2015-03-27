@@ -44,7 +44,6 @@ public class BloomFilter<E> implements Serializable {
     private int expectedNumberOfFilterElements; // expected (maximum) number of elements to be added
     private int numberOfAddedElements; // number of elements actually added to the Bloom filter
     private int k; // number of hash functions
-    private final MessageDigest digestFunction; // hash function to be used
 
     static final Charset charset = Charset.forName("UTF-8"); // encoding used for storing hash values as strings
     static final String hashName = "MD5"; // MD5 gives good enough accuracy in most circumstances. Change to SHA1 if it's needed
@@ -64,14 +63,6 @@ public class BloomFilter<E> implements Serializable {
         this.bitSetSize = (int)Math.ceil(c * n);
         numberOfAddedElements = 0;
         this.bitset = new BitSet(bitSetSize);
-
-        MessageDigest tmp;
-        try {
-            tmp = java.security.MessageDigest.getInstance(hashName);
-        } catch (NoSuchAlgorithmException e) {
-            tmp = null;
-        }
-        digestFunction = tmp;
     }
 
     /**
@@ -300,7 +291,7 @@ public class BloomFilter<E> implements Serializable {
      * @param bytes array of bytes to add to the Bloom filter.
      */
     public void add(byte[] bytes) {
-        int[] hashes = createHashes(bytes, k, digestFunction);
+        int[] hashes = createHashes(bytes, k, getNewDigestFunction());
         for (int hash : hashes)
             bitset.set(Math.abs(hash % bitSetSize), true);
         numberOfAddedElements ++;
@@ -336,7 +327,7 @@ public class BloomFilter<E> implements Serializable {
      * @return true if the array could have been inserted into the Bloom filter.
      */
     public boolean contains(byte[] bytes) {
-        int[] hashes = createHashes(bytes, k, digestFunction);
+        int[] hashes = createHashes(bytes, k, getNewDigestFunction());
         for (int hash : hashes) {
             if (!bitset.get(Math.abs(hash % bitSetSize))) {
                 return false;
@@ -433,6 +424,16 @@ public class BloomFilter<E> implements Serializable {
      */
     public double getBitsPerElement() {
         return this.bitSetSize / (double)numberOfAddedElements;
+    }
+
+    public static MessageDigest getNewDigestFunction() {
+        MessageDigest tmp;
+        try {
+            tmp = java.security.MessageDigest.getInstance(hashName);
+        } catch (NoSuchAlgorithmException e) {
+            tmp = null;
+        }
+        return tmp;
     }
 
     public static void main(String[] args) throws IOException, ClassNotFoundException {
