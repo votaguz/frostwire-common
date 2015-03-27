@@ -15,7 +15,7 @@
 
 package com.frostwire.util;
 
-import java.io.Serializable;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -435,7 +435,7 @@ public class BloomFilter<E> implements Serializable {
         return this.bitSetSize / (double)numberOfAddedElements;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException, ClassNotFoundException {
         BloomFilter<String> bf = new BloomFilter<String>(3200000,10000);
 
         System.out.println("Has b20789734afd63a6bd82208b38f9fe3fb2eb0be6 " + bf.contains("b20789734afd63a6bd82208b38f9fe3fb2eb0be6"));
@@ -466,6 +466,24 @@ public class BloomFilter<E> implements Serializable {
         System.out.println("Has 5360bda4c6d1da74492ba4c9ff8ca980724ce46d " + bf.contains("5360bda4c6d1da74492ba4c9ff8ca980724ce46d"));
 
         BitSet bs = bf.getBitSet();
+
+        // Save BitSet to disk.
+        FileOutputStream fos = new FileOutputStream("bloom_filter_test.dat");
+        ObjectOutputStream oos = new ObjectOutputStream(fos);
+        oos.writeObject(bs);
+        oos.flush();
+        oos.close();
+        fos.flush();
+        fos.close();
+
+        bs = null;
+
+        // Load BitSet from disk.
+        FileInputStream fis = new FileInputStream("bloom_filter_test.dat");
+        ObjectInputStream ois = new ObjectInputStream(fis);
+        bs = (BitSet) ois.readObject();
+        ois.close();
+        fis.close();
 
         // Now let's instantiate a new BloomFilter instance from these ByteArrays.
 
