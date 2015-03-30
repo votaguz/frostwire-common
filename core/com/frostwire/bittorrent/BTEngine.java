@@ -467,7 +467,7 @@ public final class BTEngine {
             p.setSendBufferWatermark(sendBufferWatermark / 2);
             p.setCacheSize(256);
             p.setActiveDownloads(4);
-            p.setActiveSeeds(4);
+            p.setActiveSeeds(2);
             p.setMaxPeerlistSize(200);
             p.setUtpDynamicSockBuf(false);
             p.setGuidedReadCache(true);
@@ -476,8 +476,8 @@ public final class BTEngine {
             p.setSeedingOutgoingConnections(false);
             p.setConnectionsLimit(200);
         } else {
-            p.setActiveDownloads(10);
-            p.setActiveSeeds(10);
+            p.setActiveDownloads(5);
+            p.setActiveSeeds(3);
         }
 
         session.applySettings(p);
