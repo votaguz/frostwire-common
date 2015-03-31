@@ -718,9 +718,14 @@ public final class BTEngine {
         }
     }
 
-    private void fireDownloadAdded(BTDownload dl) {
-        if (listener != null) {
-            listener.downloadAdded(this, dl);
+    private void fireDownloadAdded(TorrentAlert<?> alert) {
+        try {
+            BTDownload dl = new BTDownload(this, alert.getHandle());
+            if (listener != null) {
+                listener.downloadAdded(this, dl);
+            }
+        } catch (Throwable e) {
+            LOG.error("Unable to create and/or notify the new download", e);
         }
     }
 
@@ -840,8 +845,9 @@ public final class BTEngine {
 
             switch (type) {
                 case TORRENT_ADDED:
-                    fireDownloadAdded(new BTDownload(BTEngine.this, ((TorrentAlert<?>) alert).getHandle()));
-                    doResumeData((TorrentAlert<?>) alert);
+                    TorrentAlert<?> torrentAlert = (TorrentAlert<?>) alert;
+                    fireDownloadAdded(torrentAlert);
+                    doResumeData(torrentAlert);
                     runNextRestoreDownloadTask();
                     break;
                 case PIECE_FINISHED:
