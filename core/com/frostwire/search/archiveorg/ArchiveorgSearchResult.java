@@ -85,12 +85,14 @@ public class ArchiveorgSearchResult extends AbstractSearchResult implements Craw
 
     private long parsePublicDate(String publicdate) {
         // 2009-12-02T15:41:50Z
+        // 2008-02-20T22:02:21Z
         //"yyyy-MM-dd'T'HH:mm:ss'Z'"
         SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
         long result = -1;
         try {
             result = date.parse(publicdate).getTime();
-        } catch (ParseException e) {
+        } catch (Throwable e) {
+            e.printStackTrace();
         }
         return result;
     }

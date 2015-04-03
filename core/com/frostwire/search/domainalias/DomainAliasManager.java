@@ -139,6 +139,10 @@ public final class DomainAliasManager {
             } else {
                 result = getCurrentDomainAlias().alias;
             }
+
+            if (result == null) {
+                result = defaultDomain; //fallback to default Domain
+            }
         }
         return result;
     }

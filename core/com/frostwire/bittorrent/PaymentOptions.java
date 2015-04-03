@@ -109,4 +109,8 @@ public class PaymentOptions implements Mappable<String, Map<String, String>> {
     public String getItemName() {
         return itemName;
     }
+
+    public boolean isEmpty() {
+        return bitcoin == null && paypalUrl == null;
+    }
 }
