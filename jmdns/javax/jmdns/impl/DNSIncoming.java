@@ -28,12 +28,20 @@ import javax.jmdns.impl.constants.DNSResultCode;
 public final class DNSIncoming extends DNSMessage {
     private static Logger logger                                = Logger.getLogger(DNSIncoming.class.getName());
 
+    static {
+        logger.setLevel(Level.OFF);
+    }
+
     // This is a hack to handle a bug in the BonjourConformanceTest
     // It is sending out target strings that don't follow the "domain name" format.
     public static boolean USE_DOMAIN_NAME_FORMAT_FOR_SRV_TARGET = true;
 
     public static class MessageInputStream extends ByteArrayInputStream {
         private static Logger      logger1 = Logger.getLogger(MessageInputStream.class.getName());
+
+        static {
+            logger1.setLevel(Level.OFF);
+        }
 
         final Map<Integer, String> _names;
 
