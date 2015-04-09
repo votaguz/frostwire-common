@@ -720,7 +720,8 @@ public final class BTEngine {
 
     private void fireDownloadAdded(TorrentAlert<?> alert) {
         try {
-            BTDownload dl = new BTDownload(this, alert.getHandle());
+            TorrentHandle th = session.findTorrent(alert.getHandle().getInfoHash());
+            BTDownload dl = new BTDownload(this, th);
             if (listener != null) {
                 listener.downloadAdded(this, dl);
             }
