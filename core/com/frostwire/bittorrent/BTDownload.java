@@ -406,8 +406,6 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     @Override
     public void torrentChecked(TorrentCheckedAlert alert) {
         try {
-            TorrentHandle th = alert.getHandle();
-
             if (th.isValid()) {
                 // trigger items calculation
                 getItems();
@@ -607,7 +605,6 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
     private void serializeResumeData(SaveResumeDataAlert alert) {
         try {
-            TorrentHandle th = alert.getHandle();
             if (th.isValid()) {
                 String infoHash = th.getInfoHash().toString();
                 File file = engine.resumeDataFile(infoHash);
