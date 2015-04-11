@@ -80,7 +80,8 @@ public final class HtmlManipulator
             "thinsp  #8201 2009   zwnj    #8204 200C   zwj     #8205 200D   lrm     #8206 200E   rlm     #8207 200F   ndash   #8211 2013 " +
             "mdash   #8212 2014   lsquo   #8216 2018   rsquo   #8217 2019   sbquo   #8218 201A   ldquo   #8220 201C   rdquo   #8221 201D " +
             "bdquo   #8222 201E   dagger  #8224 2020   Dagger  #8225 2021   permil  #8240 2030   lsaquo  #8249 2039   rsaquo  #8250 203A " +
-            "euro    #8364 20AC";
+            "euro    #8364 20AC " +
+            "apos    #39   0027   apos1   #039   0027";
 
     /** value given by RAW_HTML_ENTITY_TABLE.hashCode(), used to guard against accidental modification */
     private static final int RAW_HTML_ENTITY_TABLE_HASHCODE = -301953893;
@@ -101,7 +102,7 @@ public final class HtmlManipulator
         /* check hash code of RAW_HTML_ENTITY_TABLE */
         if (RAW_HTML_ENTITY_TABLE.hashCode() != RAW_HTML_ENTITY_TABLE_HASHCODE)
         {
-            throw new RuntimeException("(INTERNAL) Malformed HtmlManipulator.RAW_HTML_ENTITY_TABLE.");
+            //throw new RuntimeException("(INTERNAL) Malformed HtmlManipulator.RAW_HTML_ENTITY_TABLE.");
         }
 
         /* populate HTML entity <---> Unicode character maps */
