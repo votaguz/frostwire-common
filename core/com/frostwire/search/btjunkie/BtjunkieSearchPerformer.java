@@ -58,7 +58,7 @@ public class BtjunkieSearchPerformer extends CrawlRegexSearchPerformer<BtjunkieS
 
     @Override
     protected String getUrl(int page, String encodedKeywords) {
-        return "http://btjunkie.eu/all/by-default_sort/desc/page" + page + "/" + encodedKeywords;
+        return "http://"+getDomainAliasManager().getDomainNameToUse()+"/all/by-default_sort/desc/page" + page + "/" + encodedKeywords;
     }
 
     @Override
@@ -72,7 +72,7 @@ public class BtjunkieSearchPerformer extends CrawlRegexSearchPerformer<BtjunkieS
 
         BtjunkieSearchResult sr = new BtjunkieSearchResult(
                 domainName,
-                "http://" + domainName + matcher.group("detailsUrl"),
+                parseDisplayUrl(domainName, matcher.group("detailsUrl")),
                 parseFileName(matcher.group("title")),
                 parseDisplayName(matcher.group("title")),
                 matcher.group("magnet"),
@@ -82,6 +82,16 @@ public class BtjunkieSearchPerformer extends CrawlRegexSearchPerformer<BtjunkieS
                 parseSeeds(matcher.group("seeds")));
 
         return sr;
+    }
+
+    private String parseDisplayUrl(String domainName, String detailsUrl) {
+        String result;
+        try {
+            result = "http://" +domainName + "/" + detailsUrl.substring(detailsUrl.indexOf("/",7)+1);
+        } catch (Throwable t) {
+            result = detailsUrl;
+        }
+        return result;
     }
 
     private long parseDate(String dateString) {
