@@ -53,7 +53,7 @@ public class ExtratorrentSearchPerformer extends TorrentJsonSearchPerformer<Extr
         UNIT_TO_BYTES.put("GB", 1024 * 1024 * 1024);
     }
 
-    private static final String FILES_REGEX = "(?is)<tr>.*?<td.*?<img.*?<img.*?<td.*?>(?<filename>.*?)&nbsp;<font.*?>\\((?<size>.*?)&nbsp;(?<unit>.*?)\\)</font>.*?</td></tr>";
+    private static final String FILES_REGEX = "(?is)<tr>.*?<td.*?<img.*?<img.*?<td.*?nowrap\">[^<](?<filename>.*?)&nbsp;<font.*?>\\((?<size>.*?)&nbsp;(?<unit>.*?)\\)</font>.*?</td></tr>";
     private static final Pattern FILES_PATTERN = Pattern.compile(FILES_REGEX);
 
     public ExtratorrentSearchPerformer(DomainAliasManager domainAliasManager, long token, String keywords, int timeout) {
