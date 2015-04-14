@@ -102,7 +102,7 @@ public class ExtratorrentSearchPerformer extends TorrentJsonSearchPerformer<Extr
                     size = -1;
                 }
 
-                result.add(new ExtratorrentCrawledSearchResult(esr, filename, (int) size));
+                result.add(new ExtratorrentScrapedFileSearchResult(esr, filename, (int) size));
 
             } catch (Throwable e) {
                 LOG.warn("Error creating single file search result", e);
