@@ -16,15 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.frostwire.search.extratorrent2;
+package com.frostwire.search.extratorrent;
 
 import com.frostwire.logging.Logger;
 import com.frostwire.search.MaxIterCharSequence;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.domainalias.DomainAliasManager;
-import com.frostwire.search.kat2.KATCrawledSearchResult;
-import com.frostwire.search.kat2.KATSearchResult;
 import com.frostwire.search.torrent.TorrentCrawlableSearchResult;
 import com.frostwire.search.torrent.TorrentJsonSearchPerformer;
 import com.frostwire.util.HtmlManipulator;

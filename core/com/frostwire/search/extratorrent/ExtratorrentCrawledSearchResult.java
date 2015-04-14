@@ -16,10 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.frostwire.search.extratorrent2;
+package com.frostwire.search.extratorrent;
 
 import com.frostwire.search.AbstractCrawledSearchResult;
-import com.frostwire.search.kat2.KATSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import org.apache.commons.io.FilenameUtils;
 
