@@ -50,7 +50,7 @@ public class YifySearchPerformer extends TorrentRegexSearchPerformer<YifySearchR
 
     @Override
     protected String getUrl(int page, String encodedKeywords) {
-        return "http://" + getDomainNameToUse() + "/search/" + encodedKeywords + "/";
+        return "https://" + getDomainNameToUse() + "/search/" + encodedKeywords + "/";
     }
 
     @Override

@@ -35,7 +35,7 @@ public class YifyTempSearchResult extends AbstractSearchResult implements Crawla
 
     public YifyTempSearchResult(String domainName, String itemId, String htmlFilename, String displayName) {
         this.itemId = itemId;
-        this.detailsUrl = "http://" + domainName + "/movie/" + itemId + "/" + htmlFilename;
+        this.detailsUrl = "https://" + domainName + "/movie/" + itemId + "/" + htmlFilename;
         this.displayName = displayName;
     }
 
