@@ -19,6 +19,7 @@
 package com.frostwire.search.extratorrent;
 
 import com.frostwire.search.AbstractCrawledSearchResult;
+import com.frostwire.search.TorrentScrapedFileSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import org.apache.commons.io.FilenameUtils;
 
@@ -26,23 +27,19 @@ import org.apache.commons.io.FilenameUtils;
  * @author gubatron
  * @author aldenml
  */
-public final class ExtratorrentCrawledSearchResult extends AbstractCrawledSearchResult<ExtratorrentSearchResult> implements TorrentSearchResult {
+public final class ExtratorrentScrapedFileSearchResult extends AbstractCrawledSearchResult<ExtratorrentSearchResult> implements TorrentScrapedFileSearchResult, TorrentSearchResult {
 
     private final String filePath;
     private final String displayName;
     private final String filename;
     private final long size;
 
-    public ExtratorrentCrawledSearchResult(ExtratorrentSearchResult sr, String filePath, long fileSize) {
+    public ExtratorrentScrapedFileSearchResult(ExtratorrentSearchResult sr, String filePath, long fileSize) {
         super(sr);
         this.filePath = filePath;
         this.filename = FilenameUtils.getName(this.filePath);
         this.size = fileSize;
         this.displayName = FilenameUtils.getBaseName(this.filename);
-    }
-
-    public String getFilePath() {
-        return filePath;
     }
 
     @Override
@@ -78,5 +75,10 @@ public final class ExtratorrentCrawledSearchResult extends AbstractCrawledSearch
     @Override
     public String getThumbnailUrl() {
         return parent.getThumbnailUrl();
+    }
+
+    @Override
+    public String getFilePath() {
+        return filePath;
     }
 }
