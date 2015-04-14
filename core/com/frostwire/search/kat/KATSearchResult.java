@@ -18,31 +18,27 @@
 
 package com.frostwire.search.kat;
 
+import com.frostwire.search.torrent.AbstractTorrentSearchResult;
+import com.frostwire.util.HtmlManipulator;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-import com.frostwire.search.torrent.AbstractTorrentSearchResult;
-import com.frostwire.util.StringUtils;
-
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class KATSearchResult extends AbstractTorrentSearchResult {
 
     private final KATItem item;
     private final String filename;
-    private final String torrentUrl;
     private final long creationTime;
 
     public KATSearchResult(KATItem item) {
         this.item = item;
 
         this.filename = buildFilename(item);
-        this.torrentUrl = buildUrl();
         this.creationTime = buildCreationTime(item);
     }
 
@@ -53,7 +49,7 @@ public class KATSearchResult extends AbstractTorrentSearchResult {
 
     @Override
     public String getTorrentUrl() {
-        return torrentUrl;
+        return item.torrentLink;
     }
 
     @Override
@@ -93,11 +89,7 @@ public class KATSearchResult extends AbstractTorrentSearchResult {
 
     private String buildFilename(KATItem item) {
         String titleNoTags = item.title.replace("<b>", "").replace("</b>", "");
-        return titleNoTags + ".torrent";
-    }
-
-    private String buildUrl() {
-        return "magnet:?xt=urn:btih:" + getHash() + "&dn=" + StringUtils.encodeUrl(getFilename()) + "&tr=http%3A%2F%2Ftracker.publicbt.com%2Fannounce";
+        return HtmlManipulator.replaceHtmlEntities(titleNoTags) + ".torrent";
     }
 
     private long buildCreationTime(KATItem item) {
