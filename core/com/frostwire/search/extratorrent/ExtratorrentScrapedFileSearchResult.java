@@ -19,7 +19,7 @@
 package com.frostwire.search.extratorrent;
 
 import com.frostwire.search.AbstractCrawledSearchResult;
-import com.frostwire.search.TorrentScrapedFileSearchResult;
+import com.frostwire.search.torrent.TorrentScrapedFileSearchResult;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import org.apache.commons.io.FilenameUtils;
 

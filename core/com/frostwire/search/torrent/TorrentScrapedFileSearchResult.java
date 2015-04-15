@@ -16,12 +16,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.frostwire.search;
+package com.frostwire.search.torrent;
 
 /**
  * @author gubatron
  * @author aldenml
  */
-public interface TorrentScrapedFileSearchResult {
-    public String getFilePath();
+public interface TorrentScrapedFileSearchResult extends TorrentSearchResult {
+
+    String getFilePath();
 }
