@@ -700,9 +700,13 @@ public final class BTEngine {
     }
 
     private void doResumeData(TorrentAlert<?> alert) {
-        TorrentHandle th = alert.getHandle();
-        if (th.isValid() && th.needSaveResumeData()) {
-            th.saveResumeData();
+        try {
+            TorrentHandle th = session.findTorrent(alert.getHandle().getInfoHash());
+            if (th.isValid() && th.needSaveResumeData()) {
+                th.saveResumeData();
+            }
+        } catch (Throwable e) {
+            LOG.warn("Error triggering resume data", e);
         }
     }
 
