@@ -20,6 +20,7 @@ package com.frostwire.search.extratorrent;
 
 import com.frostwire.logging.Logger;
 import com.frostwire.search.MaxIterCharSequence;
+import com.frostwire.search.ScrapedTorrentFileSearchResult;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.domainalias.DomainAliasManager;
@@ -102,7 +103,7 @@ public class ExtratorrentSearchPerformer extends TorrentJsonSearchPerformer<Extr
                     size = -1;
                 }
 
-                result.add(new ExtratorrentScrapedFileSearchResult(esr, filename, (int) size));
+                result.add(new ScrapedTorrentFileSearchResult<ExtratorrentSearchResult>(esr, filename, (long) size));
 
             } catch (Throwable e) {
                 LOG.warn("Error creating single file search result", e);

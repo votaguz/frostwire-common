@@ -20,6 +20,7 @@ package com.frostwire.search.kat;
 
 import com.frostwire.logging.Logger;
 import com.frostwire.search.MaxIterCharSequence;
+import com.frostwire.search.ScrapedTorrentFileSearchResult;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.domainalias.DomainAliasManager;
@@ -101,7 +102,7 @@ public class KATSearchPerformer extends TorrentJsonSearchPerformer<KATItem, KATS
                     size = -1;
                 }
 
-                result.add(new KATScrapedFileSearchResult(ksr, filename, (int) size));
+                result.add(new ScrapedTorrentFileSearchResult<KATSearchResult>(ksr, filename, (long) size));
 
             } catch (Throwable e) {
                 LOG.warn("Error creating single file search result", e);
