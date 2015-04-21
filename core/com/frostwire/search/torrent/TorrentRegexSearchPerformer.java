@@ -21,12 +21,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.frostwire.logging.Logger;
-import com.frostwire.search.CrawlRegexSearchPerformer;
-import com.frostwire.search.CrawlableSearchResult;
-import com.frostwire.search.MaxIterCharSequence;
-import com.frostwire.search.PerformersHelper;
-import com.frostwire.search.SearchMatcher;
-import com.frostwire.search.SearchResult;
+import com.frostwire.search.*;
 import com.frostwire.search.domainalias.DomainAliasManager;
 import com.google.code.regexp.Matcher;
 import com.google.code.regexp.Pattern;
@@ -73,7 +68,9 @@ public abstract class TorrentRegexSearchPerformer<T extends CrawlableSearchResul
     protected List<? extends SearchResult> crawlResult(CrawlableSearchResult sr, byte[] data) throws Exception {
         List<SearchResult> list = new LinkedList<SearchResult>();
 
-        if (sr instanceof TorrentCrawlableSearchResult) {
+        boolean dataIsHTML = data[0] == '<';
+
+        if (sr instanceof TorrentCrawlableSearchResult && !(sr instanceof ScrapedTorrentFileSearchResult) && !dataIsHTML) {
             //in case we fetched a torrent's info (magnet, or the .torrent itself) to obtain 
             list.addAll(PerformersHelper.crawlTorrent(this, (TorrentCrawlableSearchResult) sr, data));
         } else {

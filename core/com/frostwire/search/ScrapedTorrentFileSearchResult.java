@@ -32,7 +32,7 @@ import org.apache.commons.io.FilenameUtils;
  * or a link to another page holding those, in which case your implementation of crawlResult
  * would have to make a second request.
  *
- * This class is for you to extend and use when modeling the torrent scraped file search results found.
+ * This class is for you to use when modeling the torrent scraped file search results found.
  * You will initialize such scraped results by passing the main torrent results found by the
  * parent call to crawlResult.
  *

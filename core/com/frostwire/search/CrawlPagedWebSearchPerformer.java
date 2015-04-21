@@ -131,6 +131,7 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
                             }
                         }
                     } catch (Throwable e) {
+                        e.printStackTrace();
                         LOG.warn("Error creating crawled results from downloaded data: " + e.getMessage());
                         cacheRemove(url); // invalidating cache data
                     }
@@ -141,6 +142,7 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
                             onResults(this, results);
                         }
                     } catch (Throwable e) {
+                        e.printStackTrace();
                         LOG.warn("Error creating crawled results from search result alone: " + obj.getDetailsUrl() + ", e=" + e.getMessage());
                     }
                 }
