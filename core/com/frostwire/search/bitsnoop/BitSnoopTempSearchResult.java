@@ -20,6 +20,7 @@ package com.frostwire.search.bitsnoop;
 
 import com.frostwire.search.AbstractSearchResult;
 import com.frostwire.search.CrawlableSearchResult;
+import com.frostwire.search.PreliminarySearchResult;
 
 /**
  * 
@@ -27,7 +28,7 @@ import com.frostwire.search.CrawlableSearchResult;
  * @author aldenml
  *
  */
-public class BitSnoopTempSearchResult extends AbstractSearchResult implements CrawlableSearchResult {
+public class BitSnoopTempSearchResult extends AbstractSearchResult implements CrawlableSearchResult, PreliminarySearchResult {
 
     private final String itemId;
     private final String detailsUrl;

@@ -173,7 +173,11 @@ public class BitSnoopSearchPerformer extends TorrentRegexSearchPerformer<BitSnoo
         List<AbstractSearchResult> searchResults = null;
 
         try {
-            searchResults = (List<AbstractSearchResult>) super.crawlResult(sr, data);
+            if (sr instanceof PreliminarySearchResult) {
+                searchResults = (List<AbstractSearchResult>) super.crawlResult(sr, fetchBytes(sr.getDetailsUrl()));
+            } else if (sr instanceof BitSnoopSearchResult) {
+                searchResults = (List<AbstractSearchResult>) super.crawlResult(sr, data);
+            }
         } catch (Throwable runtime) {
             // could fail when not meant to... simplest fix is to let it fail.
             searchResults = null;

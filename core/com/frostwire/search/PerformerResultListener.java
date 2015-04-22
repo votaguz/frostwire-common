@@ -39,7 +39,10 @@ public final class PerformerResultListener implements SearchListener {
         List<SearchResult> list = new LinkedList<SearchResult>();
 
         for (SearchResult sr : results) {
-            if (sr instanceof CrawlableSearchResult) {
+            //List of PreliminarySearchResults might be here.
+            if (sr instanceof PreliminarySearchResult && sr instanceof CrawlableSearchResult) {
+                manager.crawl(performer, (CrawlableSearchResult) sr);
+            } else if (sr instanceof CrawlableSearchResult) {
                 CrawlableSearchResult csr = (CrawlableSearchResult) sr;
 
                 if (csr.isComplete()) {
