@@ -69,6 +69,7 @@ public final class BTEngine {
     private boolean firewalled;
     private BTEngineListener listener;
 
+    /*
     private long bytesRecv;
     private long bytesSent;
     private long averageRecvSpeed;
@@ -78,6 +79,7 @@ public final class BTEngine {
     private long speedMarkTimestamp;
     private long totalRecvSinceLastSpeedStamp;
     private long totalSentSinceLastSpeedStamp;
+    */
 
     private BTEngine() {
         this.sync = new ReentrantLock();
@@ -125,9 +127,7 @@ public final class BTEngine {
             return 0;
         }
 
-        updateAverageSpeeds();
-
-        return averageRecvSpeed;
+        return session.getStatus().getDownloadRate();
     }
 
     public long getUploadRate() {
@@ -135,9 +135,7 @@ public final class BTEngine {
             return 0;
         }
 
-        updateAverageSpeeds();
-
-        return averageSentSpeed;
+        return session.getStatus().getUploadRate();
     }
 
     public long getTotalDownload() {
@@ -145,7 +143,7 @@ public final class BTEngine {
             return 0;
         }
 
-        return session.getStats().getTotalDownload();
+        return session.getStatus().getTotalDownload();
     }
 
     public long getTotalUpload() {
@@ -153,7 +151,7 @@ public final class BTEngine {
             return 0;
         }
 
-        return session.getStats().getTotalUpload();
+        return session.getStatus().getTotalUpload();
     }
 
     public int getDownloadRateLimit() {
@@ -290,12 +288,12 @@ public final class BTEngine {
         }
     }
 
-    private void saveSettings(SettingsPack s) {
+    private void saveSettings(SessionSettings s) {
         if (session == null) {
             return;
         }
 
-        session.applySettings(s);
+        session.setSettings(s);
         saveSettings();
     }
 
@@ -456,6 +454,7 @@ public final class BTEngine {
             return;
         }
 
+        /*
         SettingsPack p = settingsToPack(defaultSettings);
         SessionSettings s = defaultSettings;
 
@@ -481,6 +480,41 @@ public final class BTEngine {
         }
 
         session.applySettings(p);
+        saveSettings();
+        */
+
+        defaultSettings.broadcastLSD(true);
+
+        session.setSettings(defaultSettings);
+
+        SessionSettings s = session.getSettings(); // working with a copy?
+
+        if (ctx.optimizeMemory) {
+
+            int maxQueuedDiskBytes = s.getMaxQueuedDiskBytes();
+            s.setMaxQueuedDiskBytes(maxQueuedDiskBytes / 2);
+            int sendBufferWatermark = s.getSendBufferWatermark();
+            s.setSendBufferWatermark(sendBufferWatermark / 2);
+            s.setCacheSize(256);
+            s.setActiveDownloads(4);
+            s.setActiveSeeds(4);
+            s.setMaxPeerlistSize(200);
+            s.setUtpDynamicSockBuf(false);
+            s.setGuidedReadCache(true);
+            s.setTickInterval(1000);
+            s.setInactivityTimeout(60);
+            s.optimizeHashingForSpeed(false);
+            s.setSeedingOutgoingConnections(false);
+            s.setConnectionsLimit(200);
+
+        } else {
+
+            s.setActiveDownloads(10);
+            s.setActiveSeeds(10);
+        }
+
+        session.setSettings(s);
+
         saveSettings();
     }
 
@@ -808,6 +842,8 @@ public final class BTEngine {
         }
     }
 
+    // NOTE: don't delete, new API
+    /*
     private static SettingsPack settingsToPack(SessionSettings s) {
         string_entry_map map = new string_entry_map();
         libtorrent.save_settings_to_dict(s.getSwig(), map);
@@ -820,8 +856,9 @@ public final class BTEngine {
         }
 
         return new SettingsPack(libtorrent.load_pack_from_dict(le));
-    }
+    }*/
 
+    /*
     private void updateAverageSpeeds() {
         long now = System.currentTimeMillis();
 
@@ -835,7 +872,7 @@ public final class BTEngine {
             totalRecvSinceLastSpeedStamp = bytesRecv;
             totalSentSinceLastSpeedStamp = bytesSent;
         }
-    }
+    }*/
 
     private final class InnerListener implements AlertListener {
         @Override
@@ -905,7 +942,7 @@ public final class BTEngine {
             return;
         }
 
-        SettingsPack s = new SettingsPack();
+        SessionSettings s = getSettings();
         s.setDownloadRateLimit(limit);
         saveSettings(s);
     }
@@ -923,7 +960,7 @@ public final class BTEngine {
             return;
         }
 
-        SettingsPack s = new SettingsPack();
+        SessionSettings s = getSettings();
         s.setUploadRateLimit(limit);
         saveSettings(s);
     }
@@ -941,7 +978,7 @@ public final class BTEngine {
             return;
         }
 
-        SettingsPack s = new SettingsPack();
+        SessionSettings s = getSettings();
         s.setActiveDownloads(limit);
         saveSettings(s);
     }
@@ -959,7 +996,7 @@ public final class BTEngine {
             return;
         }
 
-        SettingsPack s = new SettingsPack();
+        SessionSettings s = getSettings();
         s.setActiveSeeds(limit);
         saveSettings(s);
     }
@@ -977,7 +1014,7 @@ public final class BTEngine {
             return;
         }
 
-        SettingsPack s = new SettingsPack();
+        SessionSettings s = getSettings();
         s.setConnectionsLimit(limit);
         saveSettings(s);
     }
@@ -995,7 +1032,7 @@ public final class BTEngine {
             return;
         }
 
-        SettingsPack s = new SettingsPack();
+        SessionSettings s = getSettings();
         s.setMaxPeerlistSize(limit);
         saveSettings(s);
     }
