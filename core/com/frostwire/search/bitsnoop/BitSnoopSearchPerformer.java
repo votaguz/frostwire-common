@@ -38,7 +38,6 @@ public class BitSnoopSearchPerformer extends TorrentRegexSearchPerformer<BitSnoo
     private static final String REGEX = "(?is)<span class=\"icon cat.*?</span> <a href=\"(.*?)\">.*?<div class=\"torInfo\"";
     private static final String HTML_REGEX = "(?is).*?Help</a>, <a href=\"magnet:\\?xt=urn:btih:([0-9a-fA-F]{40})&dn=(.*?)\" onclick=\".*?Magnet</a>.*?<a href=\"(.*?)\" title=\".*?\" class=\"dlbtn.*?title=\"Torrent Size\"><strong>(.*?)</strong>.*?title=\"Availability\"></span>(.*?)</span></td>.*?<li>Added to index &#8212; (.*?) \\(.{0,50}?\\)</li>.*?";
     private static final String SCRAPE_REGEX = "(?is)<td .*?<span class=\"filetype (?!dir).*?</span> (?<filepath>.*?)</td><td align=\"right\"><span class=\"icon.*?\"></span>(?<filesize>.*?) (?<unit>[GBMK]+)</td>";
-    //private static final String SCRAPE_REGEX = "(?is)<td style=\"padding.*?<span class=\"filetype (?!dir).*?</span> (?<filepath>.*?)</td><td align=\"right\"><span class=\"icon fff\"></span>(?<filesize>.*?) (?<unit>[BKMG]*?)</td></tr></table>";
     private boolean isScrapingFile = false;
     private final Pattern fileScrapePattern;
 

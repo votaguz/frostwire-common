@@ -133,6 +133,7 @@ public class BitSnoopSearchResult extends AbstractTorrentSearchResult {
     private long parseSize(String group) {
         String[] size = group.trim().split(" ");
         String amount = size[0].trim();
+        amount = amount.replaceAll(",", "");
         String unit = size[1].trim();
 
         long multiplier = BYTE_MULTIPLIERS[UNIT_TO_BYTE_MULTIPLIERS_MAP.get(unit)];
