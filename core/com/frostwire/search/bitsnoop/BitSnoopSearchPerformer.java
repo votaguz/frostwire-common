@@ -18,9 +18,11 @@
 
 package com.frostwire.search.bitsnoop;
 
+import com.frostwire.logging.Logger;
 import com.frostwire.search.*;
 import com.frostwire.search.domainalias.DomainAliasManager;
 import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
+import com.frostwire.util.HtmlManipulator;
 import com.google.code.regexp.Matcher;
 import com.google.code.regexp.Pattern;
 
@@ -36,7 +38,7 @@ import java.util.Map;
  *
  */
 public class BitSnoopSearchPerformer extends TorrentRegexSearchPerformer<BitSnoopSearchResult> {
-    //private static Logger LOG = Logger.getLogger(BitSnoopSearchPerformer.class);
+    private static Logger LOG = Logger.getLogger(BitSnoopSearchPerformer.class);
     private static final int MAX_RESULTS = 10;
     private static final String REGEX = "(?is)<span class=\"icon cat.*?</span> <a href=\"(.*?)\">.*?<div class=\"torInfo\"";
     private static final String HTML_REGEX = "(?is).*?Help</a>, <a href=\"magnet:\\?xt=urn:btih:([0-9a-fA-F]{40})&dn=(.*?)\" onclick=\".*?Magnet</a>.*?<a href=\"(.*?)\" title=\".*?\" class=\"dlbtn.*?title=\"Torrent Size\"><strong>(.*?)</strong>.*?title=\"Availability\"></span>(.*?)</span></td>.*?<li>Added to index &#8212; (.*?) \\(.{0,50}?\\)</li>.*?";
@@ -193,7 +195,7 @@ public class BitSnoopSearchPerformer extends TorrentRegexSearchPerformer<BitSnoo
         final Matcher matcher = fileScrapePattern.matcher(new MaxIterCharSequence(scrapeHtml, 2 * scrapeHtml.length()));
         while (matcher.find()) {
             try {
-                final String filePath = matcher.group("filepath");
+                final String filePath = HtmlManipulator.replaceHtmlEntities(matcher.group("filepath"));
                 final long fileSize = parseSize(matcher.group("filesize"), matcher.group("unit"));
 
                 ScrapedTorrentFileSearchResult<BitSnoopSearchResult> scrapedResult =
@@ -201,9 +203,9 @@ public class BitSnoopSearchPerformer extends TorrentRegexSearchPerformer<BitSnoo
                                 filePath,
                                 fileSize
                         );
-                searchResults.add((AbstractSearchResult) scrapedResult);
+                searchResults.add(scrapedResult);
             } catch (Throwable t) {
-                t.printStackTrace();
+                LOG.error(t.getMessage(), t);
             }
         }
         isScrapingFile = false;
