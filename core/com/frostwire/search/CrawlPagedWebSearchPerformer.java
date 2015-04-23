@@ -131,7 +131,7 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
                             }
                         }
                     } catch (Throwable e) {
-                        LOG.warn("Error creating crawled results from downloaded data: " + e.getMessage()); //,e);
+                        LOG.warn("Error creating crawled results from downloaded data: " + e.getMessage(),e);
                         cacheRemove(url); // invalidating cache data
                     }
                 } else {

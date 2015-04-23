@@ -26,10 +26,7 @@ import com.frostwire.util.HtmlManipulator;
 import com.google.code.regexp.Matcher;
 import com.google.code.regexp.Pattern;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author gubatron
@@ -166,27 +163,23 @@ public class BitSnoopSearchPerformer extends TorrentRegexSearchPerformer<BitSnoo
 
     @Override
     protected List<? extends SearchResult> crawlResult(CrawlableSearchResult sr, byte[] data) throws Exception {
-        // this logic could probably be abstracted into
-        // List<T extends AbstractSearchResult> scrapeFiles(sr, byte[] data, scrapePrefixOffset, scrapeSuffixOffset)
-        final String fullHtml = new String(data, "UTF-8");
+        if (!(sr instanceof BitSnoopTempSearchResult)) {
+            return Collections.emptyList();
+        }
 
-        List<AbstractSearchResult> searchResults = null;
+        List<SearchResult> searchResults = new LinkedList<SearchResult>();
+        byte[] detailPageData = null;
+        // sr is a temp result.
+        if (!sr.isComplete()) {
+            detailPageData = fetchBytes(sr.getDetailsUrl());
+            searchResults.addAll(super.crawlResult(sr,detailPageData));
 
-        try {
-            if (sr instanceof PreliminarySearchResult) {
-                searchResults = (List<AbstractSearchResult>) super.crawlResult(sr, fetchBytes(sr.getDetailsUrl()));
-            } else if (sr instanceof BitSnoopSearchResult) {
-                searchResults = (List<AbstractSearchResult>) super.crawlResult(sr, data);
+            if (searchResults == null || searchResults.isEmpty()) {
+                return Collections.emptyList();
             }
-        } catch (Throwable runtime) {
-            // could fail when not meant to... simplest fix is to let it fail.
-            searchResults = null;
         }
 
-        if (searchResults == null || searchResults.isEmpty()) {
-            return searchResults;
-        }
-
+        final String fullHtml = new String(detailPageData, "UTF-8");
         final BitSnoopSearchResult parent = (BitSnoopSearchResult) searchResults.get(0);
         isScrapingFile = true;
         final String scrapeHtml = PerformersHelper.reduceHtml(fullHtml, htmlPrefixOffset(fullHtml), htmlSuffixOffset(fullHtml));

@@ -66,9 +66,7 @@ public abstract class TorrentRegexSearchPerformer<T extends CrawlableSearchResul
     protected List<? extends SearchResult> crawlResult(CrawlableSearchResult sr, byte[] data) throws Exception {
         List<SearchResult> list = new LinkedList<SearchResult>();
 
-        boolean dataIsHTML = data[0] == '<';
-
-        if (sr instanceof TorrentCrawlableSearchResult && !(sr instanceof ScrapedTorrentFileSearchResult) && !dataIsHTML && !(sr instanceof PreliminarySearchResult)) {
+        if (sr instanceof TorrentCrawlableSearchResult) {
             //in case we fetched a torrent's info (magnet, or the .torrent itself) to obtain 
             list.addAll(PerformersHelper.crawlTorrent(this, (TorrentCrawlableSearchResult) sr, data));
         } else {

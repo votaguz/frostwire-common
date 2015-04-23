@@ -28,7 +28,7 @@ import com.frostwire.search.PreliminarySearchResult;
  * @author aldenml
  *
  */
-public class BitSnoopTempSearchResult extends AbstractSearchResult implements CrawlableSearchResult, PreliminarySearchResult {
+public final class BitSnoopTempSearchResult extends AbstractSearchResult implements CrawlableSearchResult {
 
     private final String itemId;
     private final String detailsUrl;

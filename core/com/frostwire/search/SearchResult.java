@@ -27,15 +27,15 @@ import com.frostwire.licences.License;
  */
 public interface SearchResult {
 
-    public String getDisplayName();
+    String getDisplayName();
 
-    public String getDetailsUrl();
+    String getDetailsUrl();
+
+    long getCreationTime();
+
+    String getSource();
+
+    License getLicense();
     
-    public long getCreationTime();
-
-    public String getSource();
-
-    public License getLicense();
-    
-    public String getThumbnailUrl();
+    String getThumbnailUrl();
 }
