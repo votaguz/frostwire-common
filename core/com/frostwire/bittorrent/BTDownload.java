@@ -168,6 +168,8 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         final TorrentStatus.State state = status.getState();
 
         switch (state) {
+            case QUEUED_FOR_CHECKING:
+                return TransferState.QUEUED_FOR_CHECKING;
             case CHECKING_FILES:
                 return TransferState.CHECKING;
             case DOWNLOADING_METADATA:
