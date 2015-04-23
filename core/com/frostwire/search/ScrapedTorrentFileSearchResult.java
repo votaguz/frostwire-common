@@ -24,51 +24,63 @@ import org.apache.commons.io.FilenameUtils;
 
 /**
  * Created on 4/16/15.
- *
+ * <p/>
  * When a SearchPerformer crawls a page, its
  * crawlResult(CrawlableSearchResult sr, byte[] data) method is invoked.
  * usually the 'data' holds the HTML with the main information of the torrent
  * and such page may contain information about the torrent's files (TorrentScrapedFileSearchResults)
  * or a link to another page holding those, in which case your implementation of crawlResult
  * would have to make a second request.
- *
+ * <p/>
  * This class is for you to use when modeling the torrent scraped file search results found.
  * You will initialize such scraped results by passing the main torrent results found by the
  * parent call to crawlResult.
- *
- *
+ * <p/>
+ * <p/>
  * In this HTML there might be information about the torrent files
  *
  * @author gubatron
  * @author aldenml
- *
- *
  */
 public class ScrapedTorrentFileSearchResult<T extends AbstractTorrentSearchResult> extends AbstractCrawledSearchResult<T> implements TorrentSearchResult {
     private final String filePath;
-    private final String displayName;
     private final String filename;
+    private final String displayName;
+    private final String referrerUrl;
     private final long size;
 
-    public ScrapedTorrentFileSearchResult(T parent, String filePath, long fileSize) {
+    public ScrapedTorrentFileSearchResult(T parent, String filePath, long fileSize, String referrerUrl) {
         super(parent);
         this.filePath = filePath;
         this.filename = FilenameUtils.getName(this.filePath);
-        this.size = fileSize;
         this.displayName = FilenameUtils.getBaseName(this.filename);
+        this.referrerUrl = referrerUrl;
+        this.size = fileSize;
+    }
+
+    public ScrapedTorrentFileSearchResult(T parent, String filePath, long fileSize) {
+        this(parent, filePath, fileSize, parent.getDetailsUrl());
     }
 
     // all the data that must be scraped.
-    public String getFilePath() { return filePath; }
+    public String getFilePath() {
+        return filePath;
+    }
 
     @Override
-    public String getFilename() { return filename; }
+    public String getFilename() {
+        return filename;
+    }
 
     @Override
-    public long getSize() { return size; }
+    public long getSize() {
+        return size;
+    }
 
     @Override
-    public String getDisplayName() { return displayName; }
+    public String getDisplayName() {
+        return displayName;
+    }
 
     // all data that can be obtained from the parent
 
@@ -85,5 +97,9 @@ public class ScrapedTorrentFileSearchResult<T extends AbstractTorrentSearchResul
     @Override
     public String getHash() {
         return getParent().getHash();
+    }
+
+    public String getReferrerUrl() {
+        return referrerUrl;
     }
 }

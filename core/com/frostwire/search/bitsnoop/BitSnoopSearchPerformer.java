@@ -191,7 +191,9 @@ public class BitSnoopSearchPerformer extends TorrentRegexSearchPerformer<BitSnoo
                 ScrapedTorrentFileSearchResult<BitSnoopSearchResult> scrapedResult =
                         new ScrapedTorrentFileSearchResult<BitSnoopSearchResult>(parent,
                                 filePath,
-                                fileSize
+                                fileSize,
+                                null //otherwise torcache will return an interstitial page.
+                                     //this seems to happen only with BitSnoop.
                         );
                 searchResults.add(scrapedResult);
             } catch (Throwable t) {
