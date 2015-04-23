@@ -20,7 +20,6 @@ package com.frostwire.search.bitsnoop;
 
 import com.frostwire.search.AbstractSearchResult;
 import com.frostwire.search.CrawlableSearchResult;
-import com.frostwire.search.PreliminarySearchResult;
 
 /**
  * 
