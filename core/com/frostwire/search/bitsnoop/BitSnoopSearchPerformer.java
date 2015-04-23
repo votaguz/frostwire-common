@@ -32,10 +32,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class BitSnoopSearchPerformer extends TorrentRegexSearchPerformer<BitSnoopSearchResult> {
     private static Logger LOG = Logger.getLogger(BitSnoopSearchPerformer.class);
@@ -65,7 +63,7 @@ public class BitSnoopSearchPerformer extends TorrentRegexSearchPerformer<BitSnoo
 
     @Override
     protected String getUrl(int page, String encodedKeywords) {
-        return "http://"+getDomainNameToUse()+"/search/all/" + encodedKeywords + "/c/d/" + page + "/";
+        return "http://" + getDomainNameToUse() + "/search/all/" + encodedKeywords + "/c/d/" + page + "/";
     }
 
     @Override
@@ -97,14 +95,14 @@ public class BitSnoopSearchPerformer extends TorrentRegexSearchPerformer<BitSnoo
 
     @Override
     protected int preliminaryHtmlSuffixOffset(String html) {
-        int offset = html.length()-1;
+        int offset = html.length() - 1;
         try {
             offset = html.indexOf("<div id=\"pages\"");
             if (offset == -1) {
                 //no pagination, few or no results found.
                 offset = html.indexOf("Last queries:");
                 if (offset == -1) {
-                    offset = html.length()-1;
+                    offset = html.length() - 1;
                 }
             }
         } catch (Throwable t) {
@@ -151,14 +149,14 @@ public class BitSnoopSearchPerformer extends TorrentRegexSearchPerformer<BitSnoo
             return preliminaryHtmlSuffixOffset(html);
         }
 
-        int offset = html.length()-1;
+        int offset = html.length() - 1;
         try {
             offset = html.indexOf("Additional Information");
             if (offset == -1) {
                 //no pagination, few or no results found.
                 offset = html.indexOf("Last queries:");
                 if (offset == -1) {
-                    offset = html.length()-1;
+                    offset = html.length() - 1;
                 }
             }
         } catch (Throwable t) {
@@ -170,7 +168,7 @@ public class BitSnoopSearchPerformer extends TorrentRegexSearchPerformer<BitSnoo
     protected List<? extends SearchResult> crawlResult(CrawlableSearchResult sr, byte[] data) throws Exception {
         // this logic could probably be abstracted into
         // List<T extends AbstractSearchResult> scrapeFiles(sr, byte[] data, scrapePrefixOffset, scrapeSuffixOffset)
-        final String fullHtml = new String(data,"UTF-8");
+        final String fullHtml = new String(data, "UTF-8");
 
         List<AbstractSearchResult> searchResults = null;
 
@@ -185,7 +183,7 @@ public class BitSnoopSearchPerformer extends TorrentRegexSearchPerformer<BitSnoo
             searchResults = null;
         }
 
-        if (searchResults==null||searchResults.isEmpty()) {
+        if (searchResults == null || searchResults.isEmpty()) {
             return searchResults;
         }
 
@@ -213,7 +211,7 @@ public class BitSnoopSearchPerformer extends TorrentRegexSearchPerformer<BitSnoo
     }
 
     private long parseSize(String filesize, String unit) {
-        filesize = filesize.replaceAll("," , "");
+        filesize = filesize.replaceAll(",", "");
         double size = Double.parseDouble(filesize);
 
         if (UNIT_TO_BYTES.containsKey(unit)) {
