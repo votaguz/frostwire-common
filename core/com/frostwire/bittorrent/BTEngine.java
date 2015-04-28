@@ -921,7 +921,11 @@ public final class BTEngine {
 
         @Override
         public void run() {
-            session.asyncAddTorrent(new TorrentInfo(torrent), saveDir, priorities, resume);
+            try {
+                session.asyncAddTorrent(new TorrentInfo(torrent), saveDir, priorities, resume);
+            } catch (Throwable e) {
+                LOG.error("Unable to restore download from previous session", e);
+            }
         }
     }
 
