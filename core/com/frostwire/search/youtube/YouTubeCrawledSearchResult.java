@@ -36,6 +36,7 @@ public class YouTubeCrawledSearchResult extends AbstractCrawledSearchResult impl
     private final LinkInfo audio;
     private final String filename;
     private final String displayName;
+    private final long creationTime;
     private final long size;
     private final String downloadUrl;
 
@@ -47,7 +48,8 @@ public class YouTubeCrawledSearchResult extends AbstractCrawledSearchResult impl
 
         this.filename = buildFilename(video, audio);
         this.displayName = FilenameUtils.getBaseName(this.filename);
-        this.size = buildSize((int) sr.getSize(), video, audio);
+        this.creationTime = audio != null ? audio.date.getTime() : video.date.getTime();
+        this.size = (audio != null ? audio.size : -1) + (video != null ? video.size : -1);
         this.downloadUrl = buildDownloadUrl(video, audio);
     }
 
@@ -67,6 +69,11 @@ public class YouTubeCrawledSearchResult extends AbstractCrawledSearchResult impl
     @Override
     public String getDisplayName() {
         return displayName;
+    }
+
+    @Override
+    public long getCreationTime() {
+        return creationTime;
     }
 
     @Override

@@ -18,11 +18,13 @@
 
 package com.frostwire.search.youtube;
 
-import com.frostwire.search.CrawlPagedWebSearchPerformer;
+import com.frostwire.search.CrawlRegexSearchPerformer;
+import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.extractors.YouTubeExtractor;
 import com.frostwire.search.extractors.YouTubeExtractor.LinkInfo;
-import com.frostwire.util.JsonUtils;
+import com.frostwire.util.HtmlManipulator;
+import com.google.code.regexp.Pattern;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -34,12 +36,15 @@ import static com.frostwire.search.youtube.YouTubeUtils.isDash;
  * @author gubatron
  * @author aldenml
  */
-public class YouTubeSearchPerformer extends CrawlPagedWebSearchPerformer<YouTubeSearchResult> {
+public class YouTubeSearchPerformer extends CrawlRegexSearchPerformer<YouTubeSearchResult> {
+
+    private static final String REGEX = "(?is)<h3 class=\"yt-lockup-title\"><a href=\"(?<link>.*?)\".*? title=\"(?<title>.*?)\".*? Duration: (?<duration>.*?)\\.</span>.*?by <a href=\"/user/(?<user>.*?)\"";
+    private static final Pattern PATTERN = Pattern.compile(REGEX);
 
     private static final int MAX_RESULTS = 15;
 
     public YouTubeSearchPerformer(String domainName, long token, String keywords, int timeout) {
-        super(domainName, token, keywords, timeout, 1, MAX_RESULTS);
+        super(domainName, token, keywords, timeout, 1, MAX_RESULTS, MAX_RESULTS);
     }
 
     @Override
@@ -52,7 +57,7 @@ public class YouTubeSearchPerformer extends CrawlPagedWebSearchPerformer<YouTube
         List<YouTubeCrawledSearchResult> list = new LinkedList<YouTubeCrawledSearchResult>();
 
         String detailsUrl = sr.getDetailsUrl();
-        List<LinkInfo> infos = new YouTubeExtractor().extract(detailsUrl, sr.testConnection());
+        List<LinkInfo> infos = new YouTubeExtractor().extract(detailsUrl, false);
 
         LinkInfo dashVideo = null;
         LinkInfo dashAudio = null;
@@ -99,35 +104,31 @@ public class YouTubeSearchPerformer extends CrawlPagedWebSearchPerformer<YouTube
 
     @Override
     protected String getUrl(int page, String encodedKeywords) {
-        return String.format(Locale.US, "https://gdata.youtube.com/feeds/api/videos?q=%s&orderby=relevance&start-index=1&max-results=%d&alt=json&prettyprint=true&v=2", encodedKeywords, MAX_RESULTS);
+        return String.format(Locale.US, "https://www.youtube.com/results?search_query=%s", encodedKeywords);
     }
 
     @Override
-    protected List<? extends SearchResult> searchPage(String page) {
-        List<SearchResult> result = new LinkedList<SearchResult>();
-
-        String json = fixJson(page);
-        YouTubeResponse response = JsonUtils.toObject(json, YouTubeResponse.class);
-
-        boolean testConnection = true;
-        for (YouTubeEntry entry : response.feed.entry) {
-            if (!isStopped()) {
-                YouTubeSearchResult sr = new YouTubeSearchResult(entry, testConnection);
-                result.add(sr);
-
-                if (testConnection) {
-                    testConnection = false;
-                }
-            }
-        }
-
-        return result;
+    public Pattern getPattern() {
+        return PATTERN;
     }
 
-    private String fixJson(String json) {
-        return json.replace("\"$t\"", "\"title\"").
-                replace("\"yt$userId\"", "\"ytuserId\"").
-                replace("\"media$group\"", "\"mediagroup\"").
-                replace("\"media$content\"", "\"mediacontent\"");
+    @Override
+    protected int preliminaryHtmlPrefixOffset(String page) {
+        return page.indexOf("to learn more about how ads");
+    }
+
+    @Override
+    protected int preliminaryHtmlSuffixOffset(String page) {
+        return page.indexOf("class=\"yt-uix-pager");
+    }
+
+    @Override
+    public YouTubeSearchResult fromMatcher(SearchMatcher matcher) {
+        String link = matcher.group("link");
+        String title = HtmlManipulator.replaceHtmlEntities(matcher.group("title"));
+        String duration = matcher.group("duration");
+        String user = matcher.group("user");
+
+        return new YouTubeSearchResult(link, title, duration, user);
     }
 }

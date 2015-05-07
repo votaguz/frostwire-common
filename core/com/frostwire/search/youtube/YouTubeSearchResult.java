@@ -18,19 +18,17 @@
 
 package com.frostwire.search.youtube;
 
+import com.frostwire.search.AbstractFileSearchResult;
+import com.frostwire.search.CrawlableSearchResult;
+import org.apache.commons.io.FilenameUtils;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-import org.apache.commons.io.FilenameUtils;
-
-import com.frostwire.search.AbstractFileSearchResult;
-import com.frostwire.search.CrawlableSearchResult;
-
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public class YouTubeSearchResult extends AbstractFileSearchResult implements CrawlableSearchResult {
 
@@ -40,16 +38,14 @@ public class YouTubeSearchResult extends AbstractFileSearchResult implements Cra
     private final String videoUrl;
     private final String source;
     private final long size;
-    private final boolean testConnection;
 
-    public YouTubeSearchResult(YouTubeEntry entry, boolean testConnection) {
-        this.filename = entry.title.title + ".youtube";
+    YouTubeSearchResult(String link, String title, String duration, String user) {
+        this.filename = title + ".youtube";
         this.displayName = FilenameUtils.getBaseName(filename);
-        this.creationTime = readCreationTime(entry);
-        this.videoUrl = readVideoUrl(entry);
-        this.source = buildSource(entry);
-        this.size = buildSize(entry);
-        this.testConnection = testConnection;
+        this.creationTime = -1;
+        this.videoUrl = "https://www.youtube.com/" + link;
+        this.source = "YouTube - " + user;
+        this.size = -1;
     }
 
     @Override
@@ -86,11 +82,6 @@ public class YouTubeSearchResult extends AbstractFileSearchResult implements Cra
     public boolean isComplete() {
         return true;
     }
-    
-    boolean testConnection() {
-        return testConnection;
-    }
-
 
     private long readCreationTime(YouTubeEntry entry) {
         try {
@@ -123,7 +114,7 @@ public class YouTubeSearchResult extends AbstractFileSearchResult implements Cra
             return "YouTube";
         }
     }
-    
+
     private long buildSize(YouTubeEntry entry) {
         try {
             return entry.mediagroup.mediacontent.get(0).duration;

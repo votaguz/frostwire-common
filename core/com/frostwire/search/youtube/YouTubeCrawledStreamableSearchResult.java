@@ -30,13 +30,10 @@ import static com.frostwire.search.youtube.YouTubeUtils.isDash;
  */
 public final class YouTubeCrawledStreamableSearchResult extends YouTubeCrawledSearchResult implements StreamableSearchResult {
 
-    private final LinkInfo minQuality;
     private final String streamUrl;
 
     public YouTubeCrawledStreamableSearchResult(YouTubeSearchResult sr, LinkInfo video, LinkInfo audio, LinkInfo minQuality) {
         super(sr, video, audio);
-        this.minQuality = minQuality;
-
         if (audio != null && isDash(audio)) {
             streamUrl = buildDownloadUrl(null, minQuality);
         } else {
