@@ -119,7 +119,7 @@ public class YouTubeSearchPerformer extends CrawlRegexSearchPerformer<YouTubeSea
 
     @Override
     protected int preliminaryHtmlSuffixOffset(String page) {
-        return page.indexOf("class=\"yt-uix-pager");
+        return page.indexOf("<div id=\"footer-container\"");
     }
 
     @Override
