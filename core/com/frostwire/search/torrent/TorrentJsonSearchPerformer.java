@@ -18,13 +18,12 @@
 
 package com.frostwire.search.torrent;
 
+import com.frostwire.search.SearchResult;
+
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
-
-import com.frostwire.search.domainalias.DomainAliasManager;
-import com.frostwire.search.SearchResult;
 
 /**
  * @author gubatron
@@ -37,8 +36,8 @@ public abstract class TorrentJsonSearchPerformer<T extends ComparableTorrentJson
 
     private final Comparator<T> itemComparator;
 
-    public TorrentJsonSearchPerformer(DomainAliasManager domainAliasManager, long token, String keywords, int timeout, int pages, int numCrawls) {
-        super(domainAliasManager, token, keywords, timeout, pages, numCrawls);
+    public TorrentJsonSearchPerformer(String domainName, long token, String keywords, int timeout, int pages, int numCrawls) {
+        super(domainName, token, keywords, timeout, pages, numCrawls);
         
         this.itemComparator = new Comparator<T>() {
             @Override
@@ -48,8 +47,8 @@ public abstract class TorrentJsonSearchPerformer<T extends ComparableTorrentJson
         };
     }
 
-    public TorrentJsonSearchPerformer(DomainAliasManager domainAliasManager, long token, String keywords, int timeout, int pages) {
-        this(domainAliasManager, token, keywords, timeout, pages, DEFAULT_NUM_CRAWLS);
+    public TorrentJsonSearchPerformer(String domainName, long token, String keywords, int timeout, int pages) {
+        this(domainName, token, keywords, timeout, pages, DEFAULT_NUM_CRAWLS);
     }
 
     @Override

@@ -17,14 +17,13 @@
 
 package com.frostwire.search.torrent;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import com.frostwire.logging.Logger;
 import com.frostwire.search.*;
-import com.frostwire.search.domainalias.DomainAliasManager;
 import com.google.code.regexp.Matcher;
 import com.google.code.regexp.Pattern;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * 
@@ -38,8 +37,8 @@ public abstract class TorrentRegexSearchPerformer<T extends CrawlableSearchResul
     private final Pattern htmlDetailPagePattern;
     private final static Logger LOG = Logger.getLogger(TorrentRegexSearchPerformer.class);
 
-    public TorrentRegexSearchPerformer(DomainAliasManager domainAliasManager, long token, String keywords, int timeout, int pages, int numCrawls, int regexMaxResults, String preliminarSearchResultsRegex, String htmlDetailPagePatternRegex) {
-        super(domainAliasManager, token, keywords, timeout, pages, numCrawls, regexMaxResults);
+    public TorrentRegexSearchPerformer(String domainName, long token, String keywords, int timeout, int pages, int numCrawls, int regexMaxResults, String preliminarSearchResultsRegex, String htmlDetailPagePatternRegex) {
+        super(domainName, token, keywords, timeout, pages, numCrawls, regexMaxResults);
         this.preliminarySearchResultspattern = Pattern.compile(preliminarSearchResultsRegex);
         this.htmlDetailPagePattern = Pattern.compile(htmlDetailPagePatternRegex);
     }

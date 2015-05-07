@@ -20,7 +20,6 @@ package com.frostwire.search.torlock;
 
 import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.search.SearchMatcher;
-import com.frostwire.search.domainalias.DomainAliasManager;
 import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
 
 /**
@@ -35,25 +34,25 @@ public class TorLockSearchPerformer extends TorrentRegexSearchPerformer<TorLockS
     private static final String REGEX = "(?is)<a href=/torrent/([0-9]*?/.*?\\.html)>";
     private static final String HTML_REGEX = "(?is).*?<td><b>Name:</b></td><td>(.*?).torrent</td>.*?<td><b>Size:</b></td><td>(.*?) in .*? file.*?</td>.*?<td><b>Added:</b></td><td>Uploaded on (.*?) by .*?</td>.*?<font color=#FF5400><b>(.*?)</b></font> seeders.*?<td align=center><a href=\"/tor/(.*?).torrent\"><img.*?";
 
-    public TorLockSearchPerformer(DomainAliasManager domainAliasManager, long token, String keywords, int timeout) {
-        super(domainAliasManager, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, REGEX, HTML_REGEX);
+    public TorLockSearchPerformer(String domainName, long token, String keywords, int timeout) {
+        super(domainName, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, REGEX, HTML_REGEX);
     }
 
     @Override
     protected String getUrl(int page, String encodedKeywords) {
         String transformedKeywords = encodedKeywords.replace("0%20", "-");
-        return "http://" + getDomainNameToUse() + "/all/torrents/" + transformedKeywords + ".html";
+        return "http://" + getDomainName() + "/all/torrents/" + transformedKeywords + ".html";
     }
 
     @Override
     public CrawlableSearchResult fromMatcher(SearchMatcher matcher) {
         String itemId = matcher.group(1);
-        return new TorLockTempSearchResult(getDomainNameToUse(),itemId);
+        return new TorLockTempSearchResult(getDomainName(),itemId);
     }
 
     @Override
     protected TorLockSearchResult fromHtmlMatcher(CrawlableSearchResult sr, SearchMatcher matcher) {
-        return new TorLockSearchResult(getDomainNameToUse(),sr.getDetailsUrl(), matcher);
+        return new TorLockSearchResult(getDomainName(),sr.getDetailsUrl(), matcher);
     }
     
     /*

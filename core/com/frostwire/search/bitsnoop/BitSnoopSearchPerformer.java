@@ -20,7 +20,6 @@ package com.frostwire.search.bitsnoop;
 
 import com.frostwire.logging.Logger;
 import com.frostwire.search.*;
-import com.frostwire.search.domainalias.DomainAliasManager;
 import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
 import com.frostwire.util.HtmlManipulator;
 import com.google.code.regexp.Matcher;
@@ -52,20 +51,20 @@ public class BitSnoopSearchPerformer extends TorrentRegexSearchPerformer<BitSnoo
         UNIT_TO_BYTES.put("GB", 1024 * 1024 * 1024);
     }
 
-    public BitSnoopSearchPerformer(DomainAliasManager domainAliasManager, long token, String keywords, int timeout) {
-        super(domainAliasManager, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, REGEX, HTML_REGEX);
+    public BitSnoopSearchPerformer(String domainName, long token, String keywords, int timeout) {
+        super(domainName, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, REGEX, HTML_REGEX);
         fileScrapePattern = Pattern.compile(SCRAPE_REGEX);
     }
 
     @Override
     protected String getUrl(int page, String encodedKeywords) {
-        return "http://" + getDomainNameToUse() + "/search/all/" + encodedKeywords + "/c/d/" + page + "/";
+        return "http://" + getDomainName() + "/search/all/" + encodedKeywords + "/c/d/" + page + "/";
     }
 
     @Override
     public CrawlableSearchResult fromMatcher(SearchMatcher matcher) {
         String itemId = matcher.group(1);
-        return new BitSnoopTempSearchResult(getDomainNameToUse(), itemId);
+        return new BitSnoopTempSearchResult(getDomainName(), itemId);
     }
 
     @Override

@@ -22,8 +22,6 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-import com.frostwire.search.domainalias.DomainAliasManager;
-
 /**
  * @author gubatron
  * @author aldenml
@@ -33,8 +31,8 @@ public abstract class PagedWebSearchPerformer extends WebSearchPerformer {
 
     private final int pages;
 
-    public PagedWebSearchPerformer(DomainAliasManager domainAliasManager, long token, String keywords, int timeout, int pages) {
-        super(domainAliasManager, token, keywords, timeout);
+    public PagedWebSearchPerformer(String domainName, long token, String keywords, int timeout, int pages) {
+        super(domainName, token, keywords, timeout);
         this.pages = pages;
     }
 
@@ -55,7 +53,6 @@ public abstract class PagedWebSearchPerformer extends WebSearchPerformer {
             }
         } catch (Throwable e) {
             e.printStackTrace();
-            checkAccesibleDomains();
         }
         return result;
     }

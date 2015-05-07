@@ -19,7 +19,6 @@
 package com.frostwire.search.btjunkie;
 
 import com.frostwire.search.*;
-import com.frostwire.search.domainalias.DomainAliasManager;
 import com.google.code.regexp.Pattern;
 
 import java.util.Calendar;
@@ -52,13 +51,13 @@ public class BtjunkieSearchPerformer extends CrawlRegexSearchPerformer<BtjunkieS
         sizePattern = Pattern.compile("([\\d+\\.]+) ([BKMGTP]+)");
     }
 
-    public BtjunkieSearchPerformer(DomainAliasManager domainAliasManager, long token, String keywords, int timeout) {
-        super(domainAliasManager, token, keywords, timeout, 1, MAX_PAGES, MAX_SEARCH_RESULTS);
+    public BtjunkieSearchPerformer(String domainName, long token, String keywords, int timeout) {
+        super(domainName, token, keywords, timeout, 1, MAX_PAGES, MAX_SEARCH_RESULTS);
     }
 
     @Override
     protected String getUrl(int page, String encodedKeywords) {
-        return "http://"+getDomainAliasManager().getDomainNameToUse()+"/all/by-default_sort/desc/page" + page + "/" + encodedKeywords;
+        return "http://"+getDomainName()+"/all/by-default_sort/desc/page" + page + "/" + encodedKeywords;
     }
 
     @Override
@@ -68,7 +67,7 @@ public class BtjunkieSearchPerformer extends CrawlRegexSearchPerformer<BtjunkieS
 
     @Override
     public BtjunkieSearchResult fromMatcher(SearchMatcher matcher) {
-        final String domainName = getDomainNameToUse();
+        final String domainName = getDomainName();
 
         BtjunkieSearchResult sr = new BtjunkieSearchResult(
                 domainName,

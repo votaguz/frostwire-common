@@ -18,14 +18,13 @@
 
 package com.frostwire.search.tpb;
 
-import java.util.List;
-
 import com.frostwire.search.CrawlRegexSearchPerformer;
 import com.frostwire.search.PerformersHelper;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.SearchResult;
-import com.frostwire.search.domainalias.DomainAliasManager;
 import com.google.code.regexp.Pattern;
+
+import java.util.List;
 
 /**
  * 
@@ -40,8 +39,8 @@ public class TPBSearchPerformer extends CrawlRegexSearchPerformer<TPBSearchResul
     private static final String REGEX = "(?is)<td class=\"vertTh\">.*?<a href=\"[^\"]*?\" title=\"More from this category\">(.*?)</a>.*?</td>.*?<a href=\"([^\"]*?)\" class=\"detLink\" title=\"Details for ([^\"]*?)\">.*?</a>.*?<a href=\\\"(magnet:\\?xt=urn:btih:.*?)\\\" title=\\\"Download this torrent using magnet\\\">.*?</a>.*?<font class=\"detDesc\">Uploaded ([^,]*?), Size (.*?), ULed.*?<td align=\"right\">(.*?)</td>\\s*<td align=\"right\">(.*?)</td>";
     private static final Pattern PATTERN = Pattern.compile(REGEX);
 
-    public TPBSearchPerformer(DomainAliasManager domainAliasManager, long token, String keywords, int timeout) {
-        super(domainAliasManager, token, keywords, timeout, 1, MAX_RESULTS, MAX_RESULTS);
+    public TPBSearchPerformer(String domainName, long token, String keywords, int timeout) {
+        super(domainName, token, keywords, timeout, 1, MAX_RESULTS, MAX_RESULTS);
     }
 
     @Override
@@ -51,7 +50,7 @@ public class TPBSearchPerformer extends CrawlRegexSearchPerformer<TPBSearchResul
 
     @Override
     public TPBSearchResult fromMatcher(SearchMatcher matcher) {
-        TPBSearchResult candidate = new TPBSearchResult(getDomainNameToUse(), matcher);
+        TPBSearchResult candidate = new TPBSearchResult(getDomainName(), matcher);
         if (candidate.getSeeds() < 40 || candidate.getDaysOld() > 200) {
             candidate = null;
         }
@@ -60,7 +59,7 @@ public class TPBSearchPerformer extends CrawlRegexSearchPerformer<TPBSearchResul
 
     @Override
     protected String getUrl(int page, String encodedKeywords) {
-        return "https://"+getDomainNameToUse()+"/search/" + encodedKeywords + "/0/7/0";
+        return "https://"+getDomainName()+"/search/" + encodedKeywords + "/0/7/0";
     }
 
     @Override

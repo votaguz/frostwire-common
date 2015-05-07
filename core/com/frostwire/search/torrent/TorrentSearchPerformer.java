@@ -17,12 +17,11 @@
 
 package com.frostwire.search.torrent;
 
-import java.util.List;
-
 import com.frostwire.search.CrawlPagedWebSearchPerformer;
-import com.frostwire.search.domainalias.DomainAliasManager;
 import com.frostwire.search.PerformersHelper;
 import com.frostwire.search.SearchResult;
+
+import java.util.List;
 
 /**
  * 
@@ -32,8 +31,8 @@ import com.frostwire.search.SearchResult;
  */
 public abstract class TorrentSearchPerformer extends CrawlPagedWebSearchPerformer<TorrentCrawlableSearchResult> {
 
-    public TorrentSearchPerformer(DomainAliasManager domainAliasManager, long token, String keywords, int timeout, int pages, int numCrawls) {
-        super(domainAliasManager, token, keywords, timeout, pages, numCrawls);
+    public TorrentSearchPerformer(String domainName, long token, String keywords, int timeout, int pages, int numCrawls) {
+        super(domainName, token, keywords, timeout, pages, numCrawls);
     }
 
     @Override

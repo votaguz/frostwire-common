@@ -19,7 +19,6 @@
 package com.frostwire.search;
 
 import com.frostwire.logging.Logger;
-import com.frostwire.search.domainalias.DomainAliasManager;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.util.ByteUtils;
 import com.frostwire.util.OSUtils;
@@ -44,8 +43,8 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
 
     private int numCrawls;
 
-    public CrawlPagedWebSearchPerformer(DomainAliasManager domainAliasManager, long token, String keywords, int timeout, int pages, int numCrawls) {
-        super(domainAliasManager, token, keywords, timeout, pages);
+    public CrawlPagedWebSearchPerformer(String domainName, long token, String keywords, int timeout, int pages, int numCrawls) {
+        super(domainName, token, keywords, timeout, pages);
         this.numCrawls = numCrawls;
     }
 

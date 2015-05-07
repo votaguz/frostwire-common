@@ -20,7 +20,6 @@ package com.frostwire.search.monova;
 
 import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.search.SearchMatcher;
-import com.frostwire.search.domainalias.DomainAliasManager;
 import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
 
 import java.io.IOException;
@@ -47,13 +46,13 @@ public class MonovaSearchPerformer extends TorrentRegexSearchPerformer<MonovaSea
             // infohash
             "<strong>Hash:</strong><div class=\"pull-left pos-text-c\">(?<infohash>[A-Fa-f0-9]{40})</div><div class=\"clear-both\">";
 
-    public MonovaSearchPerformer(DomainAliasManager domainAliasManager, long token, String keywords, int timeout) {
-        super(domainAliasManager, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, REGEX, HTML_REGEX);
+    public MonovaSearchPerformer(String domainName, long token, String keywords, int timeout) {
+        super(domainName, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, REGEX, HTML_REGEX);
     }
 
     @Override
     protected String getUrl(int page, String encodedKeywords) {
-        return "http://"+getDomainNameToUse()+"/search.php?sort=5&term=" + encodedKeywords;
+        return "http://"+getDomainName()+"/search.php?sort=5&term=" + encodedKeywords;
     }
 
     @Override
@@ -65,7 +64,7 @@ public class MonovaSearchPerformer extends TorrentRegexSearchPerformer<MonovaSea
     public CrawlableSearchResult fromMatcher(SearchMatcher matcher) {
         String itemId = matcher.group(1);
         String fileName = matcher.group(2);
-        return new MonovaTempSearchResult(getDomainNameToUse(),itemId, fileName);
+        return new MonovaTempSearchResult(getDomainName(),itemId, fileName);
     }
 
     @Override

@@ -18,7 +18,6 @@
 
 package com.frostwire.search.mininova;
 
-import com.frostwire.search.domainalias.DomainAliasManager;
 import com.frostwire.search.torrent.TorrentJsonSearchPerformer;
 import com.frostwire.util.JsonUtils;
 
@@ -31,13 +30,13 @@ import java.util.List;
  */
 public class MininovaSearchPerformer extends TorrentJsonSearchPerformer<MininovaVuzeItem, MininovaVuzeSearchResult> {
 
-    public MininovaSearchPerformer(DomainAliasManager domainAliasManager, long token, String keywords, int timeout) {
-        super(domainAliasManager, token, keywords, timeout, 1);
+    public MininovaSearchPerformer(String domainName, long token, String keywords, int timeout) {
+        super(domainName, token, keywords, timeout, 1);
     }
 
     @Override
     protected String getUrl(int page, String encodedKeywords) {
-        return "http://" + getDomainNameToUse() + "/vuze.php?search=" + encodedKeywords;
+        return "http://" + getDomainName() + "/vuze.php?search=" + encodedKeywords;
     }
 
     @Override

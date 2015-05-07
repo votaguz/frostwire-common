@@ -23,7 +23,6 @@ import com.frostwire.search.MaxIterCharSequence;
 import com.frostwire.search.ScrapedTorrentFileSearchResult;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.SearchResult;
-import com.frostwire.search.domainalias.DomainAliasManager;
 import com.frostwire.search.torrent.TorrentCrawlableSearchResult;
 import com.frostwire.search.torrent.TorrentJsonSearchPerformer;
 import com.frostwire.util.HtmlManipulator;
@@ -54,8 +53,8 @@ public class KATSearchPerformer extends TorrentJsonSearchPerformer<KATItem, KATS
     private static final String FILES_REGEX = "(?is)<tr.*?<td class=\"torFileName\" title=\".*?\">(?<filename>.*?)</td>.*?<td class=\"torFileSize\">(?<size>.*?) <span>(?<unit>.*?)</span></td>.*?</tr>";
     private static final Pattern FILES_PATTERN = Pattern.compile(FILES_REGEX);
 
-    public KATSearchPerformer(DomainAliasManager domainAliasManager, long token, String keywords, int timeout) {
-        super(domainAliasManager, token, keywords, timeout, 1);
+    public KATSearchPerformer(String domainName, long token, String keywords, int timeout) {
+        super(domainName, token, keywords, timeout, 1);
     }
 
     @Override

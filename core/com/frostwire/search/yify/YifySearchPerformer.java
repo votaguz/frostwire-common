@@ -20,7 +20,6 @@ package com.frostwire.search.yify;
 
 import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.search.SearchMatcher;
-import com.frostwire.search.domainalias.DomainAliasManager;
 import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
 
 /**
@@ -44,13 +43,13 @@ public class YifySearchPerformer extends TorrentRegexSearchPerformer<YifySearchR
     private static final String REGEX = "(?is)<div class=\"mv\">.*?<h3><a href=['\"]/movie/([0-9]*)/(.*?)['\"] target=\"_blank\" title=\"(.*?)\">";
 
 
-    public YifySearchPerformer(DomainAliasManager domainAliasManager, long token, String keywords, int timeout) {
-        super(domainAliasManager, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, REGEX, HTML_REGEX);
+    public YifySearchPerformer(String domainName, long token, String keywords, int timeout) {
+        super(domainName, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, REGEX, HTML_REGEX);
     }
 
     @Override
     protected String getUrl(int page, String encodedKeywords) {
-        return "https://" + getDomainNameToUse() + "/search/" + encodedKeywords + "/";
+        return "https://" + getDomainName() + "/search/" + encodedKeywords + "/";
     }
 
     @Override
@@ -59,12 +58,12 @@ public class YifySearchPerformer extends TorrentRegexSearchPerformer<YifySearchR
         String htmlFileName = matcher.group(2);
         String displayName = matcher.group(3);
         
-        return new YifyTempSearchResult(getDomainNameToUse(), itemId, htmlFileName, displayName);
+        return new YifyTempSearchResult(getDomainName(), itemId, htmlFileName, displayName);
     }
 
     @Override
     protected YifySearchResult fromHtmlMatcher(CrawlableSearchResult sr, SearchMatcher matcher) {
-         return new YifySearchResult(getDomainNameToUse(), sr.getDetailsUrl(), matcher);
+         return new YifySearchResult(getDomainName(), sr.getDetailsUrl(), matcher);
     }
 
     public static void main(String[] args) throws Throwable {
@@ -98,6 +97,5 @@ public class YifySearchPerformer extends TorrentRegexSearchPerformer<YifySearchR
         }
         //System.out.println("-done-");
         */
-        
     }
 }

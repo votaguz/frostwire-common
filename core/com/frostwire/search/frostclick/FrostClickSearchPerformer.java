@@ -18,16 +18,15 @@
 
 package com.frostwire.search.frostclick;
 
+import com.frostwire.logging.Logger;
+import com.frostwire.search.PagedWebSearchPerformer;
+import com.frostwire.search.SearchResult;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.frostwire.logging.Logger;
-import com.frostwire.search.PagedWebSearchPerformer;
-import com.frostwire.search.SearchResult;
-import com.frostwire.search.domainalias.DomainAliasManager;
 
 /**
  * @author gubatron
@@ -42,8 +41,8 @@ public class FrostClickSearchPerformer extends PagedWebSearchPerformer {
 
     private final Map<String, String> customHeaders;
 
-    public FrostClickSearchPerformer(DomainAliasManager domainAliasManager, long token, String keywords, int timeout, UserAgent userAgent) {
-        super(domainAliasManager ,token, keywords, timeout, MAX_RESULTS);
+    public FrostClickSearchPerformer(String domainName, long token, String keywords, int timeout, UserAgent userAgent) {
+        super(domainName ,token, keywords, timeout, MAX_RESULTS);
         this.customHeaders = buildCustomHeaders(userAgent);
     }
 
@@ -59,7 +58,6 @@ public class FrostClickSearchPerformer extends PagedWebSearchPerformer {
         try {
             text = fetch(url, null, customHeaders);
         } catch (IOException e) {
-            checkAccesibleDomains();
             return Collections.emptyList();
         }
         

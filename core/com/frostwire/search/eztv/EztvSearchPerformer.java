@@ -18,13 +18,12 @@
 
 package com.frostwire.search.eztv;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.frostwire.search.CrawlableSearchResult;
 import com.frostwire.search.SearchMatcher;
-import com.frostwire.search.domainalias.DomainAliasManager;
 import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 
@@ -38,8 +37,8 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
     private static final String REGEX = "(?is)<a href=\"(/ep/.*?)\"";
     private static final String HTML_REGEX = "(?is)<td class=\"section_post_header\" colspan=\"2\"><b>(.*?)</b></td>.*?<td class=\"section_post_header\">Download Links</td>.*?<a href=\"magnet:\\?xt=urn:btih:(.*?)&.*?/a> <a href=\"(http://\\S*?torrent)\" class=\"download_.\" title=\"Download Mirror #.\".*?<b>Released:</b> (.*?)<br />.*?<b>Filesize:</b> (.*?)<br />";
 
-    public EztvSearchPerformer(DomainAliasManager domainAliasManager, long token, String keywords, int timeout) {
-        super(domainAliasManager, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, REGEX, HTML_REGEX); 
+    public EztvSearchPerformer(String domainName, long token, String keywords, int timeout) {
+        super(domainName, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, REGEX, HTML_REGEX);
     }
 
     @Override
@@ -53,13 +52,13 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
 
     @Override
     protected String getUrl(int page, String encodedKeywords) {
-        return "https://"+getDomainNameToUse()+"/search/";
+        return "https://"+getDomainName()+"/search/";
     }
 
     @Override
     public CrawlableSearchResult fromMatcher(SearchMatcher matcher) {
         String itemId = matcher.group(1);
-        return new EztvTempSearchResult(getDomainNameToUse(),itemId);
+        return new EztvTempSearchResult(getDomainName(),itemId);
     }
 
     @Override

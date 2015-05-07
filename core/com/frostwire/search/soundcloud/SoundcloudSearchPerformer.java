@@ -18,14 +18,13 @@
 
 package com.frostwire.search.soundcloud;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import com.frostwire.core.CommonConstants;
 import com.frostwire.search.PagedWebSearchPerformer;
 import com.frostwire.search.SearchResult;
-import com.frostwire.search.domainalias.DomainAliasManager;
 import com.frostwire.util.JsonUtils;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author gubatron
@@ -34,8 +33,8 @@ import com.frostwire.util.JsonUtils;
  */
 public class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
 
-    public SoundcloudSearchPerformer(DomainAliasManager domainAliasManager, long token, String keywords, int timeout) {
-        super(domainAliasManager, token, keywords, timeout, 1);
+    public SoundcloudSearchPerformer(String domainName, long token, String keywords, int timeout) {
+        super(domainName, token, keywords, timeout, 1);
     }
 
     @Override

@@ -17,17 +17,15 @@
 
 package com.frostwire.search;
 
-import java.io.IOException;
-import java.util.Map;
-
-import org.apache.commons.io.FilenameUtils;
-
 import com.frostwire.logging.Logger;
-import com.frostwire.search.domainalias.DomainAliasManager;
 import com.frostwire.util.HttpClient;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.StringUtils;
 import com.frostwire.util.UserAgentGenerator;
+import org.apache.commons.io.FilenameUtils;
+
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * 
@@ -43,21 +41,20 @@ public abstract class WebSearchPerformer extends AbstractSearchPerformer {
 
     private static final String[] STREAMABLE_EXTENSIONS = new String[] { "mp3", "ogg", "wma", "wmv", "m4a", "aac", "flac", "mp4", "flv", "mov", "mpg", "mpeg", "3gp", "m4v", "webm" };
 
+    private final String domainName;
     private final String keywords;
     private final String encodedKeywords;
     private final int timeout;
     private final HttpClient client;
 
-    private final DomainAliasManager domainAliasManager;
-
-    public WebSearchPerformer(DomainAliasManager domainAliasManager, long token, String keywords, int timeout) {
+    public WebSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(token);
 
-        if (domainAliasManager == null) {
-            throw new IllegalArgumentException("domainAliasManager can't be null");
+        if (domainName == null) {
+            throw new IllegalArgumentException("domainName can't be null");
         }
 
-        this.domainAliasManager = domainAliasManager;
+        this.domainName = domainName;
         this.keywords = keywords;
         this.encodedKeywords = StringUtils.encodeUrl(keywords);
         this.timeout = timeout;
@@ -124,25 +121,7 @@ public abstract class WebSearchPerformer extends AbstractSearchPerformer {
         return false;
     }
 
-    public String getDomainNameToUse() {
-        return domainAliasManager.getDomainNameToUse();
-    }
-
-    public String getDefaultDomainName() {
-        return domainAliasManager.getDefaultDomain();
-    }
-
-    public DomainAliasManager getDomainAliasManager() {
-        return domainAliasManager;
-    }
-
-    /**
-     * The current domain has failed, mark it offline and let's try check if other mirrors are alive.
-     */
-    protected final void checkAccesibleDomains() {
-        LOG.debug("WebSearchPerformer.checkAccesibleDomains()! " + getDefaultDomainName() + " Performer failed, marking " + getDomainNameToUse() + " offline, checking domains.");
-
-        domainAliasManager.markDomainOffline(getDomainNameToUse());
-        domainAliasManager.checkStatuses(this);
+    public String getDomainName() {
+        return domainName;
     }
 }
