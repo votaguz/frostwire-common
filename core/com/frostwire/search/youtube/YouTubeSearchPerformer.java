@@ -104,7 +104,7 @@ public class YouTubeSearchPerformer extends CrawlRegexSearchPerformer<YouTubeSea
 
     @Override
     protected String getUrl(int page, String encodedKeywords) {
-        return String.format(Locale.US, "https://www.youtube.com/results?search_query=%s", encodedKeywords);
+        return String.format(Locale.US, "https://"+getDomainName()+"/results?search_query=%s", encodedKeywords);
     }
 
     @Override
