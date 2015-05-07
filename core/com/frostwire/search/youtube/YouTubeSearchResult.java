@@ -45,7 +45,7 @@ public class YouTubeSearchResult extends AbstractFileSearchResult implements Cra
         this.creationTime = -1;
         this.videoUrl = "https://www.youtube.com/" + link;
         this.source = "YouTube - " + user;
-        this.size = -1;
+        this.size = buildSize(duration);
     }
 
     @Override
@@ -115,9 +115,17 @@ public class YouTubeSearchResult extends AbstractFileSearchResult implements Cra
         }
     }
 
-    private long buildSize(YouTubeEntry entry) {
+    private long buildSize(String duration) {
         try {
-            return entry.mediagroup.mediacontent.get(0).duration;
+            if (!duration.contains(":")) {
+                return Integer.parseInt(duration);
+            }
+
+            String[] arr = duration.split(":");
+            int m = Integer.parseInt(arr[0]);
+            int s = Integer.parseInt(arr[1]);
+
+            return m * 60 + s;
         } catch (Throwable t) {
             return UNKNOWN_SIZE;
         }
