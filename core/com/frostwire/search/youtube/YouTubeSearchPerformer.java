@@ -26,6 +26,7 @@ import com.frostwire.search.extractors.YouTubeExtractor.LinkInfo;
 import com.frostwire.util.HtmlManipulator;
 import com.google.code.regexp.Pattern;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -38,7 +39,7 @@ import static com.frostwire.search.youtube.YouTubeUtils.isDash;
  */
 public class YouTubeSearchPerformer extends CrawlRegexSearchPerformer<YouTubeSearchResult> {
 
-    private static final String REGEX = "(?is)<h3 class=\"yt-lockup-title\"><a href=\"(?<link>.*?)\".*? title=\"(?<title>.*?)\".*? class=\"accessible-description\" id=\"description-id.*?: (?<duration>.*?)\\.</span></h3><div class=\"yt-lockup-byline\">.*?<a href=\"/user/(?<user>.*?)\"";
+    private static final String REGEX = "(?is)<h3 class=\"yt-lockup-title\"><a href=\"(?<link>.*?)\".*? title=\"(?<title>.*?)\".*? Duration: (?<duration>.*?)\\.</span>.*?by <a href=\"/user/(?<user>.*?)\"";
     private static final Pattern PATTERN = Pattern.compile(REGEX);
 
     private static final int MAX_RESULTS = 15;
@@ -130,5 +131,10 @@ public class YouTubeSearchPerformer extends CrawlRegexSearchPerformer<YouTubeSea
         String user = matcher.group("user");
 
         return new YouTubeSearchResult(link, title, duration, user);
+    }
+
+    @Override
+    protected String fetchSearchPage(String url) throws IOException {
+        return fetch(url, "PREF=hl=en&f4=4000000&f5=30&f1=50000000;", null);
     }
 }
