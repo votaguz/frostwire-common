@@ -38,7 +38,7 @@ import static com.frostwire.search.youtube.YouTubeUtils.isDash;
  */
 public class YouTubeSearchPerformer extends CrawlRegexSearchPerformer<YouTubeSearchResult> {
 
-    private static final String REGEX = "(?is)<h3 class=\"yt-lockup-title\"><a href=\"(?<link>.*?)\".*? title=\"(?<title>.*?)\".*? Duration: (?<duration>.*?)\\.</span>.*?by <a href=\"/user/(?<user>.*?)\"";
+    private static final String REGEX = "(?is)<h3 class=\"yt-lockup-title\"><a href=\"(?<link>.*?)\".*? title=\"(?<title>.*?)\".*? class=\"accessible-description\" id=\"description-id.*?: (?<duration>.*?)\\.</span></h3><div class=\"yt-lockup-byline\">.*?<a href=\"/user/(?<user>.*?)\"";
     private static final Pattern PATTERN = Pattern.compile(REGEX);
 
     private static final int MAX_RESULTS = 15;
@@ -114,7 +114,7 @@ public class YouTubeSearchPerformer extends CrawlRegexSearchPerformer<YouTubeSea
 
     @Override
     protected int preliminaryHtmlPrefixOffset(String page) {
-        return page.indexOf("to learn more about how ads");
+        return page.indexOf("<div class=\"yt-uix-hovercard-content\">");
     }
 
     @Override
