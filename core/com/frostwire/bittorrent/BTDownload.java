@@ -270,7 +270,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
             }
 
             TorrentInfo ti = th.getTorrentInfo();
-            if (ti != null) {
+            if (ti != null && ti.getSwig() != null) {
                 return new File(savePath.getAbsolutePath(), ti.getNumFiles() > 1 ? th.getName() : ti.getFiles().getFilePath(0));
             }
         } catch (Throwable e) {
