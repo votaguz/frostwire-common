@@ -59,7 +59,7 @@ public class KATSearchPerformer extends TorrentJsonSearchPerformer<KATItem, KATS
 
     @Override
     protected String getUrl(int page, String encodedKeywords) {
-        return "http://kickass.to/json.php?q=" + encodedKeywords;
+        return "http://"+getDomainName()+"/json.php?q=" + encodedKeywords;
     }
 
     @Override
@@ -83,7 +83,7 @@ public class KATSearchPerformer extends TorrentJsonSearchPerformer<KATItem, KATS
         List<SearchResult> result = new LinkedList<SearchResult>();
 
         KATSearchResult ksr = (KATSearchResult) sr;
-        String page = fetch("http://kickass.to/torrents/getfiles/" + ksr.getHash() + "/?all=1");
+        String page = fetch("http://"+getDomainName()+"/torrents/getfiles/" + ksr.getHash() + "/?all=1");
 
         SearchMatcher matcher = SearchMatcher.from(FILES_PATTERN.matcher(new MaxIterCharSequence(page, 2 * page.length())));
 
