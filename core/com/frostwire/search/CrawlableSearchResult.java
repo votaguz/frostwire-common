@@ -25,5 +25,7 @@ package com.frostwire.search;
  */
 public interface CrawlableSearchResult extends SearchResult {
 
-    public boolean isComplete();
+    boolean isComplete();
+
+    String getCookies();
 }

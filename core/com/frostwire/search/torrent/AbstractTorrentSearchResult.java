@@ -31,4 +31,6 @@ public abstract class AbstractTorrentSearchResult extends AbstractFileSearchResu
     public boolean isComplete() {
         return true;
     }
+
+    public String getCookies() { return null; }
 }

@@ -60,4 +60,9 @@ public final class BitSnoopTempSearchResult extends AbstractSearchResult impleme
     public boolean isComplete() {
         return false;
     }
+
+    @Override
+    public String getCookies() {
+        return null;
+    }
 }

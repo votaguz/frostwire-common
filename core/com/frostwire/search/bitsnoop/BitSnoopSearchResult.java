@@ -176,4 +176,9 @@ public class BitSnoopSearchResult extends AbstractTorrentSearchResult {
         }
         return result;
     }
+
+    @Override
+    public String getCookies() {
+        return "session_payload=e71fea0d093037f2e7c2d85e4e97b098ad3485b9; torcache_session=4777502c8f3a5eb83f95143d263541e9578daa76;muidn=f4a50qWKWqNg; _spc=83ffca30-10fd-d33d-f9d9-151e9808d8eb; _scpu=851e1d486%3A1%3A1431388154";
+    }
 }

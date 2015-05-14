@@ -83,6 +83,11 @@ public class YouTubeSearchResult extends AbstractFileSearchResult implements Cra
         return true;
     }
 
+    @Override
+    public String getCookies() {
+        return null;
+    }
+
     private long readCreationTime(YouTubeEntry entry) {
         try {
             //2010-07-15T16:02:42

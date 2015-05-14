@@ -97,13 +97,17 @@ final class JdkHttpClient implements HttpClient {
     }
 
     public byte[] getBytes(String url, int timeout, String userAgent, String referrer) {
+        return getBytes(url, timeout, userAgent, referrer, null);
+    }
+
+    public byte[] getBytes(String url, int timeout, String userAgent, String referrer, String cookies) {
         byte[] result = null;
 
         ByteArrayOutputStream baos = null;
 
         try {
             baos = new ByteArrayOutputStream();
-            get(url, baos, timeout, userAgent, referrer, null, -1);
+            get(url, baos, timeout, userAgent, referrer, cookies, -1);
 
             result = baos.toByteArray();
         } catch (Throwable e) {

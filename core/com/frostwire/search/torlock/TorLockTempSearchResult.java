@@ -60,4 +60,9 @@ public class TorLockTempSearchResult extends AbstractSearchResult implements Cra
     public boolean isComplete() {
         return false;
     }
+
+    @Override
+    public String getCookies() {
+        return null;
+    }
 }

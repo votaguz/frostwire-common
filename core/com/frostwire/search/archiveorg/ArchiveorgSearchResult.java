@@ -83,6 +83,11 @@ public class ArchiveorgSearchResult extends AbstractSearchResult implements Craw
         return false;
     }
 
+    @Override
+    public String getCookies() {
+        return null;
+    }
+
     private long parsePublicDate(String publicdate) {
         // 2009-12-02T15:41:50Z
         // 2008-02-20T22:02:21Z

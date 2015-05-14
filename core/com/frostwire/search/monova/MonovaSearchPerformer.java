@@ -33,7 +33,7 @@ import java.io.IOException;
 public class MonovaSearchPerformer extends TorrentRegexSearchPerformer<MonovaSearchResult> {
 
     private static final int MAX_RESULTS = 10;
-    private static final String REGEX = "(?is)<a href=\"http://www.monova.org/torrent/([0-9]*?)/(.*?).html";
+    private static final String REGEX = "(?is)<a href=\"https://%s/torrent/([0-9]*?)/(.*?).html";
     private static final String HTML_REGEX = "(?is).*?" +
             // filename
             "<a id=\"tab1\" title=\"Download (?<filename>.*?) torrent.\" class=\"selected\".*?" +
@@ -47,17 +47,22 @@ public class MonovaSearchPerformer extends TorrentRegexSearchPerformer<MonovaSea
             "<strong>Hash:</strong><div class=\"pull-left pos-text-c\">(?<infohash>[A-Fa-f0-9]{40})</div><div class=\"clear-both\">";
 
     public MonovaSearchPerformer(String domainName, long token, String keywords, int timeout) {
-        super(domainName, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, REGEX, HTML_REGEX);
+        super(domainName, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, String.format(REGEX,domainName), HTML_REGEX);
     }
 
     @Override
     protected String getUrl(int page, String encodedKeywords) {
-        return "http://"+getDomainName()+"/search.php?sort=5&term=" + encodedKeywords;
+        return "http://"+getDomainName()+"/search.php?verified=1&sort=5&term=" + encodedKeywords;
     }
 
     @Override
     protected String fetchSearchPage(String url) throws IOException {
         return fetch(url, "MONOVA=1; MONOVA-ADULT=0; MONOVA-NON-ADULT=1;", null);
+    }
+
+    @Override
+    protected int preliminaryHtmlPrefixOffset(String page) {
+        return page.indexOf("alt=\"CONFIRMED\">CONFIRMED Torrent Search");
     }
 
     @Override

@@ -52,6 +52,8 @@ public interface HttpClient {
 
     public byte[] getBytes(String url, int timeout, String userAgent, String referrer);
 
+    public byte[] getBytes(String url, int timeout, String userAgent, String referrer, String cookies);
+
     public byte[] getBytes(String url, int timeout, String referrer);
 
     public byte[] getBytes(String url, int timeout);

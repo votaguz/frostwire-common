@@ -62,4 +62,9 @@ public class YifyTempSearchResult extends AbstractSearchResult implements Crawla
     public boolean isComplete() {
         return false;
     }
+
+    @Override
+    public String getCookies() {
+        return null;
+    }
 }
