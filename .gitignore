@@ -2,7 +2,7 @@ syntax: glob
 *~
 *.o
 bin/*
-builder/*
+/builder/*
 *.class
 *.orig
 *dist/*.jar
@@ -17,7 +17,7 @@ hs_err_*.log
 ._.DS_Store
 components/azureus/src/main/resources/org/gudy/azureus2/internat/*
 lib/jars-src/commons-logging-1.0.4-src/target/*
-builder
+/builder
 lib/native/mplayer/config
 lib/themes/themes.jar
 lib/mplayer/upx
