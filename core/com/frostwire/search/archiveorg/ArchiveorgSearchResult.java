@@ -18,18 +18,16 @@
 
 package com.frostwire.search.archiveorg;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Locale;
-
 import com.frostwire.licences.License;
 import com.frostwire.search.AbstractSearchResult;
 import com.frostwire.search.CrawlableSearchResult;
 
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public class ArchiveorgSearchResult extends AbstractSearchResult implements CrawlableSearchResult {
 
@@ -81,11 +79,6 @@ public class ArchiveorgSearchResult extends AbstractSearchResult implements Craw
     @Override
     public boolean isComplete() {
         return false;
-    }
-
-    @Override
-    public String getCookies() {
-        return null;
     }
 
     private long parsePublicDate(String publicdate) {

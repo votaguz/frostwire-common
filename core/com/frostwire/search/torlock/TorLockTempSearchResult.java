@@ -22,10 +22,8 @@ import com.frostwire.search.AbstractSearchResult;
 import com.frostwire.search.CrawlableSearchResult;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class TorLockTempSearchResult extends AbstractSearchResult implements CrawlableSearchResult {
 
@@ -34,7 +32,7 @@ public class TorLockTempSearchResult extends AbstractSearchResult implements Cra
 
     public TorLockTempSearchResult(String domainName, String itemId) {
         this.itemId = itemId;
-        this.detailsUrl = "http://"+ domainName +"/torrent/" + itemId;
+        this.detailsUrl = "http://" + domainName + "/torrent/" + itemId;
     }
 
     public String getItemId() {
@@ -59,10 +57,5 @@ public class TorLockTempSearchResult extends AbstractSearchResult implements Cra
     @Override
     public boolean isComplete() {
         return false;
-    }
-
-    @Override
-    public String getCookies() {
-        return null;
     }
 }

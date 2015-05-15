@@ -22,10 +22,8 @@ import com.frostwire.search.AbstractSearchResult;
 import com.frostwire.search.CrawlableSearchResult;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class YifyTempSearchResult extends AbstractSearchResult implements CrawlableSearchResult {
 
@@ -61,10 +59,5 @@ public class YifyTempSearchResult extends AbstractSearchResult implements Crawla
     @Override
     public boolean isComplete() {
         return false;
-    }
-
-    @Override
-    public String getCookies() {
-        return null;
     }
 }

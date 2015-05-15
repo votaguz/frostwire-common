@@ -18,14 +18,10 @@
 package com.frostwire.search;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public interface CrawlableSearchResult extends SearchResult {
 
     boolean isComplete();
-
-    String getCookies();
 }
