@@ -170,7 +170,7 @@ public class BitSnoopSearchPerformer extends TorrentRegexSearchPerformer<BitSnoo
         // sr is a temp result.
         if (!sr.isComplete()) {
             detailPageData = fetchBytes(sr.getDetailsUrl());
-            searchResults.addAll(super.crawlResult(sr,detailPageData));
+            searchResults.addAll(super.crawlResult(sr, detailPageData));
 
             if (searchResults == null || searchResults.isEmpty()) {
                 return Collections.emptyList();
@@ -191,10 +191,10 @@ public class BitSnoopSearchPerformer extends TorrentRegexSearchPerformer<BitSnoo
                         new ScrapedTorrentFileSearchResult<BitSnoopSearchResult>(parent,
                                 filePath,
                                 fileSize,
-                                sr.getDetailsUrl()
+                                null,
+                                null
                         );
-                // NOTE: this was not in use, commented until properly plugged.
-                //"session_payload=e71fea0d093037f2e7c2d85e4e97b098ad3485b9; torcache_session=4777502c8f3a5eb83f95143d263541e9578daa76;muidn=f4a50qWKWqNg; _spc=83ffca30-10fd-d33d-f9d9-151e9808d8eb; _scpu=851e1d486%3A1%3A1431388154"
+
                 searchResults.add(scrapedResult);
             } catch (Throwable t) {
                 LOG.error(t.getMessage(), t);

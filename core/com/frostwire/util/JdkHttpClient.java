@@ -288,7 +288,12 @@ final class JdkHttpClient implements HttpClient {
 
         conn.setConnectTimeout(timeout);
         conn.setReadTimeout(timeout);
-        conn.setRequestProperty("User-Agent", userAgent);
+
+        if (userAgent != null) {
+            conn.setRequestProperty("User-Agent", userAgent);
+        } else {
+            conn.setRequestProperty("User-Agent", DEFAULT_USER_AGENT);
+        }
 
         if (referrer != null) {
             conn.setRequestProperty("Referer", referrer);

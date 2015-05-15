@@ -47,19 +47,21 @@ public class ScrapedTorrentFileSearchResult<T extends AbstractTorrentSearchResul
     private final String filename;
     private final String displayName;
     private final String referrerUrl;
+    private final String cookie;
     private final long size;
 
-    public ScrapedTorrentFileSearchResult(T parent, String filePath, long fileSize, String referrerUrl) {
+    public ScrapedTorrentFileSearchResult(T parent, String filePath, long fileSize, String referrerUrl, String cookie) {
         super(parent);
         this.filePath = filePath;
         this.filename = FilenameUtils.getName(this.filePath);
         this.displayName = FilenameUtils.getBaseName(this.filename);
         this.referrerUrl = referrerUrl;
+        this.cookie = cookie;
         this.size = fileSize;
     }
 
     public ScrapedTorrentFileSearchResult(T parent, String filePath, long fileSize) {
-        this(parent, filePath, fileSize, parent.getDetailsUrl());
+        this(parent, filePath, fileSize, parent.getDetailsUrl(), null);
     }
 
     // all the data that must be scraped.
@@ -101,5 +103,9 @@ public class ScrapedTorrentFileSearchResult<T extends AbstractTorrentSearchResul
 
     public String getReferrerUrl() {
         return referrerUrl;
+    }
+
+    public String getCookie() {
+        return cookie;
     }
 }
