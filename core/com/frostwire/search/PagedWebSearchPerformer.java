@@ -18,6 +18,8 @@
 
 package com.frostwire.search;
 
+import com.frostwire.util.StringUtils;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -48,7 +50,7 @@ public abstract class PagedWebSearchPerformer extends WebSearchPerformer {
         try {
             String url = getUrl(page, getEncodedKeywords());
             String text = fetchSearchPage(url);
-            if (text != null) {
+            if (!StringUtils.isNullOrEmpty(text)) {
                 result = searchPage(text);
             }
         } catch (Throwable e) {

@@ -35,7 +35,7 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
 
     private static final int MAX_RESULTS = 20;
     private static final String REGEX = "(?is)<a href=\"(/ep/.*?)\"";
-    private static final String HTML_REGEX = "(?is)<td class=\"section_post_header\" colspan=\"2\"><b>(.*?)</b></td>.*?<td class=\"section_post_header\">Download Links</td>.*?<a href=\"magnet:\\?xt=urn:btih:(.*?)&.*?/a> <a href=\"(http://\\S*?torrent)\" class=\"download_.\" title=\"Download Mirror #.\".*?<b>Released:</b> (.*?)<br />.*?<b>Filesize:</b> (.*?)<br />";
+    private static final String HTML_REGEX = "(?is)<td class=\"section_post_header\" colspan=\"2\"><b>(?<displayname>.*?)</b></td>.*?<td class=\"section_post_header\">Download Links</td>.*?<a href=\"magnet:\\?xt=urn:btih:(?<infohash>.*?)&.*? class=\"magnet\" .*?a href=\"(?<torrenturl>http://\\S*?torrent)\" class=\"download_.\" title=\"Download Mirror #.\".*?<b>Released:</b> (?<creationtime>.*?)<br/>.*?<b>Filesize:</b> (?<filesize>.*?)<br/>";
 
     public EztvSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, REGEX, HTML_REGEX);
@@ -69,7 +69,7 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
     /**
     public static void main(String[] args) throws Throwable {
         
-        byte[] readAllBytes = Files.readAllBytes(Paths.get("/Users/gubatron/tmp/eztv3.html"));
+        byte[] readAllBytes = Files.readAllBytes(Paths.get("/Users/gubatron/tmp/eztv4.html"));
         String fileStr = new String(readAllBytes,"utf-8");
 
         //Pattern pattern = Pattern.compile(REGEX);
@@ -81,24 +81,15 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
         while (matcher.find()) {
             found++;
             System.out.println("\nfound " + found);
-            
-            System.out.println("group 1: " + matcher.group(1));
-            System.out.println("group 2: " + matcher.group(2));
-            System.out.println("group 3: " + matcher.group(3));
-            
-            
-            //test HTML_REGEX
-            System.out.println("group 4: " + matcher.group(4));
-            System.out.println("group 5: " + matcher.group(5));
-            
-            
-            //System.out.println("group 6: " + matcher.group(6));
-            
-            //System.out.println("group 7: " + matcher.group(7));
-            
+            System.out.println("displayname: " + matcher.group("displayname"));
+            System.out.println("infohash: " + matcher.group("infohash"));
+            System.out.println("torrenturl: " + matcher.group("torrenturl"));
+            System.out.println("creationtime: " + matcher.group("creationtime"));
+            System.out.println("filesize: " + matcher.group("filesize"));
             System.out.println("===");
         }
         //System.out.println("-done-");
     }
-    */
+     */
+
 }
