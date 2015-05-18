@@ -19,13 +19,11 @@ package com.frostwire.util;
 
 import com.frostwire.logging.Logger;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSession;
+import javax.net.ssl.*;
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
+import java.net.*;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -44,6 +42,9 @@ final class JdkHttpClient implements HttpClient {
 
     private static final int DEFAULT_TIMEOUT = 10000;
     private static final String DEFAULT_USER_AGENT = UserAgentGenerator.getUserAgent();
+
+    private static final SSLSocketFactory CUSTOM_SSL_SOCKET_FACTORY = createCustomSSLSocketFactory();
+
     private HttpClientListener listener;
 
     private boolean canceled;
@@ -508,6 +509,26 @@ final class JdkHttpClient implements HttpClient {
                 return true;
             }
         });
+        setSSLSocketFactory(conn);
+    }
+
+    private void setSSLSocketFactory(HttpsURLConnection conn) {
+        if (CUSTOM_SSL_SOCKET_FACTORY != null) {
+            conn.setSSLSocketFactory(CUSTOM_SSL_SOCKET_FACTORY);
+        }
+    }
+
+    private static SSLSocketFactory createCustomSSLSocketFactory() {
+        try {
+            SSLContext sc = SSLContext.getInstance("TLS");
+            sc.init(null, new TrustManager[]{new AllX509TrustManager()}, new SecureRandom());
+            SSLSocketFactory d = sc.getSocketFactory();
+            return new WrapSSLSocketFactory(d);
+        } catch (Throwable e) {
+            LOG.error("Unable to create custom SSL socket factory", e);
+        }
+
+        return null;
     }
 
     private int getResponseCode(URLConnection conn) {
@@ -569,7 +590,7 @@ final class JdkHttpClient implements HttpClient {
             } catch (Exception e2) {
                 LOG.warn(e2.getMessage());
             }
-        }  else {
+        } else {
             e.printStackTrace();
         }
     }
@@ -622,5 +643,62 @@ final class JdkHttpClient implements HttpClient {
     @Override
     public boolean isCanceled() {
         return canceled;
+    }
+
+    private static final class AllX509TrustManager implements X509TrustManager {
+
+        public X509Certificate[] getAcceptedIssuers() {
+            return null;
+        }
+
+        public void checkClientTrusted(X509Certificate[] certs, String authType) {
+        }
+
+        public void checkServerTrusted(X509Certificate[] certs, String authType) {
+        }
+    }
+
+    private static final class WrapSSLSocketFactory extends SSLSocketFactory {
+
+        private final SSLSocketFactory d;
+
+        public WrapSSLSocketFactory(SSLSocketFactory d) {
+            this.d = d;
+        }
+
+        @Override
+        public Socket createSocket(String s, int i) throws IOException, UnknownHostException {
+            return d.createSocket(s, i);
+        }
+
+        @Override
+        public Socket createSocket(String s, int i, InetAddress inetAddress, int i1) throws IOException, UnknownHostException {
+            return d.createSocket(s, i, inetAddress, i1);
+        }
+
+        @Override
+        public Socket createSocket(InetAddress inetAddress, int i) throws IOException {
+            return d.createSocket(inetAddress, i);
+        }
+
+        @Override
+        public Socket createSocket(InetAddress inetAddress, int i, InetAddress inetAddress1, int i1) throws IOException {
+            return d.createSocket(inetAddress, i, inetAddress1, i1);
+        }
+
+        @Override
+        public String[] getDefaultCipherSuites() {
+            return d.getDefaultCipherSuites();
+        }
+
+        @Override
+        public String[] getSupportedCipherSuites() {
+            return d.getSupportedCipherSuites();
+        }
+
+        @Override
+        public Socket createSocket(Socket socket, String s, int i, boolean b) throws IOException {
+            return d.createSocket(socket, s, i, b);
+        }
     }
 }
