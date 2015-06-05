@@ -88,6 +88,9 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
 
     @Override
     public String getName() {
+        if (th == null) {
+            return null;
+        }
         return th.getName();
     }
 
