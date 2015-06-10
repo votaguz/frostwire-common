@@ -19,6 +19,8 @@ package com.frostwire.search;
 
 import com.frostwire.logging.Logger;
 import com.frostwire.util.ThreadPool;
+import rx.Observable;
+import rx.Subscriber;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -42,6 +44,7 @@ public class SearchManagerImpl implements SearchManager {
     private final List<SearchTask> tasks;
 
     private SearchManagerListener listener;
+    private Subscriber<? super SearchResult> subscriber;
 
     public SearchManagerImpl(int nThreads) {
         this.executor = new ThreadPool("SearchManager", nThreads, nThreads, 1L, new PriorityBlockingQueue<Runnable>(), true);
@@ -55,6 +58,16 @@ public class SearchManagerImpl implements SearchManager {
     @Override
     public void registerListener(SearchManagerListener listener) {
         this.listener = listener;
+    }
+
+    @Override
+    public Observable<SearchResult> observable() {
+        return Observable.create(new Observable.OnSubscribe<SearchResult>() {
+            @Override
+            public void call(final Subscriber<? super SearchResult> subscriber) {
+                SearchManagerImpl.this.subscriber = subscriber;
+            }
+        });
     }
 
     @Override
@@ -116,6 +129,12 @@ public class SearchManagerImpl implements SearchManager {
         try {
             if (listener != null) {
                 listener.onResults(performer, results);
+            }
+
+            if (subscriber != null) {
+                for (SearchResult sr : results) {
+                    subscriber.onNext(sr);
+                }
             }
         } catch (Throwable e) {
             LOG.warn("Error sending results back to receiver: " + e.getMessage());
