@@ -42,8 +42,6 @@ public class SearchManagerImpl implements SearchManager {
     private final List<SearchTask> tasks;
     private final PublishSubject<SearchManagerSignal> subject;
 
-    private SearchManagerListener listener;
-
     public SearchManagerImpl(int nThreads) {
         this.executor = new ThreadPool("SearchManager", nThreads, nThreads, 1L, new PriorityBlockingQueue<Runnable>(), true);
         this.tasks = Collections.synchronizedList(new LinkedList<SearchTask>());
@@ -52,11 +50,6 @@ public class SearchManagerImpl implements SearchManager {
 
     public SearchManagerImpl() {
         this(DEFAULT_NTHREADS);
-    }
-
-    @Override
-    public void registerListener(SearchManagerListener listener) {
-        this.listener = listener;
     }
 
     @Override
@@ -134,10 +127,6 @@ public class SearchManagerImpl implements SearchManager {
 
     protected void onResults(SearchPerformer performer, List<? extends SearchResult> results) {
         try {
-            if (listener != null) {
-                listener.onResults(performer.getToken(), results);
-            }
-
             for (SearchResult sr : results) {
                 subject.onNext(new SearchManagerSignal.Result(performer.getToken(), sr));
             }
@@ -148,9 +137,7 @@ public class SearchManagerImpl implements SearchManager {
 
     protected void onFinished(long token) {
         try {
-            if (listener != null) {
-                listener.onFinished(token);
-            }
+            subject.onNext(new SearchManagerSignal.End(token));
         } catch (Throwable e) {
             LOG.warn("Error sending results back to receiver: " + e.getMessage());
         }

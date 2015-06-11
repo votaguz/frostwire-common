@@ -27,8 +27,6 @@ import java.util.concurrent.TimeUnit;
  */
 public interface SearchManager {
 
-    public void registerListener(SearchManagerListener listener);
-
     Observable<SearchManagerSignal> observable();
 
     void perform(SearchPerformer performer);
