@@ -29,7 +29,7 @@ public interface SearchManager {
 
     public void registerListener(SearchManagerListener listener);
 
-    Observable<ManagerSearchResult> observable();
+    Observable<SearchManagerSignal> observable();
 
     void perform(SearchPerformer performer);
 

@@ -21,11 +21,10 @@ package com.frostwire.search;
  * @author gubatron
  * @author aldenml
  */
-public final class ManagerSearchResult {
+public abstract class SearchManagerSignal {
 
-    public ManagerSearchResult(long token, SearchResult sr) {
+    public SearchManagerSignal(long token) {
         this.token = token;
-        this.sr = sr;
     }
 
     /**
@@ -33,8 +32,23 @@ public final class ManagerSearchResult {
      */
     public final long token;
 
-    /**
-     *
-     */
-    public final SearchResult sr;
+    public static final class Result extends SearchManagerSignal {
+
+        Result(long token, SearchResult sr) {
+            super(token);
+            this.sr = sr;
+        }
+
+        /**
+         *
+         */
+        public final SearchResult sr;
+    }
+
+    public static final class End extends SearchManagerSignal {
+
+        End(long token) {
+            super(token);
+        }
+    }
 }
