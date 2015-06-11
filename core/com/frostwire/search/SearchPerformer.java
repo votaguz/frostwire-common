@@ -33,7 +33,7 @@ public interface SearchPerformer {
 
     public void crawl(CrawlableSearchResult sr);
 
-    public void stop();
+    void stop();
 
     public boolean isStopped();
 }

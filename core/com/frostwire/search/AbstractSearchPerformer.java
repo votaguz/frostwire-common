@@ -54,6 +54,7 @@ public abstract class AbstractSearchPerformer implements SearchPerformer {
     @Override
     public void stop() {
         this.stopped = true;
+        subject.onCompleted();
     }
 
     @Override
