@@ -135,7 +135,7 @@ public class SearchManagerImpl implements SearchManager {
     protected void onResults(SearchPerformer performer, List<? extends SearchResult> results) {
         try {
             if (listener != null) {
-                listener.onResults(performer, results);
+                listener.onResults(performer.getToken(), results);
             }
 
             for (SearchResult sr : results) {
