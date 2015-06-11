@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
  * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
- 
+
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,25 +17,24 @@
 
 package com.frostwire.search;
 
-import rx.Observable;
-
-import java.util.concurrent.TimeUnit;
-
 /**
  * @author gubatron
  * @author aldenml
  */
-public interface SearchManager {
+public final class ManagerSearchResult {
 
-    public void registerListener(SearchManagerListener listener);
+    public ManagerSearchResult(long token, SearchResult sr) {
+        this.token = token;
+        this.sr = sr;
+    }
 
-    Observable<ManagerSearchResult> observable();
+    /**
+     *
+     */
+    public final long token;
 
-    void perform(SearchPerformer performer);
-
-    public void stop();
-
-    public void stop(long token);
-
-    public boolean shutdown(long timeout, TimeUnit unit);
+    /**
+     *
+     */
+    public final SearchResult sr;
 }

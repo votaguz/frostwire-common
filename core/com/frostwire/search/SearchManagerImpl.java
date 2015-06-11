@@ -40,7 +40,7 @@ public class SearchManagerImpl implements SearchManager {
 
     private final ExecutorService executor;
     private final List<SearchTask> tasks;
-    private final PublishSubject<SearchResult> subject;
+    private final PublishSubject<ManagerSearchResult> subject;
 
     private SearchManagerListener listener;
 
@@ -60,7 +60,7 @@ public class SearchManagerImpl implements SearchManager {
     }
 
     @Override
-    public Observable<SearchResult> observable() {
+    public Observable<ManagerSearchResult> observable() {
         return subject;
     }
 
@@ -139,7 +139,7 @@ public class SearchManagerImpl implements SearchManager {
             }
 
             for (SearchResult sr : results) {
-                subject.onNext(sr);
+                subject.onNext(new ManagerSearchResult(performer.getToken(), sr));
             }
         } catch (Throwable e) {
             LOG.warn("Error sending results back to receiver: " + e.getMessage());
