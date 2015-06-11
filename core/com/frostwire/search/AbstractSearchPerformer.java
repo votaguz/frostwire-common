@@ -34,7 +34,6 @@ public abstract class AbstractSearchPerformer implements SearchPerformer {
     private final long token;
     private final PublishSubject<SearchResult> subject;
 
-    private SearchListener listener;
     private boolean stopped;
 
     public AbstractSearchPerformer(long token) {
@@ -45,11 +44,6 @@ public abstract class AbstractSearchPerformer implements SearchPerformer {
     @Override
     public long getToken() {
         return token;
-    }
-
-    @Override
-    public void registerListener(SearchListener listener) {
-        this.listener = listener;
     }
 
     @Override
@@ -69,10 +63,6 @@ public abstract class AbstractSearchPerformer implements SearchPerformer {
 
     protected void onResults(SearchPerformer performer, List<? extends SearchResult> results) {
         try {
-            if (listener != null) {
-                listener.onResults(performer, results);
-            }
-
             if (results != null && !results.isEmpty()) { // isEmpty? to avoid creation of iterator object
                 for (SearchResult sr : results) {
                     subject.onNext(sr);

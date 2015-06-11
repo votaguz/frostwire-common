@@ -27,8 +27,6 @@ public interface SearchPerformer {
 
     public long getToken();
 
-    public void registerListener(SearchListener listener);
-
     Observable<SearchResult> observable();
 
     public void perform();
