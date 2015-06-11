@@ -17,27 +17,29 @@
 
 package com.frostwire.search;
 
+import com.frostwire.logging.Logger;
+import rx.Observable;
+import rx.subjects.PublishSubject;
+
 import java.util.List;
 
-import com.frostwire.logging.Logger;
-
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public abstract class AbstractSearchPerformer implements SearchPerformer {
 
     private static final Logger LOG = Logger.getLogger(AbstractSearchPerformer.class);
 
     private final long token;
+    private final PublishSubject<SearchResult> subject;
 
     private SearchListener listener;
     private boolean stopped;
 
     public AbstractSearchPerformer(long token) {
         this.token = token;
+        this.subject = PublishSubject.create(); // TODO: study replace this for a less imperative abstraction
     }
 
     @Override
@@ -48,6 +50,11 @@ public abstract class AbstractSearchPerformer implements SearchPerformer {
     @Override
     public void registerListener(SearchListener listener) {
         this.listener = listener;
+    }
+
+    @Override
+    public Observable<SearchResult> observable() {
+        return subject;
     }
 
     @Override
@@ -64,6 +71,12 @@ public abstract class AbstractSearchPerformer implements SearchPerformer {
         try {
             if (listener != null) {
                 listener.onResults(performer, results);
+            }
+
+            if (results != null && !results.isEmpty()) { // isEmpty? to avoid creation of iterator object
+                for (SearchResult sr : results) {
+                    subject.onNext(sr);
+                }
             }
         } catch (Throwable e) {
             LOG.warn("Error sending results back to receiver: " + e.getMessage());

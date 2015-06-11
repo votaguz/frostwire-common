@@ -17,17 +17,19 @@
 
 package com.frostwire.search;
 
+import rx.Observable;
+
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public interface SearchPerformer {
 
     public long getToken();
 
     public void registerListener(SearchListener listener);
+
+    Observable<SearchResult> observable();
 
     public void perform();
 

@@ -20,7 +20,8 @@ package com.frostwire.search;
 import com.frostwire.logging.Logger;
 import com.frostwire.util.ThreadPool;
 import rx.Observable;
-import rx.Subscriber;
+import rx.functions.Action1;
+import rx.subjects.PublishSubject;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -42,13 +43,14 @@ public class SearchManagerImpl implements SearchManager {
 
     private final ExecutorService executor;
     private final List<SearchTask> tasks;
+    private final PublishSubject<SearchResult> subject;
 
     private SearchManagerListener listener;
-    private Subscriber<? super SearchResult> subscriber;
 
     public SearchManagerImpl(int nThreads) {
         this.executor = new ThreadPool("SearchManager", nThreads, nThreads, 1L, new PriorityBlockingQueue<Runnable>(), true);
         this.tasks = Collections.synchronizedList(new LinkedList<SearchTask>());
+        this.subject = PublishSubject.create(); // TODO: study replace this for a less imperative abstraction
     }
 
     public SearchManagerImpl() {
@@ -62,12 +64,7 @@ public class SearchManagerImpl implements SearchManager {
 
     @Override
     public Observable<SearchResult> observable() {
-        return Observable.create(new Observable.OnSubscribe<SearchResult>() {
-            @Override
-            public void call(final Subscriber<? super SearchResult> subscriber) {
-                SearchManagerImpl.this.subscriber = subscriber;
-            }
-        });
+        return subject;
     }
 
     @Override
@@ -78,6 +75,12 @@ public class SearchManagerImpl implements SearchManager {
             }
 
             performer.registerListener(new PerformerResultListener(this));
+            performer.observable().subscribe(new Action1<SearchResult>() {
+                @Override
+                public void call(SearchResult sr) {
+                    subject.onNext(sr);
+                }
+            });
 
             SearchTask task = new PerformTask(this, performer, getOrder(performer.getToken()));
 
@@ -129,12 +132,6 @@ public class SearchManagerImpl implements SearchManager {
         try {
             if (listener != null) {
                 listener.onResults(performer, results);
-            }
-
-            if (subscriber != null) {
-                for (SearchResult sr : results) {
-                    subscriber.onNext(sr);
-                }
             }
         } catch (Throwable e) {
             LOG.warn("Error sending results back to receiver: " + e.getMessage());
