@@ -67,9 +67,9 @@ public class SearchManagerImpl implements SearchManager {
                 throw new IllegalArgumentException("Search token id must be >= 0");
             }
 
-            performer.observable().subscribe(new Action1<Iterable<? extends SearchResult>>() {
+            performer.observable().subscribe(new Action1<List<? extends SearchResult>>() {
                 @Override
-                public void call(Iterable<? extends SearchResult> results) {
+                public void call(List<? extends SearchResult> results) {
                     performerOnResults(performer, results);
                 }
             });
@@ -199,7 +199,7 @@ public class SearchManagerImpl implements SearchManager {
         return order;
     }
 
-    private void performerOnResults(SearchPerformer performer, Iterable<? extends SearchResult> results) {
+    private void performerOnResults(SearchPerformer performer, List<? extends SearchResult> results) {
         List<SearchResult> list = new LinkedList<SearchResult>();
 
         for (SearchResult sr : results) {

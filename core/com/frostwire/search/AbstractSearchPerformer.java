@@ -21,6 +21,8 @@ import com.frostwire.logging.Logger;
 import rx.Observable;
 import rx.subjects.PublishSubject;
 
+import java.util.List;
+
 /**
  * @author gubatron
  * @author aldenml
@@ -30,7 +32,7 @@ public abstract class AbstractSearchPerformer implements SearchPerformer {
     private static final Logger LOG = Logger.getLogger(AbstractSearchPerformer.class);
 
     private final long token;
-    private final PublishSubject<Iterable<? extends SearchResult>> subject;
+    private final PublishSubject<List<? extends SearchResult>> subject;
 
     private boolean stopped;
 
@@ -47,7 +49,7 @@ public abstract class AbstractSearchPerformer implements SearchPerformer {
     }
 
     @Override
-    public Observable<Iterable<? extends SearchResult>> observable() {
+    public Observable<List<? extends SearchResult>> observable() {
         return subject;
     }
 
@@ -62,7 +64,7 @@ public abstract class AbstractSearchPerformer implements SearchPerformer {
         return stopped;
     }
 
-    protected void onResults(Iterable<? extends SearchResult> results) {
+    protected void onResults(List<? extends SearchResult> results) {
         try {
             if (results != null && !stopped) {
                 subject.onNext(results);

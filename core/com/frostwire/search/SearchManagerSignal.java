@@ -17,6 +17,8 @@
 
 package com.frostwire.search;
 
+import java.util.List;
+
 /**
  * @author gubatron
  * @author aldenml
@@ -37,7 +39,7 @@ public abstract class SearchManagerSignal {
      */
     public static final class Results extends SearchManagerSignal {
 
-        Results(long token, Iterable<? extends SearchResult> elements) {
+        Results(long token, List<? extends SearchResult> elements) {
             super(token);
             this.elements = elements;
         }
@@ -45,7 +47,7 @@ public abstract class SearchManagerSignal {
         /**
          *
          */
-        public final Iterable<? extends SearchResult> elements;
+        public final List<? extends SearchResult> elements;
     }
 
     public static final class End extends SearchManagerSignal {

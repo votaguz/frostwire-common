@@ -19,6 +19,8 @@ package com.frostwire.search;
 
 import rx.Observable;
 
+import java.util.List;
+
 /**
  * @author gubatron
  * @author aldenml
@@ -27,7 +29,7 @@ public interface SearchPerformer {
 
     long getToken();
 
-    Observable<Iterable<? extends SearchResult>> observable();
+    Observable<List<? extends SearchResult>> observable();
 
     void perform();
 
