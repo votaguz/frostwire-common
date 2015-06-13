@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
  
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ public class SearchManagerImpl implements SearchManager {
     public SearchManagerImpl(int nThreads) {
         this.executor = new ThreadPool("SearchManager", nThreads, nThreads, 1L, new PriorityBlockingQueue<Runnable>(), true);
         this.tasks = Collections.synchronizedList(new LinkedList<SearchTask>());
-        this.subject = PublishSubject.create(); // TODO: study replace this for a less imperative abstraction
+        this.subject = PublishSubject.create();
     }
 
     public SearchManagerImpl() {
@@ -68,15 +68,9 @@ public class SearchManagerImpl implements SearchManager {
             }
 
             performer.observable().subscribe(new Action1<Iterable<? extends SearchResult>>() {
-                PerformerResultListener listener;
-
-                {
-                    listener = new PerformerResultListener(SearchManagerImpl.this);
-                }
-
                 @Override
                 public void call(Iterable<? extends SearchResult> results) {
-                    listener.onResults(performer, results);
+                    performerOnResults(performer, results);
                 }
             });
 
@@ -144,19 +138,7 @@ public class SearchManagerImpl implements SearchManager {
         }
     }
 
-    private void stopTasks(long token) {
-        synchronized (tasks) {
-            Iterator<SearchTask> it = tasks.iterator();
-            while (it.hasNext()) {
-                SearchTask task = it.next();
-                if (token == -1L || task.getToken() == token) {
-                    task.stopSearch();
-                }
-            }
-        }
-    }
-
-    public void crawl(SearchPerformer performer, CrawlableSearchResult sr) {
+    private void crawl(SearchPerformer performer, CrawlableSearchResult sr) {
         if (performer != null && !performer.isStopped()) {
             try {
                 SearchTask task = new CrawlTask(this, performer, sr, getOrder(performer.getToken()));
@@ -169,7 +151,19 @@ public class SearchManagerImpl implements SearchManager {
         }
     }
 
-    void checkIfFinished(SearchPerformer performer) {
+    private void stopTasks(long token) {
+        synchronized (tasks) {
+            Iterator<SearchTask> it = tasks.iterator();
+            while (it.hasNext()) {
+                SearchTask task = it.next();
+                if (token == -1L || task.getToken() == token) {
+                    task.stopSearch();
+                }
+            }
+        }
+    }
+
+    private void checkIfFinished(SearchPerformer performer) {
         SearchTask pendingTask = null;
 
         synchronized (tasks) {
@@ -203,6 +197,28 @@ public class SearchManagerImpl implements SearchManager {
             }
         }
         return order;
+    }
+
+    private void performerOnResults(SearchPerformer performer, Iterable<? extends SearchResult> results) {
+        List<SearchResult> list = new LinkedList<SearchResult>();
+
+        for (SearchResult sr : results) {
+            if (sr instanceof CrawlableSearchResult) {
+                CrawlableSearchResult csr = (CrawlableSearchResult) sr;
+
+                if (csr.isComplete()) {
+                    list.add(sr);
+                }
+
+                crawl(performer, csr);
+            } else {
+                list.add(sr);
+            }
+        }
+
+        if (!list.isEmpty()) {
+            onResults(performer, list);
+        }
     }
 
     private static abstract class SearchTask extends Thread implements Comparable<SearchTask> {

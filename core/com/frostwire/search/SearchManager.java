@@ -31,9 +31,9 @@ public interface SearchManager {
 
     void perform(SearchPerformer performer);
 
-    public void stop();
+    void stop();
 
-    public void stop(long token);
+    void stop(long token);
 
-    public boolean shutdown(long timeout, TimeUnit unit);
+    boolean shutdown(long timeout, TimeUnit unit);
 }
