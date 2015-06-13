@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
  
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,6 @@ import com.frostwire.logging.Logger;
 import rx.Observable;
 import rx.subjects.PublishSubject;
 
-import java.util.List;
-
 /**
  * @author gubatron
  * @author aldenml
@@ -32,13 +30,11 @@ public abstract class AbstractSearchPerformer implements SearchPerformer {
     private static final Logger LOG = Logger.getLogger(AbstractSearchPerformer.class);
 
     private final long token;
-    private final PublishSubject<SearchResult> subject;
-
-    private boolean stopped;
+    private final PublishSubject<Iterable<? extends SearchResult>> subject;
 
     public AbstractSearchPerformer(long token) {
         this.token = token;
-        this.subject = PublishSubject.create(); // TODO: study replace this for a less imperative abstraction
+        this.subject = PublishSubject.create();
     }
 
     @Override
@@ -47,27 +43,24 @@ public abstract class AbstractSearchPerformer implements SearchPerformer {
     }
 
     @Override
-    public Observable<SearchResult> observable() {
+    public Observable<Iterable<? extends SearchResult>> observable() {
         return subject;
     }
 
     @Override
     public void stop() {
-        this.stopped = true;
         subject.onCompleted();
     }
 
     @Override
     public boolean isStopped() {
-        return stopped;
+        return subject.hasCompleted();
     }
 
-    protected void onResults(SearchPerformer performer, List<? extends SearchResult> results) {
+    protected void onResults(Iterable<? extends SearchResult> results) {
         try {
-            if (results != null && !results.isEmpty()) { // isEmpty? to avoid creation of iterator object
-                for (SearchResult sr : results) {
-                    subject.onNext(sr);
-                }
+            if (results != null) {
+                subject.onNext(results);
             }
         } catch (Throwable e) {
             LOG.warn("Error sending results back to receiver: " + e.getMessage());

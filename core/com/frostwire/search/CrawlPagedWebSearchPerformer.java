@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014,, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,6 @@ import java.util.List;
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResult> extends PagedWebSearchPerformer {
 
@@ -126,18 +125,18 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
                         if (data != null) {
                             List<? extends SearchResult> results = crawlResult(obj, data);
                             if (results != null) {
-                                onResults(this, results);
+                                onResults(results);
                             }
                         }
                     } catch (Throwable e) {
-                        LOG.warn("Error creating crawled results from downloaded data: " + e.getMessage(),e);
+                        LOG.warn("Error creating crawled results from downloaded data: " + e.getMessage(), e);
                         cacheRemove(url); // invalidating cache data
                     }
                 } else {
                     try {
                         List<? extends SearchResult> results = crawlResult(obj, null);
                         if (results != null) {
-                            onResults(this, results);
+                            onResults(results);
                         }
                     } catch (Throwable e) {
                         LOG.warn("Error creating crawled results from search result alone: " + obj.getDetailsUrl() + ", e=" + e.getMessage());//,e);

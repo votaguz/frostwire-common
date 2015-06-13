@@ -35,7 +35,7 @@ public final class PerformerResultListener implements SearchListener {
     }
 
     @Override
-    public void onResults(SearchPerformer performer, List<? extends SearchResult> results) {
+    public void onResults(SearchPerformer performer, Iterable<? extends SearchResult> results) {
         List<SearchResult> list = new LinkedList<SearchResult>();
 
         for (SearchResult sr : results) {

@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
  
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,15 +25,15 @@ import rx.Observable;
  */
 public interface SearchPerformer {
 
-    public long getToken();
+    long getToken();
 
-    Observable<SearchResult> observable();
+    Observable<Iterable<? extends SearchResult>> observable();
 
-    public void perform();
+    void perform();
 
-    public void crawl(CrawlableSearchResult sr);
+    void crawl(CrawlableSearchResult sr);
 
     void stop();
 
-    public boolean isStopped();
+    boolean isStopped();
 }

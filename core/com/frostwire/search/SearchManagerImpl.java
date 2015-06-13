@@ -23,7 +23,10 @@ import rx.Observable;
 import rx.functions.Action1;
 import rx.subjects.PublishSubject;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -64,7 +67,7 @@ public class SearchManagerImpl implements SearchManager {
                 throw new IllegalArgumentException("Search token id must be >= 0");
             }
 
-            performer.observable().subscribe(new Action1<SearchResult>() {
+            performer.observable().subscribe(new Action1<Iterable<? extends SearchResult>>() {
                 PerformerResultListener listener;
 
                 {
@@ -72,10 +75,8 @@ public class SearchManagerImpl implements SearchManager {
                 }
 
                 @Override
-                public void call(SearchResult sr) {
-                    List t = new ArrayList(1);
-                    t.add(sr);
-                    listener.onResults(performer, t);
+                public void call(Iterable<? extends SearchResult> results) {
+                    listener.onResults(performer, results);
                 }
             });
 

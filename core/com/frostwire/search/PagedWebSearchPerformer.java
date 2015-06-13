@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,6 @@ import java.util.List;
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public abstract class PagedWebSearchPerformer extends WebSearchPerformer {
 
@@ -41,7 +40,7 @@ public abstract class PagedWebSearchPerformer extends WebSearchPerformer {
     @Override
     public void perform() {
         for (int i = 1; !isStopped() && i <= pages; i++) {
-            onResults(this, searchPage(i));
+            onResults(searchPage(i));
         }
     }
 
