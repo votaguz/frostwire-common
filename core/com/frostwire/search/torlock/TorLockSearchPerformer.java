@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,7 +32,8 @@ public class TorLockSearchPerformer extends TorrentRegexSearchPerformer<TorLockS
 
     private static final int MAX_RESULTS = 10;
     private static final String REGEX = "(?is)<a href=/torrent/([0-9]*?/.*?\\.html)>";
-    private static final String HTML_REGEX = "(?is).*?<td><b>Name:</b></td><td>(.*?).torrent</td>.*?<td><b>Size:</b></td><td>(.*?) in .*? file.*?</td>.*?<td><b>Added:</b></td><td>Uploaded on (.*?) by .*?</td>.*?<font color=#FF5400><b>(.*?)</b></font> seeders.*?<td align=center><a href=\"/tor/(.*?).torrent\"><img.*?";
+    private static final String HTML_REGEX = "(?is).*?<td><b>Name:</b></td><td>(?<filename>.*?).torrent</td>.*?<td><b>Size:</b></td><td>(?<filesize>.*?) in .*? file.*?</td>.*?<td><b>Added:</b></td><td>Uploaded on (?<time>.*?) by .*?color:#FF5400.*?>(?<seeds>\\d*?)</b>.*? seeders.*?<a href=\"/tor/(?<torrentid>.*?).torrent\"><img.*?";
+    ;//
 
     public TorLockSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1, 2 * MAX_RESULTS, MAX_RESULTS, REGEX, HTML_REGEX);
@@ -41,7 +42,7 @@ public class TorLockSearchPerformer extends TorrentRegexSearchPerformer<TorLockS
     @Override
     protected String getUrl(int page, String encodedKeywords) {
         String transformedKeywords = encodedKeywords.replace("0%20", "-");
-        return "http://" + getDomainName() + "/all/torrents/" + transformedKeywords + ".html";
+        return "https://" + getDomainName() + "/all/torrents/" + transformedKeywords + ".html";
     }
 
     @Override
@@ -55,17 +56,28 @@ public class TorLockSearchPerformer extends TorrentRegexSearchPerformer<TorLockS
         return new TorLockSearchResult(getDomainName(),sr.getDetailsUrl(), matcher);
     }
     
-    /*
+    /**
     public static void main(String[] args) throws Exception {
-        DomainAliasManagerBroker domainBroker = new DomainAliasManagerBroker();
-        DomainAliasManager aliasManager = domainBroker.getDomainAliasManager("www.torlock.net");
-        TorLockSearchPerformer performer = new TorLockSearchPerformer(aliasManager, 21312, "whatever", 5000);
-        TorLockTempSearchResult tempSearchResult = new TorLockTempSearchResult(performer.getDomainName(), "2457897");
-        
-        byte[] data = FileUtils.readFileToByteArray(new File("/Users/gubatron/Desktop/torlocktest.html"));
-        performer.crawlResult(tempSearchResult, data);
-        
-        //new TorLockTempSearchResult(performer.getDomainName(), tempSearchResult.getDetailsUrl(), )
-    }
-    */
+        //REGEX TEST CODE
+        String resultsHTML = FileUtils.readFileToString(new File("/Users/gubatron/Desktop/torlock-results.html"));
+        final Pattern resultsPattern = Pattern.compile(REGEX);
+
+        final SearchMatcher matcher = SearchMatcher.from(resultsPattern.matcher(resultsHTML));
+        while (matcher.find()) {
+            //System.out.println(matcher.group(1));
+        }
+        String resultHTML = FileUtils.readFileToString(new File("/Users/gubatron/Desktop/torlock-result.html"));
+        final Pattern detailPattern = Pattern.compile(HTML_REGEX);
+        final SearchMatcher detailMatcher = SearchMatcher.from(detailPattern.matcher(new MaxIterCharSequence(resultHTML,resultHTML.length())));
+
+        if (detailMatcher.find()) {
+            System.out.println("File name: " + detailMatcher.group("filename"));
+            System.out.println("Size: " + detailMatcher.group("filesize"));
+            System.out.println("Date: " + detailMatcher.group("time"));
+            System.out.println("Seeds: " + detailMatcher.group("seeds"));
+            System.out.println("TorrentID: " + detailMatcher.group("torrentid"));
+        } else {
+            System.out.println("No detail matched.");
+        }
+   }*/
 }

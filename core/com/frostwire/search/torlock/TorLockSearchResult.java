@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -66,11 +66,11 @@ public class TorLockSearchResult extends AbstractTorrentSearchResult {
     public TorLockSearchResult(String domainName, String detailsUrl, SearchMatcher matcher) {
         this.detailsUrl = detailsUrl;
         this.infoHash = null;
-        this.filename = parseFileName(matcher.group(1), FilenameUtils.getBaseName(detailsUrl));
-        this.size = parseSize(matcher.group(2));
-        this.creationTime = parseCreationTime(matcher.group(3));
-        this.seeds = parseSeeds(matcher.group(4));
-        this.torrentUrl = "http://" + domainName + "/tor/" + matcher.group(5) + ".torrent";
+        this.filename = parseFileName(matcher.group("filename"), FilenameUtils.getBaseName(detailsUrl));
+        this.size = parseSize(matcher.group("filesize"));
+        this.creationTime = parseCreationTime(matcher.group("time"));
+        this.seeds = parseSeeds(matcher.group("seeds"));
+        this.torrentUrl = "http://" + domainName + "/tor/" + matcher.group("torrentid") + ".torrent";
         this.displayName = HtmlManipulator.replaceHtmlEntities(FilenameUtils.getBaseName(filename));
     }
 
