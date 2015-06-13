@@ -32,9 +32,13 @@ public abstract class AbstractSearchPerformer implements SearchPerformer {
     private final long token;
     private final PublishSubject<Iterable<? extends SearchResult>> subject;
 
+    private boolean stopped;
+
     public AbstractSearchPerformer(long token) {
         this.token = token;
         this.subject = PublishSubject.create();
+
+        this.stopped = false;
     }
 
     @Override
@@ -50,16 +54,17 @@ public abstract class AbstractSearchPerformer implements SearchPerformer {
     @Override
     public void stop() {
         subject.onCompleted();
+        stopped = true;
     }
 
     @Override
     public boolean isStopped() {
-        return subject.hasCompleted();
+        return stopped;
     }
 
     protected void onResults(Iterable<? extends SearchResult> results) {
         try {
-            if (results != null) {
+            if (results != null && !stopped) {
                 subject.onNext(results);
             }
         } catch (Throwable e) {
