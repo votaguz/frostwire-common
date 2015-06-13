@@ -126,7 +126,7 @@ public class SearchManagerImpl implements SearchManager {
                 subject.onNext(new SearchManagerSignal.Results(performer.getToken(), results));
             }
         } catch (Throwable e) {
-            LOG.warn("Error sending results back to receiver: " + e.getMessage());
+            LOG.warn("Error sending results back to receiver: " + e.getMessage(), e);
         }
     }
 
@@ -134,7 +134,7 @@ public class SearchManagerImpl implements SearchManager {
         try {
             subject.onNext(new SearchManagerSignal.End(token));
         } catch (Throwable e) {
-            LOG.warn("Error sending results back to receiver: " + e.getMessage());
+            LOG.warn("Error sending results back to receiver: " + e.getMessage(), e);
         }
     }
 
