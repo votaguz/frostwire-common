@@ -127,8 +127,8 @@ public class SearchManagerImpl implements SearchManager {
 
     protected void onResults(SearchPerformer performer, List<? extends SearchResult> results) {
         try {
-            for (SearchResult sr : results) {
-                subject.onNext(new SearchManagerSignal.Result(performer.getToken(), sr));
+            if (results != null) {
+                subject.onNext(new SearchManagerSignal.Results(performer.getToken(), results));
             }
         } catch (Throwable e) {
             LOG.warn("Error sending results back to receiver: " + e.getMessage());

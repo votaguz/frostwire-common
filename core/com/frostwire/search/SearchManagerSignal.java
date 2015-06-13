@@ -32,17 +32,20 @@ public abstract class SearchManagerSignal {
      */
     public final long token;
 
-    public static final class Result extends SearchManagerSignal {
+    /**
+     *
+     */
+    public static final class Results extends SearchManagerSignal {
 
-        Result(long token, SearchResult sr) {
+        Results(long token, Iterable<? extends SearchResult> elements) {
             super(token);
-            this.sr = sr;
+            this.elements = elements;
         }
-
+        
         /**
          *
          */
-        public final SearchResult sr;
+        public final Iterable<? extends SearchResult> elements;
     }
 
     public static final class End extends SearchManagerSignal {

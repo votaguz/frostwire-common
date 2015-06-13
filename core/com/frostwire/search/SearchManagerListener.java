@@ -17,15 +17,13 @@
 
 package com.frostwire.search;
 
-import java.util.List;
-
 /**
  * @author gubatron
  * @author aldenml
  */
 public interface SearchManagerListener {
 
-    public void onResults(long token, List<? extends SearchResult> results);
+    public void onResults(long token, Iterable<? extends SearchResult> results);
 
     public void onFinished(long token);
 }
