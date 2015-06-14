@@ -246,7 +246,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     }
 
     public long getUploadSpeed() {
-        return th.getStatus().getUploadPayloadRate();
+        return ((isFinished() && !isSeeding()) || isPaused()) ? 0 : th.getStatus().getUploadPayloadRate();
     }
 
     public int getConnectedPeers() {
