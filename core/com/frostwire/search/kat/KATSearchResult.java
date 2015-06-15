@@ -94,7 +94,7 @@ public class KATSearchResult extends AbstractTorrentSearchResult {
 
     private long buildCreationTime(KATItem item) {
         //Saturday 26 Jan 2008 01:01:52 +0000
-        SimpleDateFormat date = new SimpleDateFormat("EEEE dd MMM yyyy HH:mm:ss Z ", Locale.US);
+        SimpleDateFormat date = new SimpleDateFormat("EEEE d MMM yyyy HH:mm:ss Z", Locale.US);
         long result = System.currentTimeMillis();
         try {
             result = date.parse(item.pubDate).getTime();
