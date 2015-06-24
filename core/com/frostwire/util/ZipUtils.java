@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014,, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,23 +18,17 @@
 
 package com.frostwire.util;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import com.frostwire.logging.Logger;
+import org.apache.commons.io.FileUtils;
+
+import java.io.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
-import org.apache.commons.io.FileUtils;
-
-import com.frostwire.logging.Logger;
-
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public final class ZipUtils {
 
@@ -130,9 +124,9 @@ public final class ZipUtils {
         return count;
     }
 
-    public static interface ZipListener {
-        public void onUnzipping(String fileName, int progress);
+    public interface ZipListener {
+        void onUnzipping(String fileName, int progress);
 
-        public boolean isCanceled();
+        boolean isCanceled();
     }
 }
