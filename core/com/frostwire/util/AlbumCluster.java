@@ -78,6 +78,27 @@ public final class AlbumCluster {
         return new String[]{album, artist};
     }
 
+    /**
+     * Remove all non-alphanumeric characters.
+     *
+     * @param s
+     * @return
+     */
+    public static String stripNonAlnum(String s) {
+        return s.replaceAll("\\W+", "");
+    }
+
+    /**
+     * Strips non-alphanumeric characters from a string unless doing so would make it blank.
+     *
+     * @param s
+     * @return
+     */
+    public static String normalize(String s) {
+        String s1 = stripNonAlnum(s);
+        return s1.length() != 0 ? s1 : s;
+    }
+
     public static void main(String[] args) {
         test_album_artist_from_path();
     }
