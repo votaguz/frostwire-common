@@ -99,13 +99,55 @@ public final class AlbumCluster {
         return s1.length() != 0 ? s1 : s;
     }
 
+    /**
+     * Compute Levenshtein distance.
+     *
+     * @param s1
+     * @param s2
+     * @return
+     */
+    public static float astrcmp(String s1, String s2) {
+        float d = org.apache.commons.lang3.StringUtils.getLevenshteinDistance(s1, s2);
+        float len1 = s1.length();
+        float len2 = s2.length();
+
+        return (float) 1 - d / Math.max(len1, len2);
+    }
+
+    /**
+     * Calculates similarity of single words as a function of their edit distance.
+     *
+     * @param s1
+     * @param s2
+     * @return
+     */
+    public static float similarity(String s1, String s2) {
+        s1 = normalize(s1);
+        s2 = normalize(s2);
+
+        return astrcmp(s1, s2);
+    }
+
     public static void main(String[] args) {
         test_album_artist_from_path();
+        test_similarity();
     }
 
     private static void assertEqual(String[] a, String[] b) {
         if (!Arrays.equals(a, b)) {
             throw new IllegalStateException("Arrays must be equals");
+        }
+    }
+
+    private static void assertEqual(float a, float b) {
+        if (!new Float(a).equals(b)) {
+            throw new IllegalStateException("Numbers must be equals");
+        }
+    }
+
+    private static void assertAlmostEqual(float a, float b, float d) {
+        if (Math.abs(a - b) >= d) {
+            throw new IllegalStateException("Numbers must be equals");
         }
     }
 
@@ -122,5 +164,11 @@ public final class AlbumCluster {
         assertEqual(albumArtistFromPath(file_4, "album", ""), new String[]{"album", "" });
         assertEqual(albumArtistFromPath(file_4, "", "artist"), new String[]{"", "artist" });
         assertEqual(albumArtistFromPath(file_4, "album", "artist"), new String[]{"album", "artist" });
+    }
+
+    private static void test_similarity() {
+        assertEqual(similarity("K!", "K!"), 1.0f);
+        assertEqual(similarity("BBB", "AAA"), 0.0f);
+        assertAlmostEqual(similarity("ABC", "ABB"), 0.7f, 0.1f);
     }
 }
