@@ -71,7 +71,7 @@ public final class AlbumCluster {
                 artist = parts[0];
                 album = parts[1];
             } else if (dirs.size() > 1) {
-                album = dirs.get(dirs.size() - 2);
+                artist = dirs.get(dirs.size() - 2);
             }
         }
 
@@ -95,5 +95,11 @@ public final class AlbumCluster {
         String file_4 = "/02 I'm Not in Love.mp3";
 
         assertEqual(albumArtistFromPath(file_1, "", ""), new String[]{"Original Soundtrack", "10cc" });
+        assertEqual(albumArtistFromPath(file_2, "", ""), new String[]{"Original Soundtrack", "10cc" });
+        assertEqual(albumArtistFromPath(file_3, "", ""), new String[]{"Original Soundtrack", "" });
+        assertEqual(albumArtistFromPath(file_4, "", ""), new String[]{"", "" });
+        assertEqual(albumArtistFromPath(file_4, "album", ""), new String[]{"album", "" });
+        assertEqual(albumArtistFromPath(file_4, "", "artist"), new String[]{"", "artist" });
+        assertEqual(albumArtistFromPath(file_4, "album", "artist"), new String[]{"album", "artist" });
     }
 }
