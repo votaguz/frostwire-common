@@ -23,9 +23,9 @@
 
 package com.frostwire.util;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Locale;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.*;
 
 /**
  * @author gubatron
@@ -131,9 +131,13 @@ public final class AlbumCluster {
 
     public static final class ClusterDict {
 
-        private int id;
+        private Map<String, II> words; // word -> id index
+        private Map<Integer, WW> ids; // id -> word, token index
+        private int id; // counter for new id generation
 
         public ClusterDict() {
+            this.words = new HashMap<String, II>();
+            this.ids = new HashMap<Integer, WW>();
             this.id = 0;
         }
 
@@ -148,6 +152,62 @@ public final class AlbumCluster {
             } else {
                 return word.toLowerCase(Locale.US).replaceAll("\\s", "");
             }
+        }
+
+        /**
+         * Add a new entry to the cluster if it does not exist. If it
+         * does exist, increment the count. Return the index of the word
+         * in the dictionary or -1 is the word is empty.
+         *
+         * @param word
+         */
+        public int add(String word) {
+            if (org.apache.commons.lang3.StringUtils.isBlank(word)) {
+                return -1;
+            }
+
+            String token = tokenize(word);
+
+            if (StringUtils.isBlank(token)) {
+                return -1;
+            }
+
+            if (words.containsKey(word)) {
+                II p = words.get(word);
+                p.count = p.count + 1;
+                return p.index;
+            } else {
+                int index = this.id;
+
+                words.put(word, new II(this.id, 1));
+                ids.put(index, new WW(word, token));
+
+                this.id = this.id + 1;
+
+                return index;
+            }
+        }
+
+        private static final class II {
+
+            public II(int index, int count) {
+                this.index = index;
+                this.count = count;
+            }
+
+            public int index;
+            public int count;
+        }
+
+        private static final class WW {
+
+            public WW(String word, String token) {
+                this.word = word;
+                this.token = token;
+            }
+
+            public String word;
+            public String token;
         }
     }
 
