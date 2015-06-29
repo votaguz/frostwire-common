@@ -25,6 +25,7 @@ package com.frostwire.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Locale;
 
 /**
  * @author gubatron
@@ -128,6 +129,28 @@ public final class AlbumCluster {
         return astrcmp(s1, s2);
     }
 
+    public static final class ClusterDict {
+
+        private int id;
+
+        public ClusterDict() {
+            this.id = 0;
+        }
+
+        public int getSize() {
+            return id;
+        }
+
+        public String tokenize(String word) {
+            String token = word.toLowerCase(Locale.US).replaceAll("\\W", "");
+            if (token.length() > 0) {
+                return token;
+            } else {
+                return word.toLowerCase(Locale.US).replaceAll("\\s", "");
+            }
+        }
+    }
+
     public static void main(String[] args) {
         test_album_artist_from_path();
         test_similarity();
@@ -157,13 +180,13 @@ public final class AlbumCluster {
         String file_3 = "/Original Soundtrack/02 I'm Not in Love.mp3";
         String file_4 = "/02 I'm Not in Love.mp3";
 
-        assertEqual(albumArtistFromPath(file_1, "", ""), new String[]{"Original Soundtrack", "10cc" });
-        assertEqual(albumArtistFromPath(file_2, "", ""), new String[]{"Original Soundtrack", "10cc" });
-        assertEqual(albumArtistFromPath(file_3, "", ""), new String[]{"Original Soundtrack", "" });
-        assertEqual(albumArtistFromPath(file_4, "", ""), new String[]{"", "" });
-        assertEqual(albumArtistFromPath(file_4, "album", ""), new String[]{"album", "" });
-        assertEqual(albumArtistFromPath(file_4, "", "artist"), new String[]{"", "artist" });
-        assertEqual(albumArtistFromPath(file_4, "album", "artist"), new String[]{"album", "artist" });
+        assertEqual(albumArtistFromPath(file_1, "", ""), new String[]{"Original Soundtrack", "10cc"});
+        assertEqual(albumArtistFromPath(file_2, "", ""), new String[]{"Original Soundtrack", "10cc"});
+        assertEqual(albumArtistFromPath(file_3, "", ""), new String[]{"Original Soundtrack", ""});
+        assertEqual(albumArtistFromPath(file_4, "", ""), new String[]{"", ""});
+        assertEqual(albumArtistFromPath(file_4, "album", ""), new String[]{"album", ""});
+        assertEqual(albumArtistFromPath(file_4, "", "artist"), new String[]{"", "artist"});
+        assertEqual(albumArtistFromPath(file_4, "album", "artist"), new String[]{"album", "artist"});
     }
 
     private static void test_similarity() {
