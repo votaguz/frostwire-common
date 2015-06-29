@@ -24,6 +24,7 @@
 package com.frostwire.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.MutablePair;
 
 import java.util.*;
 
@@ -131,13 +132,13 @@ public final class AlbumCluster {
 
     public static final class ClusterDict {
 
-        private Map<String, II> words; // word -> id index
-        private Map<Integer, WW> ids; // id -> word, token index
+        private Map<String, MutablePair<Integer, Integer>> words; // word -> id index
+        private Map<Integer, MutablePair<String, String>> ids; // id -> word, token index
         private int id; // counter for new id generation
 
         public ClusterDict() {
-            this.words = new HashMap<String, II>();
-            this.ids = new HashMap<Integer, WW>();
+            this.words = new HashMap<String, MutablePair<Integer, Integer>>();
+            this.ids = new HashMap<Integer, MutablePair<String, String>>();
             this.id = 0;
         }
 
@@ -173,14 +174,14 @@ public final class AlbumCluster {
             }
 
             if (words.containsKey(word)) {
-                II p = words.get(word);
-                p.count = p.count + 1;
-                return p.index;
+                MutablePair<Integer, Integer> p = words.get(word);
+                p.setRight(p.getRight() + 1);
+                return p.getLeft();
             } else {
                 int index = this.id;
 
-                words.put(word, new II(this.id, 1));
-                ids.put(index, new WW(word, token));
+                words.put(word, MutablePair.of(this.id, 1));
+                ids.put(index, MutablePair.of(word, token));
 
                 this.id = this.id + 1;
 
@@ -188,26 +189,12 @@ public final class AlbumCluster {
             }
         }
 
-        private static final class II {
-
-            public II(int index, int count) {
-                this.index = index;
-                this.count = count;
+        public String getWord(int index) {
+            if (ids.containsKey(index)) {
+                return ids.get(index).getLeft();
+            } else {
+                return null;
             }
-
-            public int index;
-            public int count;
-        }
-
-        private static final class WW {
-
-            public WW(String word, String token) {
-                this.word = word;
-                this.token = token;
-            }
-
-            public String word;
-            public String token;
         }
     }
 
