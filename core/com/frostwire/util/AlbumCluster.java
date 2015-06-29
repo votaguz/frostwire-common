@@ -24,7 +24,9 @@
 package com.frostwire.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.MutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
 
@@ -194,6 +196,25 @@ public final class AlbumCluster {
                 return ids.get(index).getLeft();
             } else {
                 return null;
+            }
+        }
+
+        public String getToken(int index) {
+            if (ids.containsKey(index)) {
+                return ids.get(index).getRight();
+            } else {
+                return null;
+            }
+        }
+
+        public Pair<String, Integer> getWordAndCount(int index) {
+            if (ids.containsKey(index)) {
+                Pair<String, String> wordToken = ids.get(index);
+                Pair<Integer, Integer> indexCount = words.get(wordToken.getLeft());
+
+                return ImmutablePair.of(wordToken.getLeft(), indexCount.getRight());
+            } else {
+                return ImmutablePair.of(null, 0);
             }
         }
     }
