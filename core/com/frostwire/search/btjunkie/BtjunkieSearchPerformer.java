@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ public class BtjunkieSearchPerformer extends CrawlRegexSearchPerformer<BtjunkieS
 
     @Override
     protected String getUrl(int page, String encodedKeywords) {
-        return "http://"+getDomainName()+"/all/by-default_sort/desc/page" + page + "/" + encodedKeywords;
+        return "http://" + getDomainName() + "/all/by-default_sort/desc/page" + page + "/" + encodedKeywords;
     }
 
     @Override
@@ -86,7 +86,7 @@ public class BtjunkieSearchPerformer extends CrawlRegexSearchPerformer<BtjunkieS
     private String parseDisplayUrl(String domainName, String detailsUrl) {
         String result;
         try {
-            result = "http://" +domainName + "/" + detailsUrl.substring(detailsUrl.indexOf("/",7)+1);
+            result = "http://" + domainName + "/" + detailsUrl.substring(detailsUrl.indexOf("/", 7) + 1);
         } catch (Throwable t) {
             result = detailsUrl;
         }
@@ -122,7 +122,7 @@ public class BtjunkieSearchPerformer extends CrawlRegexSearchPerformer<BtjunkieS
     }
 
     private String parseDisplayName(String rawdisplayname) {
-        return rawdisplayname.replaceAll("[\\:*?\"|\\[\\]]+"," ");
+        return rawdisplayname.replaceAll("[\\:*?\"|\\[\\]]+", " ");
     }
 
     private String parseFileName(String filename) {
@@ -130,9 +130,8 @@ public class BtjunkieSearchPerformer extends CrawlRegexSearchPerformer<BtjunkieS
     }
 
     private long parseSize(String sizeString) {
-        System.out.println("parseSize of ["+ sizeString+"]");
         long result = 0;
-        SearchMatcher matcher = SearchMatcher.from(sizePattern.matcher(new MaxIterCharSequence(sizeString, sizeString.length()*2)));
+        SearchMatcher matcher = SearchMatcher.from(sizePattern.matcher(new MaxIterCharSequence(sizeString, sizeString.length() * 2)));
         if (matcher.find()) {
             String amount = matcher.group(1);
             String unit = matcher.group(2);
@@ -174,26 +173,26 @@ public class BtjunkieSearchPerformer extends CrawlRegexSearchPerformer<BtjunkieS
     }
 
     /**
-    public static void main(String[] args) throws IOException {
-        System.out.println(HTML_REGEX);
+     public static void main(String[] args) throws IOException {
+     System.out.println(HTML_REGEX);
 
-        String fileStr = IOUtils.toString(new FileInputStream("/Users/gubatron/Desktop/btjunkie.html"),"utf-8");
-        com.google.code.regexp.Matcher matcher = PATTERN.matcher(fileStr);
+     String fileStr = IOUtils.toString(new FileInputStream("/Users/gubatron/Desktop/btjunkie.html"),"utf-8");
+     com.google.code.regexp.Matcher matcher = PATTERN.matcher(fileStr);
 
-        int found = 0;
-        while (matcher.find()) {
-            found++;
-            System.out.println("\nfound " + found);
+     int found = 0;
+     while (matcher.find()) {
+     found++;
+     System.out.println("\nfound " + found);
 
-            System.out.println("group detailsUrl: " + matcher.group("detailsUrl"));
-            System.out.println("group title: " + matcher.group("title"));
-            System.out.println("group magnet: " + matcher.group("magnet"));
-            System.out.println("group size: " + matcher.group("size"));
-            System.out.println("group date: " + matcher.group("date"));
-            System.out.println("group seeds: " + matcher.group("seeds"));
-        }
+     System.out.println("group detailsUrl: " + matcher.group("detailsUrl"));
+     System.out.println("group title: " + matcher.group("title"));
+     System.out.println("group magnet: " + matcher.group("magnet"));
+     System.out.println("group size: " + matcher.group("size"));
+     System.out.println("group date: " + matcher.group("date"));
+     System.out.println("group seeds: " + matcher.group("seeds"));
+     }
 
-        System.out.println("Ended.");
-    }
+     System.out.println("Ended.");
+     }
      */
 }
