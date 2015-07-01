@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,14 +22,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public final class MimeDetector {
 
-    //private static final String directory = "application/directory";
     public static final String UNKNOWN = "application/octet-stream";
 
     private static Map<String, String> map = null;

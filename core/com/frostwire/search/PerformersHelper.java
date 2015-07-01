@@ -32,9 +32,10 @@ import java.util.List;
  * @author aldenml
  */
 public final class PerformersHelper {
-    private static final Pattern MAGNET_HASH_PATTERN = Pattern.compile("magnet\\:\\?xt\\=urn\\:btih\\:([a-fA-F0-9]){40}");
 
     private static final Logger LOG = Logger.getLogger(PerformersHelper.class);
+
+    private static final Pattern MAGNET_HASH_PATTERN = Pattern.compile("magnet\\:\\?xt\\=urn\\:btih\\:([a-fA-F0-9]){40}");
 
     private PerformersHelper() {
     }
@@ -50,7 +51,7 @@ public final class PerformersHelper {
         SearchMatcher matcher = SearchMatcher.from(performer.getPattern().matcher(new MaxIterCharSequence(page, 2 * page.length())));
         int max = regexMaxResults;
         int i = 0;
-        boolean matcherFound = false;
+        boolean matcherFound;
 
         do {
             try {
@@ -75,7 +76,7 @@ public final class PerformersHelper {
     /**
      * This method is only public allow reuse inside the package search, consider it a private API
      */
-    public static List<? extends SearchResult> crawlTorrent(SearchPerformer performer, TorrentCrawlableSearchResult sr, byte[] data) {
+    public static List<? extends SearchResult> crawlTorrent(SearchPerformer performer, TorrentCrawlableSearchResult sr, byte[] data, boolean detectAlbums) {
         List<TorrentCrawledSearchResult> list = new LinkedList<TorrentCrawledSearchResult>();
 
         TorrentInfo ti = TorrentInfo.bdecode(data);
@@ -92,7 +93,18 @@ public final class PerformersHelper {
             list.add(new TorrentCrawledSearchResult(sr, ti, i, fs.getFilePath(i), fs.getFileSize(i)));
         }
 
-        return list;
+        if (detectAlbums) {
+            List<SearchResult> temp = new LinkedList<SearchResult>();
+            temp.addAll(list);
+            temp.addAll(new AlbumCluster().detect(sr, list));
+            return temp;
+        } else {
+            return list;
+        }
+    }
+
+    public static List<? extends SearchResult> crawlTorrent(SearchPerformer performer, TorrentCrawlableSearchResult sr, byte[] data) {
+        return crawlTorrent(performer, sr, data, true);
     }
 
     public static String parseInfoHash(String url) {

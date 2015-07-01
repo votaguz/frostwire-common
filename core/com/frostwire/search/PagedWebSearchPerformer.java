@@ -18,6 +18,7 @@
 
 package com.frostwire.search;
 
+import com.frostwire.logging.Logger;
 import com.frostwire.util.StringUtils;
 
 import java.io.IOException;
@@ -29,6 +30,8 @@ import java.util.List;
  * @author aldenml
  */
 public abstract class PagedWebSearchPerformer extends WebSearchPerformer {
+
+    private static final Logger LOG = Logger.getLogger(PagedWebSearchPerformer.class);
 
     private final int pages;
 
@@ -53,7 +56,7 @@ public abstract class PagedWebSearchPerformer extends WebSearchPerformer {
                 result = searchPage(text);
             }
         } catch (Throwable e) {
-            e.printStackTrace();
+            LOG.error("Error searching page: " + e.getMessage());
         }
         return result;
     }
