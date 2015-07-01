@@ -200,6 +200,9 @@ public class BitSnoopSearchPerformer extends TorrentRegexSearchPerformer<BitSnoo
                 LOG.error(t.getMessage(), t);
             }
         }
+
+        // TODO: aldenml - Add album logic here, can't reason with isScrapingFile mutable flag.
+
         isScrapingFile = false;
         return searchResults;
     }

@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ import org.apache.commons.io.FilenameUtils;
  * @author gubatron
  * @author aldenml
  */
-public final class TorrentCrawledSearchResult extends AbstractCrawledSearchResult<TorrentCrawlableSearchResult> implements TorrentSearchResult {
+public final class TorrentCrawledSearchResult extends AbstractCrawledSearchResult<TorrentCrawlableSearchResult> implements TorrentItemSearchResult {
 
     private final TorrentInfo ti;
     private final int fileIndex;
@@ -53,6 +53,7 @@ public final class TorrentCrawledSearchResult extends AbstractCrawledSearchResul
         return fileIndex;
     }
 
+    @Override
     public String getFilePath() {
         return filePath;
     }

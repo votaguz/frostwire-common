@@ -19,7 +19,7 @@ package com.frostwire.search;
 
 import com.frostwire.search.torrent.TorrentCrawlableSearchResult;
 import com.frostwire.search.torrent.TorrentCrawledAlbumSearchResult;
-import com.frostwire.search.torrent.TorrentCrawledSearchResult;
+import com.frostwire.search.torrent.TorrentItemSearchResult;
 import com.frostwire.util.MimeDetector;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -28,12 +28,13 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.util.*;
 
 /**
- * To be used only inside PerformersHelper and only for torrents.
+ * To be used only inside PerformersHelper and only for torrents search related functions.
+ * Private API.
  *
  * @author gubatron
  * @author aldenml
  */
-class AlbumCluster {
+public class AlbumCluster {
 
     private static final int ALBUM_SIZE_THRESHOLD = 4;
 
@@ -83,27 +84,27 @@ class AlbumCluster {
         return ImmutablePair.of(album, artist);
     }
 
-    public LinkedList<TorrentCrawledAlbumSearchResult> detect(TorrentCrawlableSearchResult parent, List<TorrentCrawledSearchResult> results) {
+    public LinkedList<TorrentCrawledAlbumSearchResult> detect(TorrentCrawlableSearchResult parent, List<? extends TorrentItemSearchResult> results) {
         LinkedList<TorrentCrawledAlbumSearchResult> albums = new LinkedList<TorrentCrawledAlbumSearchResult>();
 
-        Map<String, LinkedList<TorrentCrawledSearchResult>> dirs = new HashMap<String, LinkedList<TorrentCrawledSearchResult>>();
+        Map<String, LinkedList<TorrentItemSearchResult>> dirs = new HashMap<String, LinkedList<TorrentItemSearchResult>>();
 
-        for (TorrentCrawledSearchResult sr : results) {
+        for (TorrentItemSearchResult sr : results) {
             String path = sr.getFilePath();
             String dir = FilenameUtils.getPathNoEndSeparator(path);
 
             if (!dirs.containsKey(dir)) {
-                dirs.put(dir, new LinkedList<TorrentCrawledSearchResult>());
+                dirs.put(dir, new LinkedList<TorrentItemSearchResult>());
             }
 
-            LinkedList<TorrentCrawledSearchResult> items = dirs.get(dir);
+            LinkedList<TorrentItemSearchResult> items = dirs.get(dir);
             items.add(sr);
         }
 
-        for (Map.Entry<String, LinkedList<TorrentCrawledSearchResult>> kv : dirs.entrySet()) {
+        for (Map.Entry<String, LinkedList<TorrentItemSearchResult>> kv : dirs.entrySet()) {
             int numAudio = 0;
 
-            for (TorrentCrawledSearchResult sr : kv.getValue()) {
+            for (TorrentItemSearchResult sr : kv.getValue()) {
                 String mime = MimeDetector.getMimeType(sr.getFilePath());
                 if (mime.startsWith("audio")) {
                     numAudio++;

@@ -19,10 +19,7 @@
 package com.frostwire.search.extratorrent;
 
 import com.frostwire.logging.Logger;
-import com.frostwire.search.MaxIterCharSequence;
-import com.frostwire.search.ScrapedTorrentFileSearchResult;
-import com.frostwire.search.SearchMatcher;
-import com.frostwire.search.SearchResult;
+import com.frostwire.search.*;
 import com.frostwire.search.torrent.TorrentCrawlableSearchResult;
 import com.frostwire.search.torrent.TorrentJsonSearchPerformer;
 import com.frostwire.util.HtmlManipulator;
@@ -34,7 +31,6 @@ import java.util.*;
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public class ExtratorrentSearchPerformer extends TorrentJsonSearchPerformer<ExtratorrentItem, ExtratorrentSearchResult> {
 
@@ -68,7 +64,7 @@ public class ExtratorrentSearchPerformer extends TorrentJsonSearchPerformer<Extr
         ExtratorrentResponse response = JsonUtils.toObject(json, ExtratorrentResponse.class);
         for (ExtratorrentItem item : response.list) {
             item.link = item.link.replaceAll("extratorrent.com", "extratorrent.cc");
-            item.torrentLink = item.torrentLink.replaceAll("extratorrent.com","extratorrent.cc");
+            item.torrentLink = item.torrentLink.replaceAll("extratorrent.com", "extratorrent.cc");
         }
         return response.list;
     }
@@ -79,12 +75,12 @@ public class ExtratorrentSearchPerformer extends TorrentJsonSearchPerformer<Extr
             return Collections.emptyList();
         }
 
-        List<SearchResult> result = new LinkedList<SearchResult>();
+        LinkedList<ScrapedTorrentFileSearchResult> result = new LinkedList<ScrapedTorrentFileSearchResult>();
 
         ExtratorrentSearchResult esr = (ExtratorrentSearchResult) sr;
-        final String torrent_files_url = esr.getDetailsUrl().replace("/torrent/","/torrent_files/");
-        String completePage = fetch(torrent_files_url);
-        String page = completePage.substring(completePage.indexOf("Torrent files list"),completePage.indexOf("Recent Searches"));
+        String torrentFilesUrl = esr.getDetailsUrl().replace("/torrent/", "/torrent_files/");
+        String completePage = fetch(torrentFilesUrl);
+        String page = completePage.substring(completePage.indexOf("Torrent files list"), completePage.indexOf("Recent Searches"));
 
         SearchMatcher matcher = SearchMatcher.from(FILES_PATTERN.matcher(new MaxIterCharSequence(page, 2 * page.length())));
 
@@ -109,7 +105,10 @@ public class ExtratorrentSearchPerformer extends TorrentJsonSearchPerformer<Extr
             }
         }
 
-        return result;
+        LinkedList<SearchResult> temp = new LinkedList<SearchResult>();
+        temp.addAll(result);
+        temp.addAll(new AlbumCluster().detect(sr, result));
+        return temp;
     }
 
 

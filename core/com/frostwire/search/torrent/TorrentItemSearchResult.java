@@ -18,33 +18,13 @@
 
 package com.frostwire.search.torrent;
 
-import com.frostwire.search.FileSearchResult;
+import com.frostwire.search.CrawledSearchResult;
 
 /**
  * @author gubatron
  * @author aldenml
  */
-public interface TorrentSearchResult extends FileSearchResult {
+public interface TorrentItemSearchResult extends TorrentSearchResult, CrawledSearchResult {
 
-    long getCreationTime();
-
-    /**
-     * Returns the torrent uri, could be a magnet uri.
-     * <p/>
-     * Should be renamed to getTorrentUri
-     *
-     * @return
-     */
-    String getTorrentUrl();
-
-    int getSeeds();
-
-    /**
-     * Returns the info hash of the torrent.
-     * <p/>
-     * Should be renamed to getInfoHash
-     *
-     * @return
-     */
-    String getHash();
+    String getFilePath();
 }

@@ -19,10 +19,7 @@
 package com.frostwire.search.kat;
 
 import com.frostwire.logging.Logger;
-import com.frostwire.search.MaxIterCharSequence;
-import com.frostwire.search.ScrapedTorrentFileSearchResult;
-import com.frostwire.search.SearchMatcher;
-import com.frostwire.search.SearchResult;
+import com.frostwire.search.*;
 import com.frostwire.search.torrent.TorrentCrawlableSearchResult;
 import com.frostwire.search.torrent.TorrentJsonSearchPerformer;
 import com.frostwire.util.HtmlManipulator;
@@ -59,7 +56,7 @@ public class KATSearchPerformer extends TorrentJsonSearchPerformer<KATItem, KATS
 
     @Override
     protected String getUrl(int page, String encodedKeywords) {
-        return "http://"+getDomainName()+"/json.php?q=" + encodedKeywords;
+        return "http://" + getDomainName() + "/json.php?q=" + encodedKeywords;
     }
 
     @Override
@@ -80,10 +77,10 @@ public class KATSearchPerformer extends TorrentJsonSearchPerformer<KATItem, KATS
             return Collections.emptyList();
         }
 
-        List<SearchResult> result = new LinkedList<SearchResult>();
+        List<ScrapedTorrentFileSearchResult> result = new LinkedList<ScrapedTorrentFileSearchResult>();
 
         KATSearchResult ksr = (KATSearchResult) sr;
-        String page = fetch("http://"+getDomainName()+"/torrents/getfiles/" + ksr.getHash() + "/?all=1");
+        String page = fetch("http://" + getDomainName() + "/torrents/getfiles/" + ksr.getHash() + "/?all=1");
 
         SearchMatcher matcher = SearchMatcher.from(FILES_PATTERN.matcher(new MaxIterCharSequence(page, 2 * page.length())));
 
@@ -108,7 +105,10 @@ public class KATSearchPerformer extends TorrentJsonSearchPerformer<KATItem, KATS
             }
         }
 
-        return result;
+        LinkedList<SearchResult> temp = new LinkedList<SearchResult>();
+        temp.addAll(result);
+        temp.addAll(new AlbumCluster().detect(sr, result));
+        return temp;
     }
 
     private void fixItems(List<KATItem> list) {

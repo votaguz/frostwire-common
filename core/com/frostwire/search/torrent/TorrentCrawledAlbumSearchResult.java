@@ -31,11 +31,11 @@ public final class TorrentCrawledAlbumSearchResult extends AbstractCrawledSearch
 
     private final String artist;
     private final String album;
-    private final List<TorrentCrawledSearchResult> items;
+    private final List<TorrentItemSearchResult> items;
     private final String displayName;
     private final long size;
 
-    public TorrentCrawledAlbumSearchResult(TorrentCrawlableSearchResult sr, String artist, String album, List<TorrentCrawledSearchResult> items) {
+    public TorrentCrawledAlbumSearchResult(TorrentCrawlableSearchResult sr, String artist, String album, List<TorrentItemSearchResult> items) {
         super(sr);
         this.artist = artist;
         this.album = album;
@@ -52,7 +52,7 @@ public final class TorrentCrawledAlbumSearchResult extends AbstractCrawledSearch
         return album;
     }
 
-    public List<TorrentCrawledSearchResult> items() {
+    public List<TorrentItemSearchResult> items() {
         return items;
     }
 
@@ -110,10 +110,10 @@ public final class TorrentCrawledAlbumSearchResult extends AbstractCrawledSearch
         return result;
     }
 
-    private long buildSize(List<TorrentCrawledSearchResult> items) {
+    private long buildSize(List<TorrentItemSearchResult> items) {
         long r = 0;
 
-        for (TorrentCrawledSearchResult sr : items) {
+        for (TorrentItemSearchResult sr : items) {
             r += sr.getSize();
         }
 

@@ -19,12 +19,10 @@
 package com.frostwire.search;
 
 import com.frostwire.search.torrent.AbstractTorrentSearchResult;
-import com.frostwire.search.torrent.TorrentSearchResult;
+import com.frostwire.search.torrent.TorrentItemSearchResult;
 import org.apache.commons.io.FilenameUtils;
 
 /**
- * Created on 4/16/15.
- * <p/>
  * When a SearchPerformer crawls a page, its
  * crawlResult(CrawlableSearchResult sr, byte[] data) method is invoked.
  * usually the 'data' holds the HTML with the main information of the torrent
@@ -42,7 +40,8 @@ import org.apache.commons.io.FilenameUtils;
  * @author gubatron
  * @author aldenml
  */
-public class ScrapedTorrentFileSearchResult<T extends AbstractTorrentSearchResult> extends AbstractCrawledSearchResult<T> implements TorrentSearchResult {
+public class ScrapedTorrentFileSearchResult<T extends AbstractTorrentSearchResult> extends AbstractCrawledSearchResult<T> implements TorrentItemSearchResult {
+
     private final String filePath;
     private final String filename;
     private final String displayName;
@@ -65,6 +64,8 @@ public class ScrapedTorrentFileSearchResult<T extends AbstractTorrentSearchResul
     }
 
     // all the data that must be scraped.
+
+    @Override
     public String getFilePath() {
         return filePath;
     }
@@ -88,17 +89,17 @@ public class ScrapedTorrentFileSearchResult<T extends AbstractTorrentSearchResul
 
     @Override
     public String getTorrentUrl() {
-        return getParent().getTorrentUrl();
+        return parent.getTorrentUrl();
     }
 
     @Override
     public int getSeeds() {
-        return getParent().getSeeds();
+        return parent.getSeeds();
     }
 
     @Override
     public String getHash() {
-        return getParent().getHash();
+        return parent.getHash();
     }
 
     public String getReferrerUrl() {
