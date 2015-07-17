@@ -39,7 +39,8 @@ public class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
 
     @Override
     protected String getUrl(int page, String encodedKeywords) {
-        return "https://api.sndcdn.com/search/sounds?q=" + encodedKeywords + "&limit=50&offset=0&client_id=" + CommonConstants.SOUNDCLOUD_CLIENTID;
+        https://api-v2.soundcloud.com/search?q=love&limit=50&offset=0&client_id=b45b1aa10f1ac2941910a7f0d10f8e28
+        return "https://api-v2.soundcloud.com/search?q=" + encodedKeywords + "&limit=50&offset=0&client_id=" + CommonConstants.SOUNDCLOUD_CLIENTID;
     }
 
     @Override
