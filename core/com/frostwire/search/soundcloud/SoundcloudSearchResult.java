@@ -164,6 +164,11 @@ public class SoundcloudSearchResult extends AbstractFileSearchResult implements 
         final String clientAppenderChar = (item.download_url != null && item.download_url.contains("?")) ? "&" : "?";
         String downloadUrl = ((item.download_url != null) ? item.download_url : item.stream_url);
 
+        //http://api.soundcloud.com/tracks/#########/download no longer works, has to be /stream now.
+        if (downloadUrl.endsWith("/download")) {
+            downloadUrl = downloadUrl.replace("/download","/stream");
+        }
+
         // direct download urls don't seem to need client_id & app_version, if passed to the url returns HTTP 404.
         if (clientId != null && appVersion != null) {
             downloadUrl += clientAppenderChar + "client_id=" + clientId + "&app_version=" + appVersion;
