@@ -78,7 +78,7 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
         this.created = new Date(th.getStatus().getAddedTime());
         TorrentInfo ti = th.getTorrentInfo();
         this.piecesTracker = ti != null ? new PiecesTracker(ti) : null;
-        this.parts = ti != null ? new File(savePath, ti.getInfoHash() + ".parts") : null;
+        this.parts = ti != null ? new File(savePath, "." + ti.getInfoHash() + ".parts") : null;
 
         this.extra = createExtra();
         this.paymentOptions = loadPaymentOptions(ti);
@@ -363,10 +363,6 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
             }
         }
 
-        if (parts != null) {
-            parts.delete();
-        }
-
         engine.resumeDataFile(infoHash).delete();
         engine.resumeTorrentFile(infoHash).delete();
     }
@@ -412,6 +408,11 @@ public final class BTDownload extends TorrentAlertAdapter implements BittorrentD
     @Override
     public void torrentRemoved(TorrentRemovedAlert alert) {
         engine.getSession().removeListener(this);
+
+        if (parts != null) {
+            parts.delete();
+        }
+
         fireRemoved(incompleteFilesToRemove);
     }
 
