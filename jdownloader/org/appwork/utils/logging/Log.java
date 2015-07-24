@@ -39,22 +39,12 @@ public class Log {
 //        } catch (final Throwable e) {
 //            Log.exception(e);
 //        }
-        Log.LOGGER.addHandler(LogEventHandler.getInstance());
         Log.LOGGER.setLevel(Level.WARNING);
     }
     /**
      * For shorter access
      */
     public static Logger            L = Log.LOGGER;
-
-    public synchronized static void closeLogfile() {
-//        if (Log.fh != null) {
-//            Log.fh.flush();
-//            Log.fh.close();
-//            Log.LOGGER.removeHandler(Log.fh);
-//            Log.fh = null;
-//        }
-    }
 
     /**
      * Adds an exception to the logger. USe this instead of e.printStackTrace if
@@ -98,12 +88,6 @@ public class Log {
             lvl = Level.SEVERE;
         }
         Log.exception(lvl, e);
-    }
-
-    public synchronized static void flushLogFile() {
-//        if (Log.fh != null) {
-//            Log.fh.flush();
-//        }
     }
 
     /**

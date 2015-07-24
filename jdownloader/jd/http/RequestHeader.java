@@ -39,11 +39,6 @@ public class RequestHeader {
         this.values = new ArrayList<String>();
     }
 
-    public RequestHeader(final Map<String, String> headers) {
-        this();
-        this.putAll(headers);
-    }
-
     public void clear() {
         this.keys.clear();
         this.values.clear();
@@ -126,16 +121,6 @@ public class RequestHeader {
         }
 
         return null;
-    }
-
-    /**
-     * if a header is dominant, it will not get merged with existing headers. It
-     * will replace it completely
-     * 
-     * @param dominant
-     */
-    public void setDominant(final boolean dominant) {
-        this.dominant = dominant;
     }
 
     public int size() {

@@ -99,10 +99,6 @@ public class Cookies {
     public Cookies() {
     }
 
-    public Cookies(final Cookies cookies) {
-        this.add(cookies);
-    }
-
     public void add(final Cookie cookie) {
         synchronized (this.cookies) {
             for (final Cookie cookie2 : this.cookies) {

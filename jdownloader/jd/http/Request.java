@@ -36,7 +36,6 @@ import java.util.regex.Pattern;
 import jd.nutils.encoding.Encoding;
 import jd.parser.Regex;
 
-import org.appwork.utils.Application;
 import org.appwork.utils.ReusableByteArrayOutputStreamPool;
 import org.appwork.utils.ReusableByteArrayOutputStreamPool.ReusableByteArrayOutputStream;
 import org.appwork.utils.StringUtils;
@@ -454,12 +453,7 @@ public abstract class Request {
         this.headers.put("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
         this.headers.put("Accept-Language", "de, en-gb;q=0.9, en;q=0.8");
 
-        if (Application.getJavaVersion() >= 1.6) {
-            /* deflate only java >=1.6 */
-            this.headers.put("Accept-Encoding", "gzip,deflate");
-        } else {
-            this.headers.put("Accept-Encoding", "gzip");
-        }
+        this.headers.put("Accept-Encoding", "gzip");
         this.headers.put("Accept-Charset", "ISO-8859-1,utf-8;q=0.7,*;q=0.3");
 
         this.headers.put("Cache-Control", "no-cache");

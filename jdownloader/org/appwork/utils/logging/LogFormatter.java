@@ -9,12 +9,12 @@
  */
 package org.appwork.utils.logging;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.logging.LogRecord;
 import java.util.logging.SimpleFormatter;
-
-import org.appwork.utils.Exceptions;
 
 public class LogFormatter extends SimpleFormatter {
     /**
@@ -75,9 +75,23 @@ public class LogFormatter extends SimpleFormatter {
         sb.append(message);
         sb.append("\r\n");
         if (record.getThrown() != null) {
-            sb.append(Exceptions.getStackTrace(record.getThrown()));
+            sb.append(getStackTrace(record.getThrown()));
             sb.append("\r\n");
         }
         return sb.toString();
+    }
+
+    /**
+     * returns the Exceptions Stacktrace as String
+     *
+     * @param thrown
+     * @return
+     */
+    public static String getStackTrace(final Throwable thrown) {
+        final StringWriter sw = new StringWriter();
+        final PrintWriter pw = new PrintWriter(sw);
+        thrown.printStackTrace(pw);
+        pw.close();
+        return sw.toString();
     }
 }

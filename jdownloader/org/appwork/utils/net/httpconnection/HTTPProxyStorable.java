@@ -12,13 +12,11 @@ package org.appwork.utils.net.httpconnection;
 //import java.util.LinkedList;
 //import java.util.List;
 
-import org.appwork.storage.Storable;
-
 /**
  * @author daniel
  * 
  */
-public class HTTPProxyStorable implements Storable {
+public class HTTPProxyStorable {
 
     public static enum TYPE {
         NONE,

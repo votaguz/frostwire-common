@@ -15,15 +15,6 @@ public class StringUtils {
     }
 
     /**
-     * @param name
-     * @param jdPkgRule
-     * @return
-     */
-    public static boolean endsWithCaseInsensitive(String name, String jdPkgRule) {
-        return name.toLowerCase(Locale.ENGLISH).endsWith(jdPkgRule.toLowerCase(Locale.ENGLISH));
-    }
-
-    /**
      * @param pass
      * @param pass2
      * @return
@@ -44,13 +35,4 @@ public class StringUtils {
         if (pass == null && pass2 != null) return false;
         return pass.equals(pass2);
     }
-
-    /**
-     * @param value
-     * @return
-     */
-    public static boolean isNotEmpty(String value) {        
-        return !isEmpty(value);
-    }
-
 }

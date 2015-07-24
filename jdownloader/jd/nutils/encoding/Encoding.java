@@ -24,32 +24,6 @@ import org.appwork.utils.logging.Log;
 
 public class Encoding {
 
-    public static byte[] base16Decode(String code) {
-        while (code.length() % 2 > 0) {
-            code += "0";
-        }
-        final byte[] res = new byte[code.length() / 2];
-        int i = 0;
-        while (i < code.length()) {
-            res[i / 2] = (byte) Integer.parseInt(code.substring(i, i + 2), 16);
-            i += 2;
-
-        }
-        return res;
-    }
-
-    public static String Base64Decode(final String base64) {
-        if (base64 == null) { return null; }
-        try {
-
-            final byte[] plain = Base64.decode(base64);
-            if (Encoding.filterString(new String(plain)).length() < plain.length / 1.5) { return base64; }
-            return new String(plain);
-        } catch (final Exception e) {
-            return base64;
-        }
-    }
-
     public static String Base64Encode(final String plain) {
 
         if (plain == null) { return null; }
@@ -57,65 +31,6 @@ public class Encoding {
         // String base64 = new BASE64Encoder().encode(plain.getBytes());
         final String base64 = new String(Base64.encodeToByte(plain.getBytes(), false));
         return base64;
-    }
-
-    /**
-     * Wenden htmlDecode an, bis es keine Änderungen mehr gibt. Aber max 50 mal!
-     * 
-     * @param string
-     * @return
-     */
-    public static String deepHtmlDecode(final String string) {
-        String decoded, tmp;
-        tmp = Encoding.htmlDecode(string);
-        int i = 50;
-        while (!tmp.equals(decoded = Encoding.htmlDecode(tmp))) {
-            tmp = decoded;
-            if (i-- <= 0) {
-                System.err.println("Max Decodeingloop 50 reached!!!");
-                return tmp;
-            }
-        } 
-        return tmp;
-    }
-
-    /**
-     * Filtert alle nicht lesbaren zeichen aus str
-     * 
-     * @param str
-     * @return
-     */
-    public static String filterString(final String str) {
-        final String allowed = "QWERTZUIOPÜASDFGHJKLÖÄYXCVBNMqwertzuiopasdfghjklyxcvbnmöäü;:,._-&$%(){}#~+ 1234567890<>='\"/";
-        return Encoding.filterString(str, allowed);
-    }
-
-    /**
-     * Filtert alle zeichen aus str die in filter nicht auftauchen
-     * 
-     * @param str
-     * @param filter
-     * @return
-     */
-    public static String filterString(final String str, final String filter) {
-        if (str == null || filter == null) { return ""; }
-
-        final byte[] org = str.getBytes();
-        final byte[] mask = filter.getBytes();
-        final byte[] ret = new byte[org.length];
-        int count = 0;
-        int i;  
-        for (i = 0; i < org.length; i++) {
-            final byte letter = org[i];
-            for (final byte element : mask) {
-                if (letter == element) {
-                    ret[count] = letter;
-                    count++;
-                    break;
-                }
-            }
-        }
-        return new String(ret).trim();
     }
 
     /**
@@ -158,20 +73,6 @@ public class Encoding {
         str = HTMLEntities.unhtmlDoubleQuotes(str);
         str = HTMLEntities.unhtmlQuotes(str);
         str = HTMLEntities.unhtmlSingleQuotes(str);
-        return str;
-    }
-
-    /**
-     * 
-     * Wandelt HTML in CDATA um
-     * 
-     * @param str
-     * @return decoded string
-     */
-    public static String cdataEncode(String str) {
-        if (str == null) { return null; }
-        str = str.replaceAll("<", "&lt;");
-        str = str.replaceAll(">", "&gt;");
         return str;
     }
 
@@ -259,30 +160,6 @@ public class Encoding {
         return sb.toString();
     }
 
-    public static String urlTotalEncode(final String string) {
-        final byte[] org = string.getBytes();
-        final StringBuilder sb = new StringBuilder();
-        String code;
-        for (final byte element : org) {
-
-            sb.append('%');
-            code = Integer.toHexString(element);
-            sb.append(code.substring(code.length() - 2));
-
-        }
-        return sb + "";
-    }
-
-    /**
-     * @author JD-Team
-     * @param str
-     * @return str als UTF8Decodiert
-     */
-
-    public static String UTF8Decode(final String str) {
-        return Encoding.UTF8Decode(str, null);
-    }
-
     public static String UTF8Decode(final String str, final String sourceEncoding) {
         if (str == null) { return null; }
         try {
@@ -296,19 +173,4 @@ public class Encoding {
             return str;
         }
     }
-
-    /**
-     * @author JD-Team
-     * @param str
-     * @return str als UTF8 Kodiert
-     */
-    public static String UTF8Encode(final String str) {
-        try {
-            return new String(str.getBytes("UTF-8"));
-        } catch (final Exception e) {
-            Log.exception(e);
-            return null;
-        } 
-    }
-
 }
