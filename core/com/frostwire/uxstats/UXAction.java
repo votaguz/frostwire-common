@@ -61,6 +61,7 @@ public final class UXAction {
     public static final int DOWNLOAD_CLICK_LITECOIN_PAYMENT = DOWNLOAD_BASE + 14;
     public static final int DOWNLOAD_CLICK_DOGECOIN_PAYMENT = DOWNLOAD_BASE + 15;
     public static final int DOWNLOAD_CLICK_PAYPAL_PAYMENT = DOWNLOAD_BASE + 16;
+    public static final int DOWNLOAD_CLOUD_FILE_FROM_PREVIEW = DOWNLOAD_BASE + 17;
 
     public static final int SHARING_BASE = 3000;
     public static final int SHARING_TORRENT_CREATED_FORMALLY = SHARING_BASE + 1;
