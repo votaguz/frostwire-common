@@ -18,6 +18,12 @@
 
 package com.frostwire.search.torlock;
 
+import com.frostwire.search.SearchMatcher;
+import com.frostwire.search.torrent.AbstractTorrentSearchResult;
+import com.frostwire.util.HtmlManipulator;
+import com.frostwire.util.StringUtils;
+import org.apache.commons.io.FilenameUtils;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
@@ -25,22 +31,13 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import org.apache.commons.io.FilenameUtils;
-
-import com.frostwire.search.SearchMatcher;
-import com.frostwire.search.torrent.AbstractTorrentSearchResult;
-import com.frostwire.util.HtmlManipulator;
-import com.frostwire.util.StringUtils;
-
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public class TorLockSearchResult extends AbstractTorrentSearchResult {
 
-    private final static long[] BYTE_MULTIPLIERS = new long[] { 1, 2 << 9, 2 << 19, 2 << 29, 2 << 39, 2 << 49 };
+    private final static long[] BYTE_MULTIPLIERS = new long[]{1, 2 << 9, 2 << 19, 2 << 29, 2 << 39, 2 << 49};
 
     private static final Map<String, Integer> UNIT_TO_BYTE_MULTIPLIERS_MAP;
 
