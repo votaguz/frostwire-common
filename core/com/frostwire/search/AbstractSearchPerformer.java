@@ -39,7 +39,6 @@ public abstract class AbstractSearchPerformer implements SearchPerformer {
     public AbstractSearchPerformer(long token) {
         this.token = token;
         this.subject = PublishSubject.create();
-
         this.stopped = false;
     }
 

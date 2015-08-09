@@ -68,6 +68,7 @@ public class SearchManagerImpl implements SearchManager {
             }
 
             performer.observable().subscribe(new Action1<List<? extends SearchResult>>() {
+                // NOTE: This is what's called when we do subject.onNext(List<>)
                 @Override
                 public void call(List<? extends SearchResult> results) {
                     performerOnResults(performer, results);
