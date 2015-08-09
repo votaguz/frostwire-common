@@ -23,6 +23,7 @@ import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.util.ByteUtils;
 import com.frostwire.util.OSUtils;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -34,7 +35,7 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
     private static final Logger LOG = Logger.getLogger(CrawlPagedWebSearchPerformer.class);
 
     private static final int DEFAULT_CRAWL_TIMEOUT = 10000; // 10 seconds.
-    private static final int FAILED_CRAWL_URL_CACHE_LIFETIME = 900000; // 15 minutes.
+    private static final int FAILED_CRAWL_URL_CACHE_LIFETIME = 600000; // 10 minutes.
     private static final int DEFAULT_MAGNET_DOWNLOAD_TIMEOUT = OSUtils.isAndroid() ? 4000 : 20000; // 4 seconds for android, 20 seconds for desktop.
 
     private static CrawlCache cache = null;
@@ -74,6 +75,8 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
                     long failedWhen = ByteUtils.byteArrayToLong(failed);
                     if ((System.currentTimeMillis() - failedWhen) < FAILED_CRAWL_URL_CACHE_LIFETIME) {
                         //if the failed request is still fresh we stop
+                        LOG.info("CrawlPagedWebSearchPerformer::crawl() - hit failed cache url");
+                        onResults(Collections.EMPTY_LIST);
                         return;
                     } else {
                         cacheRemove("failed:" + url);
