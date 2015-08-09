@@ -68,13 +68,14 @@ public class MonovaSearchPerformer extends TorrentRegexSearchPerformer<MonovaSea
 
     @Override
     public CrawlableSearchResult fromMatcher(SearchMatcher matcher) {
-        return new MonovaTempSearchResult(getDomainName(), matcher.group("itemid"), matcher.group("filename"));
+        String fileName = matcher.group("filename").replace("&amp;","&");
+        return new MonovaTempSearchResult(getDomainName(), matcher.group("itemid"), fileName);
     }
 
     @Override
     protected MonovaSearchResult fromHtmlMatcher(CrawlableSearchResult sr, SearchMatcher matcher) {
         MonovaSearchResult candidate = new MonovaSearchResult(sr.getDetailsUrl(), matcher);
-        if (candidate.getSeeds() < 40 || candidate.getDaysOld() > 200) {
+        if (candidate.getSeeds() < 25 || candidate.getDaysOld() > 200) {
             //since we can only do monova using magnets, we better have seeds or else we'll
             //suck in UX.
             candidate = null;
