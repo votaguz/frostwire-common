@@ -26,15 +26,10 @@ import java.util.Map;
  *
  * @since 0.1.9
  */
-public class Matcher implements MatchResult {
+public class Matcher {
 
     private java.util.regex.Matcher matcher;
     private Pattern parentPattern;
-
-    Matcher(Pattern parentPattern, java.util.regex.MatchResult matcher) {
-        this.parentPattern = parentPattern;
-        this.matcher = (java.util.regex.Matcher) matcher;
-    }
 
     Matcher(Pattern parentPattern, CharSequence input) {
         this.parentPattern = parentPattern;
@@ -112,16 +107,6 @@ public class Matcher implements MatchResult {
      */
     public boolean matches() {
         return matcher.matches();
-    }
-
-    /**
-     * Returns the match state of this matcher as a NamedMatchResult. The result
-     * is unaffected by subsequent operations performed upon this matcher.
-     *
-     * @return a NamedMatchResult with the state of this matcher
-     */
-    public MatchResult toMatchResult() {
-        return new Matcher(this.parentPattern, matcher.toMatchResult());
     }
 
     /**
@@ -341,7 +326,7 @@ public class Matcher implements MatchResult {
      * Returns the offset after the last character of the subsequence
      * captured by the given named group during the previous match operation.
      *
-     * @param group the name of the capture group
+     * @param groupName the name of the capture group
      * @return the offset
      */
     public int end(String groupName) {
