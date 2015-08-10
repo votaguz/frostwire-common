@@ -40,7 +40,7 @@ public class Pattern {
     /** index of group within patterns above where group name is captured */
     private static final int INDEX_GROUP_NAME = 1;
 
-    private java.util.regex.Pattern pattern;
+    private com.google.re2j.Pattern pattern;
     private String namedPattern;
     private List<String> groupNames;
     private Map<String,List<GroupInfo> > groupInfo;
@@ -155,7 +155,7 @@ public class Pattern {
      * Returns the wrapped {@link java.util.regex.Pattern}
      * @return the pattern
      */
-    public java.util.regex.Pattern pattern() {
+    public com.google.re2j.Pattern pattern() {
         return pattern;
     }
 
@@ -226,7 +226,7 @@ public class Pattern {
      * @return The array of strings computed by splitting the input around
      * matches of this pattern
      */
-    public String[] split(CharSequence input, int limit) {
+    public String[] split(String input, int limit) {
         return pattern.split(input, limit);
     }
 
@@ -237,7 +237,7 @@ public class Pattern {
      * @return The array of strings computed by splitting the input around
      * matches of this pattern
      */
-    public String[] split(CharSequence input) {
+    public String[] split(String input) {
         return pattern.split(input);
     }
 
@@ -529,12 +529,12 @@ public class Pattern {
      * </ul>
      * @return the standard {@code java.util.regex.Pattern}
      */
-    private java.util.regex.Pattern buildStandardPattern(String namedPattern, Integer flags) {
+    private com.google.re2j.Pattern buildStandardPattern(String namedPattern, Integer flags) {
         // replace the named-group construct with left-paren but
         // make sure we're actually looking at the construct (ignore escapes)
         StringBuilder s = new StringBuilder(namedPattern);
         s = replace(s, NAMED_GROUP_PATTERN, "(");
-        return java.util.regex.Pattern.compile(s.toString(), flags);
+        return com.google.re2j.Pattern.compile(s.toString(), flags);
     }
 
     /*

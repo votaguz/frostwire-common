@@ -18,6 +18,7 @@
 package com.frostwire.search;
 
 /**
+ * TODO: Remove this class
  *
  * This works only on the real Java Runtime.
  *
@@ -44,7 +45,7 @@ public class MaxIterCharSequence implements CharSequence {
 
     public MaxIterCharSequence(CharSequence inner, int counter) {
         this.inner = inner;
-        this.counter = counter;
+        this.counter = Integer.MAX_VALUE; // ignore counter, not used anymore.
     }
 
     @Override

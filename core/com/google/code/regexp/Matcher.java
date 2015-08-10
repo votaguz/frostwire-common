@@ -22,13 +22,13 @@ import java.util.Map;
 
 /**
  * An engine that performs match operations on a character sequence by
- * interpreting a {@link Pattern}. This is a wrapper for {@link java.util.regex.Matcher}.
+ * interpreting a {@link Pattern}. This is a wrapper for {@link com.google.re2j.Matcher}.
  *
  * @since 0.1.9
  */
 public class Matcher {
 
-    private java.util.regex.Matcher matcher;
+    private com.google.re2j.Matcher matcher;
     private Pattern parentPattern;
 
     Matcher(Pattern parentPattern, CharSequence input) {
@@ -41,7 +41,7 @@ public class Matcher {
      *
      * @return the pattern
      */
-    public java.util.regex.Pattern standardPattern() {
+    public com.google.re2j.Pattern standardPattern() {
         return matcher.pattern();
     }
 
@@ -52,21 +52,6 @@ public class Matcher {
      */
     public Pattern namedPattern() {
         return parentPattern;
-    }
-
-    /**
-     * Changes the Pattern that this Matcher uses to find matches with
-     *
-     * @param newPattern the new pattern
-     * @return this Matcher
-     */
-    public Matcher usePattern(Pattern newPattern) {
-        if (newPattern == null) {
-            throw new IllegalArgumentException("newPattern cannot be null");
-        }
-        this.parentPattern = newPattern;
-        matcher.usePattern(newPattern.pattern());
-        return this;
     }
 
     /**
@@ -334,77 +319,6 @@ public class Matcher {
     }
 
     /**
-     * Sets the limits of this matcher's region.
-     *
-     * @param start The index to start searching at (inclusive)
-     * @param end The index to end searching at (exclusive)
-     * @return this Matcher
-     */
-    public Matcher region(int start, int end) {
-        matcher.region(start, end);
-        return this;
-    }
-
-    /**
-     * Reports the end index (exclusive) of this matcher's region. The searches
-     * this matcher conducts are limited to finding matches within regionStart
-     * (inclusive) and regionEnd (exclusive).
-     *
-     * @return the ending point of this matcher's region
-     */
-    public int regionEnd() {
-        return matcher.regionEnd();
-    }
-
-    /**
-     * Reports the start index of this matcher's region. The searches this
-     * matcher conducts are limited to finding matches within regionStart
-     * (inclusive) and regionEnd (exclusive).
-     *
-     * @return The starting point of this matcher's region
-     */
-    public int regionStart() {
-        return matcher.regionStart();
-    }
-
-    /**
-     * Returns true if the end of input was hit by the search engine in the
-     * last match operation performed by this matcher.
-     *
-     * @return true iff the end of input was hit in the last match; false otherwise
-     */
-    public boolean hitEnd() {
-        return matcher.hitEnd();
-    }
-
-    /**
-     * Returns true if more input could change a positive match into a negative one.
-     *
-     * @return true iff more input could change a positive match into a negative one.
-     */
-    public boolean requireEnd() {
-        return matcher.requireEnd();
-    }
-
-    /**
-     * Queries the anchoring of region bounds for this matcher.
-     *
-     * @return true iff this matcher is using anchoring bounds, false otherwise.
-     */
-    public boolean hasAnchoringBounds() {
-        return matcher.hasAnchoringBounds();
-    }
-
-    /**
-     * Queries the transparency of region bounds for this matcher.
-     *
-     * @return true iff this matcher is using transparent bounds, false otherwise
-     */
-    public boolean hasTransparentBounds() {
-        return matcher.hasTransparentBounds();
-    }
-
-    /**
      * Replaces every subsequence of the input sequence that matches the pattern
      * with the given replacement string.
      *
@@ -426,28 +340,6 @@ public class Matcher {
      */
     public String replaceFirst(String replacement) {
         return matcher.replaceFirst(replacement);
-    }
-
-    /**
-     * Sets the anchoring of region bounds for this matcher.
-     *
-     * @param b a boolean indicating whether or not to use anchoring bounds.
-     * @return this Matcher
-     */
-    public Matcher useAnchoringBounds(boolean b) {
-        matcher.useAnchoringBounds(b);
-        return this;
-    }
-
-    /**
-     * Sets the transparency of region bounds for this matcher.
-     *
-     * @param b a boolean indicating whether to use opaque or transparent regions
-     * @return this Matcher
-     */
-    public Matcher useTransparentBounds(boolean b) {
-        matcher.useTransparentBounds(b);
-        return this;
     }
 
     /*
