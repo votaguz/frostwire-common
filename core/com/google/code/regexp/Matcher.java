@@ -180,18 +180,6 @@ public class Matcher implements MatchResult {
     }
 
     /**
-     * Implements a non-terminal append-and-replace step.
-     *
-     * @param sb The target string buffer
-     * @param replacement The replacement string
-     * @return The target string buffer
-     */
-    public Matcher appendReplacement(StringBuffer sb, String replacement) {
-        matcher.appendReplacement(sb, parentPattern.replaceProperties(replacement));
-        return this;
-    }
-
-    /**
      * Implements a terminal append-and-replace step.
      *
      * @param sb The target string buffer
@@ -440,8 +428,7 @@ public class Matcher implements MatchResult {
      * the replacement string, substituting captured subsequences as needed
      */
     public String replaceAll(String replacement) {
-        String r = parentPattern.replaceProperties(replacement);
-        return matcher.replaceAll(r);
+        return matcher.replaceAll(replacement);
     }
 
     /**
@@ -453,7 +440,7 @@ public class Matcher implements MatchResult {
      * by the replacement string, substituting captured subsequences as needed
      */
     public String replaceFirst(String replacement) {
-        return matcher.replaceFirst(parentPattern.replaceProperties(replacement));
+        return matcher.replaceFirst(replacement);
     }
 
     /**

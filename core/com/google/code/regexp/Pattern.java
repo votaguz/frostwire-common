@@ -37,12 +37,6 @@ public class Pattern {
     /** Pattern to match named capture groups in a pattern string */
     private static final java.util.regex.Pattern NAMED_GROUP_PATTERN = java.util.regex.Pattern.compile("\\(\\?<(" + NAME_PATTERN + ")>", java.util.regex.Pattern.DOTALL);
 
-    /** Pattern to match back references for named capture groups */
-    private static final java.util.regex.Pattern BACKREF_NAMED_GROUP_PATTERN = java.util.regex.Pattern.compile("\\\\k<(" + NAME_PATTERN + ")>", java.util.regex.Pattern.DOTALL);
-
-    /** Pattern to match properties for named capture groups in a replacement string */
-    private static final java.util.regex.Pattern PROPERTY_PATTERN = java.util.regex.Pattern.compile("\\$\\{(" + NAME_PATTERN + ")\\}", java.util.regex.Pattern.DOTALL);
-
     /** index of group within patterns above where group name is captured */
     private static final int INDEX_GROUP_NAME = 1;
 
@@ -203,31 +197,6 @@ public class Pattern {
      */
     public Map<String, List<GroupInfo> > groupInfo() {
         return groupInfo;
-    }
-
-    /**
-     * Replaces group-name properties (e.g., <b><code>${named}</code></b>) in
-     * a replacement pattern with the equivalent reference that uses the
-     * corresponding group index (e.g., <b><code>$2</code></b>). If the string
-     * contains literal "$", it must be escaped with slash or else this call
-     * will attempt to parse it as a group-name property.
-     *
-     * This is meant to be used to transform the parameter for:
-     *  <ul>
-     *  <li>{@link Matcher#replaceAll(String)}</li>
-     *  <li>{@link Matcher#replaceFirst(String)}</li>
-     *  <li>{@link Matcher#appendReplacement(StringBuffer, String)}</li>
-     *  </ul>
-     * @param replacementPattern the input string to be evaluated
-     * @return the modified string
-     * @throws PatternSyntaxException group name was not found
-     */
-    public String replaceProperties(String replacementPattern) {
-        return replaceGroupNameWithIndex(
-                new StringBuilder(replacementPattern),
-                PROPERTY_PATTERN,
-                "$"
-                ).toString();
     }
 
     /**
@@ -565,7 +534,6 @@ public class Pattern {
         // make sure we're actually looking at the construct (ignore escapes)
         StringBuilder s = new StringBuilder(namedPattern);
         s = replace(s, NAMED_GROUP_PATTERN, "(");
-        s = replaceGroupNameWithIndex(s, BACKREF_NAMED_GROUP_PATTERN, "\\");
         return java.util.regex.Pattern.compile(s.toString(), flags);
     }
 
