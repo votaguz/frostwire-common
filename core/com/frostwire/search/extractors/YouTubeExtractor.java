@@ -117,13 +117,13 @@ public final class YouTubeExtractor {
     private List<LinkInfo> extractLinksFromDashManifest(String dashManifestUrl, YouTubeSig ytSig, String filename,
                                                         Date date, String videoId, String userName, String channelName, ThumbnailLinks thumbnailLinks) throws IOException, ParserConfigurationException, SAXException {
         dashManifestUrl = dashManifestUrl.replace("\\/", "/");
-        Pattern p = Pattern.compile("/s/([^/]*)/");
+        Pattern p = Pattern.compile("/s/([a-fA-F0-9\\.]+)/");
         Matcher m = p.matcher(dashManifestUrl);
         if (m.find()) {
             String sig = m.group(1);
             String signature = ytSig.calc(sig);
 
-            dashManifestUrl = dashManifestUrl.replaceAll("/s/([^/]*)/", "/signature/" + signature + "/");
+            dashManifestUrl = dashManifestUrl.replaceAll("/s/([a-fA-F0-9\\.]+)/", "/signature/" + signature + "/");
         } else if (dashManifestUrl.contains("/signature/")) {
             // dashManifestUrl as it is, empty block to review
         } else {
@@ -557,6 +557,8 @@ public final class YouTubeExtractor {
         formats.put(44, new Format("webm", "VP8", "Vorbis", "480p"));
         formats.put(45, new Format("webm", "VP8", "Vorbis", "720p"));
         formats.put(46, new Format("webm", "VP8", "Vorbis", "1080p"));
+        formats.put(59, new Format("mp4", "H264", "AAC", "480p"));
+        formats.put(78, new Format("mp4", "H264", "AAC", "480p"));
         formats.put(82, new Format("mp4", "H264", "AAC", "360p"));
         formats.put(83, new Format("mp4", "H264", "AAC", "240p"));
         formats.put(84, new Format("mp4", "H264", "AAC", "720p"));
