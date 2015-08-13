@@ -19,10 +19,7 @@
 package com.frostwire.bittorrent;
 
 import com.frostwire.jlibtorrent.*;
-import com.frostwire.jlibtorrent.alerts.Alert;
-import com.frostwire.jlibtorrent.alerts.AlertType;
-import com.frostwire.jlibtorrent.alerts.TorrentAlert;
-import com.frostwire.jlibtorrent.alerts.TorrentPausedAlert;
+import com.frostwire.jlibtorrent.alerts.*;
 import com.frostwire.jlibtorrent.swig.*;
 import com.frostwire.logging.Logger;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
@@ -59,6 +56,7 @@ public final class BTEngine {
 
     private final ReentrantLock sync;
     private final InnerListener innerListener;
+    private final DHTStatsAlertListener dhtStatsListener;
 
     private final Queue<RestoreDownloadTask> restoreDownloadsQueue;
 
@@ -68,6 +66,7 @@ public final class BTEngine {
 
     private boolean firewalled;
     private BTEngineListener listener;
+    private int totalDHTNodes;
 
     /*
     private long bytesRecv;
@@ -84,6 +83,7 @@ public final class BTEngine {
     private BTEngine() {
         this.sync = new ReentrantLock();
         this.innerListener = new InnerListener();
+        this.dhtStatsListener = new DHTStatsAlertListener();
         this.restoreDownloadsQueue = new LinkedList<RestoreDownloadTask>();
     }
 
@@ -194,6 +194,7 @@ public final class BTEngine {
 
             loadSettings();
             session.addListener(innerListener);
+            session.addListener(dhtStatsListener);
 
             fireStarted();
 
@@ -214,6 +215,7 @@ public final class BTEngine {
             }
 
             session.removeListener(innerListener);
+            session.removeListener(dhtStatsListener);
             saveSettings();
 
             downloader = null;
@@ -905,6 +907,35 @@ public final class BTEngine {
         }
     }
 
+    private final class DHTStatsAlertListener implements AlertListener {
+        @Override
+        public int[] types() {
+            return new int[] { AlertType.DHT_STATS.getSwig() };
+        }
+
+        public void alert(Alert<?> alert) {
+            if (alert instanceof DhtStatsAlert) {
+                DhtStatsAlert dhtAlert = (DhtStatsAlert) alert;
+                BTEngine.this.totalDHTNodes = countTotalDHTNodes(dhtAlert);
+            }
+        }
+
+        private int countTotalDHTNodes(DhtStatsAlert alert) {
+            final DHTRoutingBucket[] routingTable = alert.getRoutingTable();
+
+            int totalNodes = 0;
+            if (routingTable != null && routingTable.length > 0) {
+                for (int i=0; i < routingTable.length; i++) {
+                    DHTRoutingBucket bucket = routingTable[i];
+                    totalNodes += bucket.numNodes();
+                }
+            }
+
+            return totalNodes;
+        }
+
+    }
+
     private final class RestoreDownloadTask implements Runnable {
 
         private final File torrent;
@@ -1039,5 +1070,9 @@ public final class BTEngine {
         SessionSettings s = getSettings();
         s.setMaxPeerlistSize(limit);
         saveSettings(s);
+    }
+
+    public int getTotalDHTNodes() {
+        return totalDHTNodes;
     }
 }
