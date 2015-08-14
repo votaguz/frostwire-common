@@ -927,7 +927,7 @@ public final class BTEngine {
             if (routingTable != null && routingTable.length > 0) {
                 for (int i=0; i < routingTable.length; i++) {
                     DHTRoutingBucket bucket = routingTable[i];
-                    totalNodes += bucket.getNumNodes();
+                    totalNodes += bucket.numNodes();
                 }
             }
 
