@@ -18,6 +18,8 @@
 package com.frostwire.search;
 
 import com.frostwire.licences.License;
+import com.frostwire.search.torrent.TorrentSearchResult;
+import com.frostwire.util.Digests;
 
 /**
  * 
@@ -26,6 +28,8 @@ import com.frostwire.licences.License;
  *
  */
 public abstract class AbstractSearchResult implements SearchResult {
+
+    private int uid = -1;
 
     @Override
     public License getLicense() {
@@ -53,5 +57,17 @@ public abstract class AbstractSearchResult implements SearchResult {
     @Override
     public String getThumbnailUrl() {
         return null;
+    }
+
+    @Override
+    public int uid() {
+        if (uid == -1) {
+            StringBuilder key = new StringBuilder();
+            key.append(getDisplayName());
+            key.append(getDetailsUrl());
+            key.append(getSource());
+            uid = Digests.fnvhash32(key.toString().getBytes());
+        }
+        return uid;
     }
 }

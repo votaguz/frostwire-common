@@ -18,6 +18,9 @@
 package com.frostwire.search.torrent;
 
 import com.frostwire.search.AbstractFileSearchResult;
+import com.frostwire.util.Digests;
+
+import java.nio.ByteBuffer;
 
 /**
  * 
@@ -27,10 +30,25 @@ import com.frostwire.search.AbstractFileSearchResult;
  */
 public abstract class AbstractTorrentSearchResult extends AbstractFileSearchResult implements TorrentCrawlableSearchResult {
 
+    private int uid = -1;
+
     @Override
     public boolean isComplete() {
         return true;
     }
 
     public String getCookies() { return null; }
+
+    @Override
+    public int uid() {
+        if (uid == -1) {
+            StringBuilder key = new StringBuilder();
+            key.append(getDisplayName());
+            key.append(getDetailsUrl());
+            key.append(getSource());
+            key.append(getHash());
+            uid = Digests.fnvhash32(key.toString().getBytes());
+        }
+        return uid;
+    }
 }

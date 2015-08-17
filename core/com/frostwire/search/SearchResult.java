@@ -19,6 +19,8 @@ package com.frostwire.search;
 
 import com.frostwire.licences.License;
 
+import java.util.UUID;
+
 /**
  * 
  * @author gubatron
@@ -38,4 +40,6 @@ public interface SearchResult {
     License getLicense();
     
     String getThumbnailUrl();
+
+    int uid();
 }
