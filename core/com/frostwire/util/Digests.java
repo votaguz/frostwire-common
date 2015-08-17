@@ -32,6 +32,12 @@ import java.security.MessageDigest;
 public final class Digests {
     private final static Logger LOG = Logger.getLogger(Digests.class);
 
+    private static final long FNV_64_INIT = 0xcbf29ce484222325L;
+    private static final long FNV_64_PRIME = 0x100000001b3L;
+
+    private static final int FNV_32_INIT = 0x811c9dc5;
+    private static final int FNV_32_PRIME = 0x01000193;
+
     private Digests() {}
 
     public static byte[] sha1Bytes(File f)  {
@@ -56,5 +62,45 @@ public final class Digests {
 
     public static String sha1(File f) {
         return ByteUtils.encodeHex(sha1Bytes(f));
+    }
+
+    public static int fnvhash32(final byte[] k) {
+        int rv = FNV_32_INIT;
+        final int len = k.length;
+        for(int i = 0; i < len; i++) {
+            rv ^= k[i];
+            rv *= FNV_32_PRIME;
+        }
+        return rv;
+    }
+
+    public static long fnvhash64(final byte[] k) {
+        long rv = FNV_64_INIT;
+        final int len = k.length;
+        for(int i = 0; i < len; i++) {
+            rv ^= k[i];
+            rv *= FNV_64_PRIME;
+        }
+        return rv;
+    }
+
+    public static int fnvhash32(final String k) {
+        int rv = FNV_32_INIT;
+        final int len = k.length();
+        for(int i = 0; i < len; i++) {
+            rv ^= k.charAt(i);
+            rv *= FNV_32_PRIME;
+        }
+        return rv;
+    }
+
+    public static long fnvhash64(final String k) {
+        long rv = FNV_64_INIT;
+        final int len = k.length();
+        for(int i = 0; i < len; i++) {
+            rv ^= k.charAt(i);
+            rv *= FNV_64_PRIME;
+        }
+        return rv;
     }
 }
