@@ -20,8 +20,6 @@ package com.frostwire.search.torrent;
 import com.frostwire.search.AbstractFileSearchResult;
 import com.frostwire.util.Digests;
 
-import java.nio.ByteBuffer;
-
 /**
  * 
  * @author gubatron

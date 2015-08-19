@@ -19,8 +19,6 @@ package com.frostwire.search;
 
 import com.frostwire.licences.License;
 
-import java.util.UUID;
-
 /**
  * 
  * @author gubatron
