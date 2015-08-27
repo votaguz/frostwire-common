@@ -501,11 +501,9 @@ public final class BTEngine {
             s.setActiveDownloads(4);
             s.setActiveSeeds(4);
             s.setMaxPeerlistSize(200);
-            s.setUtpDynamicSockBuf(false);
             s.setGuidedReadCache(true);
             s.setTickInterval(1000);
             s.setInactivityTimeout(60);
-            s.optimizeHashingForSpeed(false);
             s.setSeedingOutgoingConnections(false);
             s.setConnectionsLimit(200);
 
