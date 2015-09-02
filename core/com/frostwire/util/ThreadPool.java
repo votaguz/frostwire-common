@@ -37,7 +37,7 @@ public final class ThreadPool extends ThreadPoolExecutor {
     }
 
     public ThreadPool(String name, int corePoolSize, int maximumPoolSize, long keepAliveTime, BlockingQueue<Runnable> workQueue, boolean daemon) {
-        super(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.MILLISECONDS, workQueue, new PoolThreadFactory(daemon));
+        super(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.SECONDS, workQueue, new PoolThreadFactory(daemon));
         this.name = name;
     }
 
