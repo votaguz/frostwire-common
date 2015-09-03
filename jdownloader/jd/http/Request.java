@@ -190,10 +190,6 @@ public abstract class Request {
         this.collectCookiesFromConnection();
     }
 
-    public Request cloneRequest() {
-        return null;
-    }
-
     private void collectCookiesFromConnection() {
         final List<String> cookieHeaders = this.httpConnection.getHeaderFields("Set-Cookie");
         if (cookieHeaders == null || cookieHeaders.size() == 0) { return; }
@@ -225,10 +221,6 @@ public abstract class Request {
             this.requested = true;
         }
         return this;
-    }
-
-    public boolean containsHTML(final String html) throws CharacterCodingException {
-        return this.getHtmlCode() == null ? false : this.getHtmlCode().contains(html);
     }
 
     public void disconnect() {
@@ -384,33 +376,6 @@ public abstract class Request {
         return this.proxy;
     }
 
-    public long getReadTime() {
-        return this.readTime;
-    }
-
-    public int getReadTimeout() {
-        return this.readTimeout;
-    }
-
-    public long getRequestTime() {
-        return this.httpConnection == null ? -1 : this.httpConnection.getRequestTime();
-    }
-
-    /**
-     * @return the byteArray
-     */
-    public byte[] getResponseBytes() {
-        return this.byteArray;
-    }
-
-    public String getResponseHeader(final String key) {
-        return this.httpConnection == null ? null : this.httpConnection.getHeaderField(key);
-    }
-
-    public Map<String, List<String>> getResponseHeaders() {
-        return this.httpConnection == null ? null : this.httpConnection.getHeaderFields();
-    }
-
     /**
      * tries to generate an image out of the loaded bytes
      * 
@@ -528,11 +493,6 @@ public abstract class Request {
      */
     public void setHeaders(final RequestHeader headers) {
         this.headers = headers;
-    }
-
-    public void setHtmlCode(final String htmlCode) {
-        this.byteArray = null;
-        this.htmlCode = htmlCode;
     }
 
     public void setProxy(final HTTPProxy proxy) {
