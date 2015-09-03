@@ -16,7 +16,7 @@
  */
 package org.apache.commons.lang3;
 
-import org.apache.commons.lang3.math.NumberUtils;
+//import org.apache.commons.lang3.math.NumberUtils;
 
 /**
  * <p>Operations on boolean primitives and Boolean objects.</p>
@@ -406,7 +406,7 @@ public class BooleanUtils {
      * @return one if {@code true}, zero if {@code false}
      */
     public static Integer toIntegerObject(final boolean bool) {
-        return bool ? NumberUtils.INTEGER_ONE : NumberUtils.INTEGER_ZERO;
+        return bool ? 1 : 0;
     }
 
     /**
@@ -427,7 +427,7 @@ public class BooleanUtils {
         if (bool == null) {
             return null;
         }
-        return bool.booleanValue() ? NumberUtils.INTEGER_ONE : NumberUtils.INTEGER_ZERO;
+        return bool.booleanValue() ? 1 : 0;
     }
 
     /**

@@ -27,8 +27,8 @@ import java.util.Map;
 //import org.apache.commons.lang3.builder.HashCodeBuilder;
 //import org.apache.commons.lang3.builder.ToStringBuilder;
 //import org.apache.commons.lang3.builder.ToStringStyle;
-import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.commons.lang3.mutable.MutableInt;
+//import org.apache.commons.lang3.math.NumberUtils;
+//import org.apache.commons.lang3.mutable.MutableInt;
 
 /**
  * <p>Operations on arrays, primitive arrays (like {@code int[]}) and
@@ -5263,7 +5263,7 @@ public class ArrayUtils {
      *         earliest-encountered occurrences of the specified elements.
      * @since 3.0.1
      */
-    public static <T> T[] removeElements(final T[] array, final T... values) {
+    /*public static <T> T[] removeElements(final T[] array, final T... values) {
         if (isEmpty(array) || isEmpty(values)) {
             return clone(array);
         }
@@ -5292,7 +5292,7 @@ public class ArrayUtils {
         final
         T[] result = (T[]) removeAll(array, toRemove);
         return result;
-    }
+    }*/
 
     /**
      * <p>Removes the elements at the specified positions from the specified array.
@@ -5354,7 +5354,7 @@ public class ArrayUtils {
      *         earliest-encountered occurrences of the specified elements.
      * @since 3.0.1
      */
-    public static byte[] removeElements(final byte[] array, final byte... values) {
+    /*public static byte[] removeElements(final byte[] array, final byte... values) {
         if (isEmpty(array) || isEmpty(values)) {
             return clone(array);
         }
@@ -5381,7 +5381,7 @@ public class ArrayUtils {
             }
         }
         return (byte[]) removeAll(array, toRemove);
-    }
+    }*/
 
     /**
      * <p>Removes the elements at the specified positions from the specified array.
@@ -5443,7 +5443,7 @@ public class ArrayUtils {
      *         earliest-encountered occurrences of the specified elements.
      * @since 3.0.1
      */
-    public static short[] removeElements(final short[] array, final short... values) {
+    /*public static short[] removeElements(final short[] array, final short... values) {
         if (isEmpty(array) || isEmpty(values)) {
             return clone(array);
         }
@@ -5470,7 +5470,7 @@ public class ArrayUtils {
             }
         }
         return (short[]) removeAll(array, toRemove);
-    }
+    }*/
 
     /**
      * <p>Removes the elements at the specified positions from the specified array.
@@ -5532,7 +5532,7 @@ public class ArrayUtils {
      *         earliest-encountered occurrences of the specified elements.
      * @since 3.0.1
      */
-    public static int[] removeElements(final int[] array, final int... values) {
+    /*public static int[] removeElements(final int[] array, final int... values) {
         if (isEmpty(array) || isEmpty(values)) {
             return clone(array);
         }
@@ -5559,7 +5559,7 @@ public class ArrayUtils {
             }
         }
         return (int[]) removeAll(array, toRemove);
-    }
+    }*/
 
     /**
      * <p>Removes the elements at the specified positions from the specified array.
@@ -5621,7 +5621,7 @@ public class ArrayUtils {
      *         earliest-encountered occurrences of the specified elements.
      * @since 3.0.1
      */
-    public static char[] removeElements(final char[] array, final char... values) {
+    /*public static char[] removeElements(final char[] array, final char... values) {
         if (isEmpty(array) || isEmpty(values)) {
             return clone(array);
         }
@@ -5648,7 +5648,7 @@ public class ArrayUtils {
             }
         }
         return (char[]) removeAll(array, toRemove);
-    }
+    }*/
 
     /**
      * <p>Removes the elements at the specified positions from the specified array.
@@ -5710,7 +5710,7 @@ public class ArrayUtils {
      *         earliest-encountered occurrences of the specified elements.
      * @since 3.0.1
      */
-    public static long[] removeElements(final long[] array, final long... values) {
+    /*public static long[] removeElements(final long[] array, final long... values) {
         if (isEmpty(array) || isEmpty(values)) {
             return clone(array);
         }
@@ -5737,7 +5737,7 @@ public class ArrayUtils {
             }
         }
         return (long[]) removeAll(array, toRemove);
-    }
+    }*/
 
     /**
      * <p>Removes the elements at the specified positions from the specified array.
@@ -5799,7 +5799,7 @@ public class ArrayUtils {
      *         earliest-encountered occurrences of the specified elements.
      * @since 3.0.1
      */
-    public static float[] removeElements(final float[] array, final float... values) {
+    /*public static float[] removeElements(final float[] array, final float... values) {
         if (isEmpty(array) || isEmpty(values)) {
             return clone(array);
         }
@@ -5826,7 +5826,7 @@ public class ArrayUtils {
             }
         }
         return (float[]) removeAll(array, toRemove);
-    }
+    }*/
 
     /**
      * <p>Removes the elements at the specified positions from the specified array.
@@ -5888,7 +5888,7 @@ public class ArrayUtils {
      *         earliest-encountered occurrences of the specified elements.
      * @since 3.0.1
      */
-    public static double[] removeElements(final double[] array, final double... values) {
+    /*public static double[] removeElements(final double[] array, final double... values) {
         if (isEmpty(array) || isEmpty(values)) {
             return clone(array);
         }
@@ -5915,7 +5915,7 @@ public class ArrayUtils {
             }
         }
         return (double[]) removeAll(array, toRemove);
-    }
+    }*/
 
     /**
      * <p>Removes the elements at the specified positions from the specified array.
@@ -5973,7 +5973,7 @@ public class ArrayUtils {
      *         earliest-encountered occurrences of the specified elements.
      * @since 3.0.1
      */
-    public static boolean[] removeElements(final boolean[] array, final boolean... values) {
+    /*public static boolean[] removeElements(final boolean[] array, final boolean... values) {
         if (isEmpty(array) || isEmpty(values)) {
             return clone(array);
         }
@@ -6000,7 +6000,7 @@ public class ArrayUtils {
             }
         }
         return (boolean[]) removeAll(array, toRemove);
-    }
+    }*/
 
     /**
      * Removes multiple array elements specified by index.
@@ -6156,7 +6156,7 @@ public class ArrayUtils {
         final int n = array.length;
         for(int i = 1; i < n; i++) {
             final int current = array[i];
-            if(NumberUtils.compare(previous, current) > 0) {
+            if(new Integer(previous).compareTo(current) > 0) {
                 return false;
             }
 
@@ -6181,7 +6181,7 @@ public class ArrayUtils {
         final int n = array.length;
         for(int i = 1; i < n; i++) {
             final long current = array[i];
-            if(NumberUtils.compare(previous, current) > 0) {
+            if(new Long(previous).compareTo(current) > 0) {
                 return false;
             }
 
@@ -6206,7 +6206,7 @@ public class ArrayUtils {
         final int n = array.length;
         for(int i = 1; i < n; i++) {
             final short current = array[i];
-            if(NumberUtils.compare(previous, current) > 0) {
+            if(new Short(previous).compareTo(current) > 0) {
                 return false;
             }
 
@@ -6281,7 +6281,7 @@ public class ArrayUtils {
         final int n = array.length;
         for(int i = 1; i < n; i++) {
             final byte current = array[i];
-            if(NumberUtils.compare(previous, current) > 0) {
+            if(new Byte(previous).compareTo(current) > 0) {
                 return false;
             }
 

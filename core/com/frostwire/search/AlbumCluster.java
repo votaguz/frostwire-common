@@ -22,8 +22,6 @@ import com.frostwire.search.torrent.TorrentCrawledAlbumSearchResult;
 import com.frostwire.search.torrent.TorrentItemSearchResult;
 import com.frostwire.util.MimeDetector;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
 
@@ -44,7 +42,7 @@ public class AlbumCluster {
      * @param filepath
      * @return
      */
-    public static final Pair<String, String> albumArtistFromPath(String filepath, String defaultAlbum, String defaultArtist) {
+    /*public static final Pair<String, String> albumArtistFromPath(String filepath, String defaultAlbum, String defaultArtist) {
         String album = defaultAlbum;
         String artist = defaultArtist;
 
@@ -82,7 +80,7 @@ public class AlbumCluster {
         }
 
         return ImmutablePair.of(album, artist);
-    }
+    }*/
 
     public LinkedList<TorrentCrawledAlbumSearchResult> detect(TorrentCrawlableSearchResult parent, List<? extends TorrentItemSearchResult> results) {
         LinkedList<TorrentCrawledAlbumSearchResult> albums = new LinkedList<TorrentCrawledAlbumSearchResult>();
@@ -111,12 +109,12 @@ public class AlbumCluster {
                 }
             }
 
-            if (numAudio >= ALBUM_SIZE_THRESHOLD) {
-                Pair<String, String> p = albumArtistFromPath(kv.getKey(), "", "");
-                TorrentCrawledAlbumSearchResult sr = new TorrentCrawledAlbumSearchResult(parent, p.getRight(), p.getLeft(), kv.getValue());
-                System.out.println(sr);
-                albums.add(sr);
-            }
+//            if (numAudio >= ALBUM_SIZE_THRESHOLD) {
+//                Pair<String, String> p = albumArtistFromPath(kv.getKey(), "", "");
+//                TorrentCrawledAlbumSearchResult sr = new TorrentCrawledAlbumSearchResult(parent, p.getRight(), p.getLeft(), kv.getValue());
+//                System.out.println(sr);
+//                albums.add(sr);
+//            }
         }
 
         return albums;
