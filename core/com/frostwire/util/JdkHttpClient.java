@@ -394,7 +394,10 @@ final class JdkHttpClient implements HttpClient {
             in = conn.getInputStream();
             int httpResponseCode = getResponseCode(conn);
 
-            if (httpResponseCode != HttpURLConnection.HTTP_OK && httpResponseCode != HttpURLConnection.HTTP_PARTIAL) {
+            if (httpResponseCode != HttpURLConnection.HTTP_OK &&
+                httpResponseCode != HttpURLConnection.HTTP_PARTIAL &&
+                httpResponseCode != HttpURLConnection.HTTP_MOVED_TEMP &&
+                httpResponseCode != HttpURLConnection.HTTP_MOVED_PERM) {
                 throw new ResponseCodeNotSupportedException(httpResponseCode);
             }
 
@@ -468,7 +471,10 @@ final class JdkHttpClient implements HttpClient {
             in = conn.getInputStream();
             int httpResponseCode = getResponseCode(conn);
 
-            if (httpResponseCode != HttpURLConnection.HTTP_OK && httpResponseCode != HttpURLConnection.HTTP_PARTIAL) {
+            if (httpResponseCode != HttpURLConnection.HTTP_OK &&
+                    httpResponseCode != HttpURLConnection.HTTP_PARTIAL &&
+                    httpResponseCode != HttpURLConnection.HTTP_MOVED_TEMP &&
+                    httpResponseCode != HttpURLConnection.HTTP_MOVED_PERM) {
                 throw new ResponseCodeNotSupportedException(httpResponseCode);
             }
 
