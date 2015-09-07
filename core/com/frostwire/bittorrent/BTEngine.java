@@ -23,7 +23,6 @@ import com.frostwire.jlibtorrent.alerts.*;
 import com.frostwire.jlibtorrent.swig.*;
 import com.frostwire.logging.Logger;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
-import com.frostwire.util.OSUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
@@ -707,7 +706,7 @@ public final class BTEngine {
             if (name == null || name.length() == 0) {
                 name = ti.getInfoHash().toString();
             }
-            name = OSUtils.escapeFilename(name);
+            name = escapeFilename(name);
 
             torrentFile = new File(ctx.torrentsDir, name + ".torrent");
             byte[] arr = ti.toEntry().bencode();
@@ -840,6 +839,11 @@ public final class BTEngine {
         if (task != null) {
             task.run();
         }
+    }
+
+    // this is here until we have a properly done OS utils.
+    private static String escapeFilename(String s) {
+        return s.replaceAll("[\\\\/:*?\"<>|\\[\\]]+", "_");
     }
 
     // NOTE: don't delete, new API

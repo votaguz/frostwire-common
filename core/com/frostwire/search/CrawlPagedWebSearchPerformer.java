@@ -21,7 +21,6 @@ package com.frostwire.search;
 import com.frostwire.logging.Logger;
 import com.frostwire.search.torrent.TorrentSearchResult;
 import com.frostwire.util.ByteUtils;
-import com.frostwire.util.OSUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -36,7 +35,7 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
 
     private static final int DEFAULT_CRAWL_TIMEOUT = 10000; // 10 seconds.
     private static final int FAILED_CRAWL_URL_CACHE_LIFETIME = 600000; // 10 minutes.
-    private static final int DEFAULT_MAGNET_DOWNLOAD_TIMEOUT = OSUtils.isAndroid() ? 4000 : 20000; // 4 seconds for android, 20 seconds for desktop.
+    private static final int DEFAULT_MAGNET_DOWNLOAD_TIMEOUT = 20000; // 20 seconds.
 
     private static CrawlCache cache = null;
     private static MagnetDownloader magnetDownloader = null;
