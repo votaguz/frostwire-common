@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014,, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
  
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -362,58 +362,6 @@ final class JdkHttpClient implements HttpClient {
             closeQuietly(conn);
         }
     }
-
-    @Override
-    public void post(String url, int timeout, String userAgent, ProgressFileEntity fileEntity) throws Throwable {
-        canceled = false;
-        final URL u = new URL(url);
-        final HttpURLConnection conn = (HttpURLConnection) u.openConnection();
-        conn.setDoOutput(true);
-
-        conn.setConnectTimeout(timeout);
-        conn.setReadTimeout(timeout);
-        conn.setRequestProperty("User-Agent", userAgent);
-        conn.setInstanceFollowRedirects(false);
-
-        if (conn instanceof HttpsURLConnection) {
-            setHostnameVerifier((HttpsURLConnection) conn);
-        }
-
-        InputStream in = null;
-        try {
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Content-Type", fileEntity.getContentType());
-            conn.setRequestProperty("charset", "utf-8");
-            conn.setUseCaches(false);
-
-            OutputStream postOut = conn.getOutputStream();
-            fileEntity.writeTo(postOut);
-            closeQuietly(postOut);
-            conn.connect();
-
-            in = conn.getInputStream();
-            int httpResponseCode = getResponseCode(conn);
-
-            if (httpResponseCode != HttpURLConnection.HTTP_OK &&
-                httpResponseCode != HttpURLConnection.HTTP_PARTIAL &&
-                httpResponseCode != HttpURLConnection.HTTP_MOVED_TEMP &&
-                httpResponseCode != HttpURLConnection.HTTP_MOVED_PERM) {
-                throw new ResponseCodeNotSupportedException(httpResponseCode);
-            }
-
-            if (canceled) {
-                onCancel();
-            } else {
-                onComplete();
-            }
-        } catch (Exception e) {
-            onError(e);
-        } finally {
-            closeQuietly(in);
-            closeQuietly(conn);
-        }
-    }
-
 
     private void post(String url, OutputStream out, int timeout, String userAgent, Map<String, String> formData) throws IOException {
         canceled = false;

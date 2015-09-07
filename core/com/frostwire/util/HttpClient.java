@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014,, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
  
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,8 +71,6 @@ public interface HttpClient {
     public String post(String url, int timeout, String userAgent, String content, boolean gzip) throws IOException;
 
     public String post(String url, int timeout, String userAgent, String content, String postContentType, boolean gzip) throws IOException;
-
-    public void post(String url, int timeout, String userAgent, ProgressFileEntity fileEntity) throws Throwable;
 
     public void cancel();
 
