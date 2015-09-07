@@ -33,19 +33,19 @@ import java.util.List;
  */
 public abstract class TorrentRegexSearchPerformer<T extends CrawlableSearchResult> extends CrawlRegexSearchPerformer<CrawlableSearchResult> {
 
-    private final Pattern preliminarySearchResultspattern;
+    private final Pattern preliminarySearchResultsPattern;
     private final Pattern htmlDetailPagePattern;
     private final static Logger LOG = Logger.getLogger(TorrentRegexSearchPerformer.class);
 
     public TorrentRegexSearchPerformer(String domainName, long token, String keywords, int timeout, int pages, int numCrawls, int regexMaxResults, String preliminarSearchResultsRegex, String htmlDetailPagePatternRegex) {
         super(domainName, token, keywords, timeout, pages, numCrawls, regexMaxResults);
-        this.preliminarySearchResultspattern = Pattern.compile(preliminarSearchResultsRegex);
+        this.preliminarySearchResultsPattern = Pattern.compile(preliminarSearchResultsRegex);
         this.htmlDetailPagePattern = Pattern.compile(htmlDetailPagePatternRegex);
     }
 
     @Override
     public Pattern getPattern() {
-        return preliminarySearchResultspattern;
+        return preliminarySearchResultsPattern;
     }
 
     @Override
@@ -77,7 +77,7 @@ public abstract class TorrentRegexSearchPerformer<T extends CrawlableSearchResul
             String html = PerformersHelper.reduceHtml(unreducedHtml, htmlPrefixOffset(unreducedHtml), htmlSuffixOffset(unreducedHtml));
 
             if (html != null) {
-                Matcher matcher = htmlDetailPagePattern.matcher(new MaxIterCharSequence(html, 2 * html.length()));
+                Matcher matcher = htmlDetailPagePattern.matcher(html);
     
                 try {
                     if (matcher.find()) {

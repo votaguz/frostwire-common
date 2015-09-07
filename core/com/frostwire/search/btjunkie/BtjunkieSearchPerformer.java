@@ -38,7 +38,7 @@ public class BtjunkieSearchPerformer extends CrawlRegexSearchPerformer<BtjunkieS
 
     private static final Map<String, Integer> UNIT_TO_BYTE_MULTIPLIERS_MAP;
 
-    private static final Pattern sizePattern;
+    private static final Pattern SIZE_PATTERN = Pattern.compile("([\\d+\\.]+) ([BKMGTP]+)");
 
     static {
         UNIT_TO_BYTE_MULTIPLIERS_MAP = new HashMap<String, Integer>();
@@ -48,7 +48,6 @@ public class BtjunkieSearchPerformer extends CrawlRegexSearchPerformer<BtjunkieS
         UNIT_TO_BYTE_MULTIPLIERS_MAP.put("GB", 3);
         UNIT_TO_BYTE_MULTIPLIERS_MAP.put("TB", 4);
         UNIT_TO_BYTE_MULTIPLIERS_MAP.put("PB", 5);
-        sizePattern = Pattern.compile("([\\d+\\.]+) ([BKMGTP]+)");
     }
 
     public BtjunkieSearchPerformer(String domainName, long token, String keywords, int timeout) {
@@ -96,7 +95,7 @@ public class BtjunkieSearchPerformer extends CrawlRegexSearchPerformer<BtjunkieS
     private long parseDate(String dateString) {
         Calendar instance = Calendar.getInstance();
         long result = instance.getTimeInMillis();
-        SearchMatcher matcher = SearchMatcher.from(YEAR_MONTH_DATE_PATTERN.matcher(new MaxIterCharSequence(dateString, dateString.length() * 2)));
+        SearchMatcher matcher = SearchMatcher.from(YEAR_MONTH_DATE_PATTERN.matcher(dateString));
         if (matcher.find()) {
             try {
                 instance.clear();
@@ -131,7 +130,7 @@ public class BtjunkieSearchPerformer extends CrawlRegexSearchPerformer<BtjunkieS
 
     private long parseSize(String sizeString) {
         long result = 0;
-        SearchMatcher matcher = SearchMatcher.from(sizePattern.matcher(new MaxIterCharSequence(sizeString, sizeString.length() * 2)));
+        SearchMatcher matcher = SearchMatcher.from(SIZE_PATTERN.matcher(sizeString));
         if (matcher.find()) {
             String amount = matcher.group(1);
             String unit = matcher.group(2);

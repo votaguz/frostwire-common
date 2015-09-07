@@ -82,7 +82,7 @@ public class ExtratorrentSearchPerformer extends TorrentJsonSearchPerformer<Extr
         String completePage = fetch(torrentFilesUrl);
         String page = completePage.substring(completePage.indexOf("Torrent files list"), completePage.indexOf("Recent Searches"));
 
-        SearchMatcher matcher = SearchMatcher.from(FILES_PATTERN.matcher(new MaxIterCharSequence(page, 2 * page.length())));
+        SearchMatcher matcher = SearchMatcher.from(FILES_PATTERN.matcher(page));
 
         while (matcher.find()) {
             try {

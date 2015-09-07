@@ -82,7 +82,7 @@ public class KATSearchPerformer extends TorrentJsonSearchPerformer<KATItem, KATS
         KATSearchResult ksr = (KATSearchResult) sr;
         String page = fetch("http://" + getDomainName() + "/torrents/getfiles/" + ksr.getHash() + "/?all=1");
 
-        SearchMatcher matcher = SearchMatcher.from(FILES_PATTERN.matcher(new MaxIterCharSequence(page, 2 * page.length())));
+        SearchMatcher matcher = SearchMatcher.from(FILES_PATTERN.matcher(page));
 
         while (matcher.find()) {
             try {

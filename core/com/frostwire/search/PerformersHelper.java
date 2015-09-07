@@ -48,7 +48,7 @@ public final class PerformersHelper {
             return result;
         }
 
-        SearchMatcher matcher = SearchMatcher.from(performer.getPattern().matcher(new MaxIterCharSequence(page, 2 * page.length())));
+        SearchMatcher matcher = SearchMatcher.from(performer.getPattern().matcher(page));
         int max = regexMaxResults;
         int i = 0;
         boolean matcherFound;
@@ -109,7 +109,7 @@ public final class PerformersHelper {
 
     public static String parseInfoHash(String url) {
         String result = null;
-        final SearchMatcher matcher = SearchMatcher.from(MAGNET_HASH_PATTERN.matcher(new MaxIterCharSequence(url, url.length() * 2)));
+        final SearchMatcher matcher = SearchMatcher.from(MAGNET_HASH_PATTERN.matcher(url));
         try {
             if (matcher.find()) {
                 result = matcher.group(1);
