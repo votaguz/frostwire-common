@@ -1,3 +1,21 @@
+/*
+ * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
+ * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
 package com.frostwire.util;
 
 import com.frostwire.logging.Logger;
@@ -8,13 +26,17 @@ import com.squareup.okhttp.Response;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Created by gubatron on 9/7/15.
- */
+/** An OkHttpClient based HTTP Client.
+  *
+  * @author gubatron
+  * @author aldenml
+*/
 public class OKHTTPClient implements HttpClient {
     private static final Logger LOG = Logger.getLogger(JdkHttpClient.class);
     private static final int DEFAULT_TIMEOUT = 10000;
@@ -67,12 +89,12 @@ public class OKHTTPClient implements HttpClient {
 
     @Override
     public int head(String url, int connectTimeoutInMillis) throws IOException {
+        okHttpClient.setConnectTimeout(connectTimeoutInMillis,TimeUnit.MILLISECONDS);
         Request req = new Request.Builder().
                 url(url).
                 header("User-Agent", DEFAULT_USER_AGENT).
                 head().
                 build();
-        okHttpClient.setConnectTimeout(connectTimeoutInMillis,TimeUnit.MILLISECONDS);
         Response resp = okHttpClient.newCall(req).execute();
         return resp.code();
     }
@@ -99,28 +121,39 @@ public class OKHTTPClient implements HttpClient {
 
     @Override
     public String get(String url, int timeout, String userAgent, String referrer, String cookie, Map<String, String> customHeaders) throws IOException {
-        String result = null;
-
-        ByteArrayOutputStream baos = null;
+        String result;
+        okHttpClient.setConnectTimeout(timeout, TimeUnit.MILLISECONDS);
+        Request.Builder builder = new Request.Builder();
+        builder.url(url);
+        if (!StringUtils.isNullOrEmpty(userAgent)) {
+            builder.header("User-Agent", userAgent);
+        }
+        if (!StringUtils.isNullOrEmpty(referrer)) {
+            builder.header("Referer", referrer); // [sic - typo in HTTP protocol]
+        }
+        if (!StringUtils.isNullOrEmpty(cookie)) {
+            builder.header("Cookie", cookie);
+        }
+        if (customHeaders != null && customHeaders.size() > 0) {
+            try {
+                final Iterator<Map.Entry<String, String>> iterator = customHeaders.entrySet().iterator();
+                while (iterator.hasNext()) {
+                    final Map.Entry<String, String> header = iterator.next();
+                    builder.header(header.getKey(), header.getValue());
+                }
+            } catch (Throwable e) {
+                LOG.warn(e.getMessage(), e);
+            }
+        }
+        Request request = builder.build();
 
         try {
-            baos = new ByteArrayOutputStream();
-            get(url, baos, timeout, userAgent, referrer, cookie, -1, -1, customHeaders);
-            result = new String(baos.toByteArray(), "UTF-8");
-        } catch (java.net.SocketTimeoutException timeoutException) {
-            throw timeoutException;
-        } catch (IOException e) {
-            throw e;
-        } finally {
-            closeQuietly(baos);
+            final Response response = okHttpClient.newCall(request).execute();
+            result = response.body().string();
+        } catch (IOException ioe) {
+            throw ioe;
         }
-
         return result;
-    }
-
-    @Override
-    public void get(String url, OutputStream out, int timeout, String userAgent, String referrer, String cookie, int rangeStart, int rangeLength, Map<String, String> customHeaders) throws IOException {
-
     }
 
     @Override
