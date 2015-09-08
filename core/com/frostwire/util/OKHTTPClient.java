@@ -121,64 +121,50 @@ public class OKHTTPClient implements HttpClient {
 
     @Override
     public String get(String url, int timeout, String userAgent, String referrer, String cookie, Map<String, String> customHeaders) throws IOException {
-        String result;
-        okHttpClient.setConnectTimeout(timeout, TimeUnit.MILLISECONDS);
-        Request.Builder builder = new Request.Builder();
-        builder.url(url);
-        if (!StringUtils.isNullOrEmpty(userAgent)) {
-            builder.header("User-Agent", userAgent);
-        }
-        if (!StringUtils.isNullOrEmpty(referrer)) {
-            builder.header("Referer", referrer); // [sic - typo in HTTP protocol]
-        }
-        if (!StringUtils.isNullOrEmpty(cookie)) {
-            builder.header("Cookie", cookie);
-        }
-        if (customHeaders != null && customHeaders.size() > 0) {
-            try {
-                final Iterator<Map.Entry<String, String>> iterator = customHeaders.entrySet().iterator();
-                while (iterator.hasNext()) {
-                    final Map.Entry<String, String> header = iterator.next();
-                    builder.header(header.getKey(), header.getValue());
-                }
-            } catch (Throwable e) {
-                LOG.warn(e.getMessage(), e);
-            }
-        }
-        Request request = builder.build();
-
+        String result = null;
+        final Request.Builder builder = prepareRequestBuilder(url, timeout, userAgent, referrer, cookie);
+        addCustomHeaders(customHeaders, builder);
         try {
-            final Response response = okHttpClient.newCall(request).execute();
-            result = response.body().string();
+            result = getSyncResponse(builder).body().string();
         } catch (IOException ioe) {
             throw ioe;
+        } catch (Throwable e) {
+            LOG.error(e.getMessage(), e);
+        }
+        return result;
+    }
+
+    @Override
+    public byte[] getBytes(String url, int timeout, String userAgent, String referrer, String cookies) {
+        byte[] result = null;
+        final Request.Builder builder = prepareRequestBuilder(url, timeout, userAgent, referrer, cookies);
+        try {
+            result = getSyncResponse(builder).body().bytes();
+        } catch (Throwable e) {
+            LOG.error("Error getting bytes from http body response: " + e.getMessage(), e);
         }
         return result;
     }
 
     @Override
     public byte[] getBytes(String url, int timeout, String userAgent, String referrer) {
-        return new byte[0];
+        return getBytes(url, timeout, userAgent, referrer, null);
     }
 
-    @Override
-    public byte[] getBytes(String url, int timeout, String userAgent, String referrer, String cookies) {
-        return new byte[0];
-    }
 
     @Override
     public byte[] getBytes(String url, int timeout, String referrer) {
-        return new byte[0];
+        return getBytes(url, timeout, DEFAULT_USER_AGENT, referrer);
     }
 
     @Override
     public byte[] getBytes(String url, int timeout) {
-        return new byte[0];
+        return getBytes(url, timeout, null);
     }
 
     @Override
     public byte[] getBytes(String url) {
-        return new byte[0];
+        return getBytes(url, DEFAULT_TIMEOUT);
     }
 
     @Override
@@ -221,13 +207,48 @@ public class OKHTTPClient implements HttpClient {
         return false;
     }
 
-    private static void closeQuietly(Closeable closeable) {
-        try {
-            if (closeable != null) {
-                closeable.close();
+    private Request.Builder prepareRequestBuilder(String url, int timeout, String userAgent, String referrer, String cookie) {
+        okHttpClient.setConnectTimeout(timeout, TimeUnit.MILLISECONDS);
+        Request.Builder builder = new Request.Builder();
+        builder.url(url);
+        if (!StringUtils.isNullOrEmpty(userAgent)) {
+            builder.header("User-Agent", userAgent);
+        }
+        if (!StringUtils.isNullOrEmpty(referrer)) {
+            builder.header("Referer", referrer); // [sic - typo in HTTP protocol]
+        }
+        if (!StringUtils.isNullOrEmpty(cookie)) {
+            builder.header("Cookie", cookie);
+        }
+        return builder;
+    }
+
+    private void addCustomHeaders(Map<String, String> customHeaders, Request.Builder builder) {
+        if (customHeaders != null && customHeaders.size() > 0) {
+            try {
+                final Iterator<Map.Entry<String, String>> iterator = customHeaders.entrySet().iterator();
+                while (iterator.hasNext()) {
+                    final Map.Entry<String, String> header = iterator.next();
+                    builder.header(header.getKey(), header.getValue());
+                }
+            } catch (Throwable e) {
+                LOG.warn(e.getMessage(), e);
             }
-        } catch (IOException ioe) {
-            // ignore
         }
     }
+
+    private Response getSyncResponse(Request.Builder builder) throws IOException {
+        final Request request = builder.build();
+        return okHttpClient.newCall(request).execute();
+    }
+
+//    private static void closeQuietly(Closeable closeable) {
+//        try {
+//            if (closeable != null) {
+//                closeable.close();
+//            }
+//        } catch (IOException ioe) {
+//            // ignore
+//        }
+//    }
 }
