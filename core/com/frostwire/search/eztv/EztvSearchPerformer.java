@@ -32,7 +32,7 @@ import java.util.Map;
  *
  */
 public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchResult> {
-
+    //private static Logger LOG = Logger.getLogger(EztvSearchPerformer.class);
     private static final int MAX_RESULTS = 20;
     private static final String REGEX = "(?is)<a href=\"(/ep/.*?)\"";
     private static final String HTML_REGEX = "(?is)<td class=\"section_post_header\" colspan=\"2\"><b>(?<displayname>.*?)</b></td>.*?<td class=\"section_post_header\">Download Links</td>.*?<a href=\"magnet:\\?xt=urn:btih:(?<infohash>.*?)&.*? class=\"magnet\" .*?a href=\"(?<torrenturl>http://\\S*?torrent)\" class=\"download_.\" title=\"Download Mirror #.\".*?<b>Released:</b> (?<creationtime>.*?)<br/>.*?<b>Filesize:</b> (?<filesize>.*?)<br/>";
@@ -65,7 +65,13 @@ public class EztvSearchPerformer extends TorrentRegexSearchPerformer<EztvSearchR
     protected EztvSearchResult fromHtmlMatcher(CrawlableSearchResult sr, SearchMatcher matcher) {
         return new EztvSearchResult(sr.getDetailsUrl(), matcher);
     }
-    
+
+    @Override
+    protected int htmlPrefixOffset(String html) {
+        int offset = html.indexOf("id=\"searchsearch_submit\"");
+        return offset > 0 ? offset : 0;
+    }
+
     /**
     public static void main(String[] args) throws Throwable {
         
