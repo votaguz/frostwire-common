@@ -31,65 +31,65 @@ import java.util.Map;
  */
 public interface HttpClient {
 
-    public void setListener(HttpClientListener listener);
+     void setListener(HttpClientListener listener);
 
-    public HttpClientListener getListener();
+     HttpClientListener getListener();
 
     /**
      * Returns the HTTP response code
      */
-    public int head(String url, int connectTimeoutInMillis) throws IOException;
+     int head(String url, int connectTimeoutInMillis) throws IOException;
 
-    public String get(String url) throws IOException;
+     String get(String url) throws IOException;
 
-    public String get(String url, int timeout) throws IOException;
+     String get(String url, int timeout) throws IOException;
 
-    public String get(String url, int timeout, String userAgent) throws IOException;
+     String get(String url, int timeout, String userAgent) throws IOException;
 
-    public String get(String url, int timeout, String userAgent, String referrer, String cookie) throws IOException;
+     String get(String url, int timeout, String userAgent, String referrer, String cookie) throws IOException;
 
-    public String get(String url, int timeout, String userAgent, String referrer, String cookie, Map<String, String> customHeaders) throws IOException;
+     String get(String url, int timeout, String userAgent, String referrer, String cookie, Map<String, String> customHeaders) throws IOException;
 
-    public byte[] getBytes(String url, int timeout, String userAgent, String referrer);
+     byte[] getBytes(String url, int timeout, String userAgent, String referrer);
 
-    public byte[] getBytes(String url, int timeout, String userAgent, String referrer, String cookies);
+     byte[] getBytes(String url, int timeout, String userAgent, String referrer, String cookies);
 
-    public byte[] getBytes(String url, int timeout, String referrer);
+     byte[] getBytes(String url, int timeout, String referrer);
 
-    public byte[] getBytes(String url, int timeout);
+     byte[] getBytes(String url, int timeout);
 
-    public byte[] getBytes(String url);
+     byte[] getBytes(String url);
 
-    public void save(String url, File file) throws IOException;
+     void save(String url, File file) throws IOException;
 
-    public void save(String url, File file, boolean resume) throws IOException;
+     void save(String url, File file, boolean resume) throws IOException;
 
-    public void save(String url, File file, boolean resume, int timeout, String userAgent) throws IOException;
+     void save(String url, File file, boolean resume, int timeout, String userAgent) throws IOException;
 
-    public String post(String url, int timeout, String userAgent, Map<String, String> formData);
+     String post(String url, int timeout, String userAgent, Map<String, String> formData);
 
-    public String post(String url, int timeout, String userAgent, String content, boolean gzip) throws IOException;
+     String post(String url, int timeout, String userAgent, String content, boolean gzip) throws IOException;
 
-    public String post(String url, int timeout, String userAgent, String content, String postContentType, boolean gzip) throws IOException;
+     String post(String url, int timeout, String userAgent, String content, String postContentType, boolean gzip) throws IOException;
 
-    public void cancel();
+     void cancel();
 
-    public boolean isCanceled();
+     boolean isCanceled();
 
-    public interface HttpClientListener {
+     interface HttpClientListener {
 
-        public void onError(HttpClient client, Throwable e);
+         void onError(HttpClient client, Throwable e);
 
-        public void onData(HttpClient client, byte[] buffer, int offset, int length);
+         void onData(HttpClient client, byte[] buffer, int offset, int length);
 
-        public void onComplete(HttpClient client);
+         void onComplete(HttpClient client);
 
-        public void onCancel(HttpClient client);
+         void onCancel(HttpClient client);
 
-        public void onHeaders(HttpClient httpClient, Map<String, List<String>> headerFields);
+         void onHeaders(HttpClient httpClient, Map<String, List<String>> headerFields);
     }
 
-    public abstract class HttpClientListenerAdapter implements HttpClientListener {
+     abstract class HttpClientListenerAdapter implements HttpClientListener {
 
         public void onError(HttpClient client, Throwable e) {
         }
@@ -107,42 +107,42 @@ public interface HttpClient {
         }
     }
 
-    public static class HttpRangeException extends IOException {
+    class HttpRangeException extends IOException {
 
         private static final long serialVersionUID = 1891038288667531894L;
 
-        public HttpRangeException(String message) {
+         HttpRangeException(String message) {
             super(message);
         }
     }
 
-    public static final class RangeNotSupportedException extends HttpRangeException {
+    final class RangeNotSupportedException extends HttpRangeException {
 
         private static final long serialVersionUID = -3356618211960630147L;
 
-        public RangeNotSupportedException(String message) {
+         RangeNotSupportedException(String message) {
             super(message);
         }
     }
 
-    public static final class HttpRangeOutOfBoundsException extends HttpRangeException {
+    final class HttpRangeOutOfBoundsException extends HttpRangeException {
 
         private static final long serialVersionUID = -335661829606230147L;
 
-        public HttpRangeOutOfBoundsException(int rangeStart, long expectedFileSize) {
+         HttpRangeOutOfBoundsException(int rangeStart, long expectedFileSize) {
             super("HttpRange Out of Bounds error: start=" + rangeStart + " expected file size=" + expectedFileSize);
         }
 
     }
 
-    public static final class ResponseCodeNotSupportedException extends IOException {
+    final class ResponseCodeNotSupportedException extends IOException {
         private final int responseCode;
 
-        public ResponseCodeNotSupportedException(int code) {
+         ResponseCodeNotSupportedException(int code) {
             responseCode = code;
         }
 
-        public int getResponseCode() {
+         int getResponseCode() {
             return responseCode;
         }
     }
