@@ -282,7 +282,7 @@ final class JdkHttpClient implements HttpClient {
         get(url, out, timeout, userAgent, referrer, cookie, rangeStart, -1, null);
     }
 
-    private void get(String url, OutputStream out, int timeout, String userAgent, String referrer, String cookie, int rangeStart, int rangeLength, final Map<String, String> customHeaders) throws IOException {
+    public void get(String url, OutputStream out, int timeout, String userAgent, String referrer, String cookie, int rangeStart, int rangeLength, final Map<String, String> customHeaders) throws IOException {
         canceled = false;
         final URL u = new URL(url);
         final URLConnection conn = u.openConnection();

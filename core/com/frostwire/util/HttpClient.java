@@ -19,6 +19,7 @@ package com.frostwire.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -49,6 +50,8 @@ public interface HttpClient {
      String get(String url, int timeout, String userAgent, String referrer, String cookie) throws IOException;
 
      String get(String url, int timeout, String userAgent, String referrer, String cookie, Map<String, String> customHeaders) throws IOException;
+
+     void get(String url, OutputStream out, int timeout, String userAgent, String referrer, String cookie, int rangeStart, int rangeLength, final Map<String, String> customHeaders) throws IOException;
 
      byte[] getBytes(String url, int timeout, String userAgent, String referrer);
 
