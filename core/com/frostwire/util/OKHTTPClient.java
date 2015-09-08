@@ -43,6 +43,7 @@ public class OKHTTPClient implements HttpClient {
     private static final String DEFAULT_USER_AGENT = UserAgentGenerator.getUserAgent();
     private HttpClientListener listener;
     private OkHttpClient okHttpClient;
+    private boolean canceled = false;
 
     enum HttpContext {
         SEARCH,
@@ -59,24 +60,6 @@ public class OKHTTPClient implements HttpClient {
         this.okHttpClient = okHttpClient;
     }
 
-    private static Map<HttpContext, OKHTTPClient> buildOkHttpClients() {
-        final HashMap<HttpContext, OKHTTPClient> map = new HashMap<HttpContext, OKHTTPClient>();
-        map.put(HttpContext.SEARCH, new OKHTTPClient(newOkHttpClient(new ThreadPool("OkHttpClient-searches", 1, 4, 60, new LinkedBlockingQueue<Runnable>(), true))));
-        map.put(HttpContext.DOWNLOAD, new OKHTTPClient(newOkHttpClient(new ThreadPool("OkHttpClient-downloads", 1, 10, 5, new LinkedBlockingQueue<Runnable>(), true))));
-        return map;
-    }
-
-    private static OkHttpClient newOkHttpClient(ThreadPool pool) {
-        OkHttpClient searchClient = new OkHttpClient();
-        searchClient.setDispatcher(new Dispatcher(pool));
-        searchClient.setFollowRedirects(true);
-        searchClient.setFollowSslRedirects(true);
-        searchClient.setConnectTimeout(DEFAULT_TIMEOUT, TimeUnit.MILLISECONDS);
-        // Maybe we should use a custom connection pool here. Using default.
-        //searchClient.setConnectionPool(?);
-       return searchClient;
-    }
-
     @Override
     public void setListener(HttpClientListener listener) {
         this.listener = listener;
@@ -85,6 +68,52 @@ public class OKHTTPClient implements HttpClient {
     @Override
     public HttpClientListener getListener() {
         return listener;
+    }
+
+    @Override
+    public void onCancel() {
+        if (getListener() != null) {
+            try {
+                getListener().onCancel(this);
+            } catch (Exception e) {
+                LOG.warn(e.getMessage(), e);
+            }
+        }
+    }
+
+    @Override
+    public void onData(byte[] b, int i, int n) {
+        if (getListener() != null) {
+            try {
+                getListener().onData(this, b, 0, n);
+            } catch (Exception e) {
+                LOG.warn(e.getMessage(), e);
+            }
+        }
+    }
+
+    @Override
+    public void onError(Exception e) {
+        if (getListener() != null) {
+            try {
+                getListener().onError(this, e);
+            } catch (Exception e2) {
+                LOG.warn(e2.getMessage());
+            }
+        } else {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onComplete() {
+        if (getListener() != null) {
+            try {
+                getListener().onComplete(this);
+            } catch (Exception e) {
+                LOG.warn(e.getMessage(), e);
+            }
+        }
     }
 
     @Override
@@ -169,17 +198,57 @@ public class OKHTTPClient implements HttpClient {
 
     @Override
     public void save(String url, File file) throws IOException {
-
+        save(url, file, false, DEFAULT_TIMEOUT, DEFAULT_USER_AGENT);
     }
 
     @Override
     public void save(String url, File file, boolean resume) throws IOException {
-
+        save(url, file, resume, DEFAULT_TIMEOUT, DEFAULT_USER_AGENT);
     }
 
     @Override
     public void save(String url, File file, boolean resume, int timeout, String userAgent) throws IOException {
+        save(url, file, resume, timeout, userAgent, null);
+    }
 
+    @Override
+    public void save(String url, File file, boolean resume, int timeout, String userAgent, String referrer) throws IOException {
+        FileOutputStream fos = null;
+        int rangeStart = 0;
+
+        try {
+            if (resume && file.exists()) {
+                fos = new FileOutputStream(file, true);
+                rangeStart = (int) file.length();
+            } else {
+                fos = new FileOutputStream(file, false);
+                rangeStart = -1;
+            }
+
+            final Request.Builder builder = prepareRequestBuilder(url, timeout, userAgent, referrer, null);
+            addRangeHeader(rangeStart, -1, builder);
+            final Response response = getSyncResponse(builder);
+            final InputStream in = response.body().byteStream();
+
+            byte[] b = new byte[4096];
+            int n;
+            while (!canceled && (n = in.read(b, 0, b.length)) != -1) {
+                if (!canceled) {
+                    fos.write(b, 0, n);
+                    onData(b, 0, n);
+                }
+            }
+            closeQuietly(fos);
+            if (canceled) {
+                onCancel();
+            } else {
+                onComplete();
+            }
+        } catch (IOException ioe) {
+            throw ioe;
+        } finally {
+            closeQuietly(fos);
+        }
     }
 
     @Override
@@ -199,12 +268,25 @@ public class OKHTTPClient implements HttpClient {
 
     @Override
     public void cancel() {
-
+        canceled = true;
     }
 
     @Override
     public boolean isCanceled() {
-        return false;
+        return canceled;
+    }
+
+    private void addRangeHeader(int rangeStart, int rangeEnd, Request.Builder builderRef) {
+        if (rangeStart < 0) {
+            return;
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.valueOf(rangeStart));
+        sb.append('-');
+        if (rangeEnd > 0 && rangeEnd > rangeStart) {
+            sb.append(String.valueOf(rangeEnd));
+        }
+        builderRef.addHeader("Range", sb.toString());
     }
 
     private Request.Builder prepareRequestBuilder(String url, int timeout, String userAgent, String referrer, String cookie) {
@@ -242,13 +324,31 @@ public class OKHTTPClient implements HttpClient {
         return okHttpClient.newCall(request).execute();
     }
 
-//    private static void closeQuietly(Closeable closeable) {
-//        try {
-//            if (closeable != null) {
-//                closeable.close();
-//            }
-//        } catch (IOException ioe) {
-//            // ignore
-//        }
-//    }
+    private static Map<HttpContext, OKHTTPClient> buildOkHttpClients() {
+        final HashMap<HttpContext, OKHTTPClient> map = new HashMap<HttpContext, OKHTTPClient>();
+        map.put(HttpContext.SEARCH, new OKHTTPClient(newOkHttpClient(new ThreadPool("OkHttpClient-searches", 1, 4, 60, new LinkedBlockingQueue<Runnable>(), true))));
+        map.put(HttpContext.DOWNLOAD, new OKHTTPClient(newOkHttpClient(new ThreadPool("OkHttpClient-downloads", 1, 10, 5, new LinkedBlockingQueue<Runnable>(), true))));
+        return map;
+    }
+
+    private static OkHttpClient newOkHttpClient(ThreadPool pool) {
+        OkHttpClient searchClient = new OkHttpClient();
+        searchClient.setDispatcher(new Dispatcher(pool));
+        searchClient.setFollowRedirects(true);
+        searchClient.setFollowSslRedirects(true);
+        searchClient.setConnectTimeout(DEFAULT_TIMEOUT, TimeUnit.MILLISECONDS);
+        // Maybe we should use a custom connection pool here. Using default.
+        //searchClient.setConnectionPool(?);
+        return searchClient;
+    }
+
+    private static void closeQuietly(Closeable closeable) {
+        try {
+            if (closeable != null) {
+                closeable.close();
+            }
+        } catch (IOException ioe) {
+            // ignore
+        }
+    }
 }

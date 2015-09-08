@@ -517,7 +517,8 @@ final class JdkHttpClient implements HttpClient {
         }
     }
 
-    private void onCancel() {
+    @Override
+    public void onCancel() {
         if (getListener() != null) {
             try {
                 getListener().onCancel(this);
@@ -527,7 +528,8 @@ final class JdkHttpClient implements HttpClient {
         }
     }
 
-    private void onData(byte[] b, int i, int n) {
+    @Override
+    public void onData(byte[] b, int i, int n) {
         if (getListener() != null) {
             try {
                 getListener().onData(this, b, 0, n);
@@ -537,7 +539,8 @@ final class JdkHttpClient implements HttpClient {
         }
     }
 
-    protected void onError(Exception e) {
+    @Override
+    public void onError(Exception e) {
         if (getListener() != null) {
             try {
                 getListener().onError(this, e);
@@ -549,7 +552,8 @@ final class JdkHttpClient implements HttpClient {
         }
     }
 
-    protected void onComplete() {
+    @Override
+    public void onComplete() {
         if (getListener() != null) {
             try {
                 getListener().onComplete(this);

@@ -31,10 +31,17 @@ import java.util.Map;
  * @author aldenml
  */
 public interface HttpClient {
+    void setListener(HttpClientListener listener);
 
-     void setListener(HttpClientListener listener);
+    HttpClientListener getListener();
 
-     HttpClientListener getListener();
+    void onCancel();
+
+    void onData(byte[] b, int i, int n);
+
+    void onError(Exception e);
+
+    void onComplete();
 
     /**
      * Returns the HTTP response code
@@ -66,6 +73,8 @@ public interface HttpClient {
      void save(String url, File file, boolean resume) throws IOException;
 
      void save(String url, File file, boolean resume, int timeout, String userAgent) throws IOException;
+
+     void save(String url, File file, boolean resume, int timeout, String userAgent, String referrer) throws IOException;
 
      String post(String url, int timeout, String userAgent, Map<String, String> formData);
 
