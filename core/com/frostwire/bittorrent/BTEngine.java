@@ -655,15 +655,17 @@ public final class BTEngine {
             }
         });
 
-        for (File t : torrents) {
-            try {
-                String infoHash = FilenameUtils.getBaseName(t.getName());
-                if (infoHash != null) {
-                    File resumeFile = resumeDataFile(infoHash);
-                    restoreDownloadsQueue.add(new RestoreDownloadTask(t, null, null, resumeFile));
+        if (torrents != null) {
+            for (File t : torrents) {
+                try {
+                    String infoHash = FilenameUtils.getBaseName(t.getName());
+                    if (infoHash != null) {
+                        File resumeFile = resumeDataFile(infoHash);
+                        restoreDownloadsQueue.add(new RestoreDownloadTask(t, null, null, resumeFile));
+                    }
+                } catch (Throwable e) {
+                    LOG.error("Error restoring torrent download: " + t, e);
                 }
-            } catch (Throwable e) {
-                LOG.error("Error restoring torrent download: " + t, e);
             }
         }
 
