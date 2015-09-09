@@ -27,6 +27,10 @@ import com.frostwire.util.http.JdkHttpClient;
  *
  */
 public class HttpClientFactory {
+    public enum HttpContext {
+        SEARCH,
+        DOWNLOAD
+    }
 
     private HttpClientFactory() {
     }

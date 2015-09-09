@@ -165,9 +165,7 @@ public abstract class AbstractHttpClient implements HttpClient {
     abstract public void save(String url, File file, boolean resume, int timeout, String userAgent, String referrer) throws IOException;
 
     @Override
-    public String post(String url, int timeout, String userAgent, Map<String, String> formData) {
-        return null;
-    }
+    abstract public String post(String url, int timeout, String userAgent, Map<String, String> formData);
 
     @Override
     public String post(String url, int timeout, String userAgent, String content, boolean gzip) throws IOException {

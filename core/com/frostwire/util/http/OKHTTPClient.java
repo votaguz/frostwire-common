@@ -19,6 +19,8 @@
 package com.frostwire.util.http;
 
 import com.frostwire.logging.Logger;
+import com.frostwire.util.HttpClientFactory;
+import static com.frostwire.util.HttpClientFactory.HttpContext;
 import com.frostwire.util.StringUtils;
 import com.frostwire.util.ThreadPool;
 import com.squareup.okhttp.*;
@@ -41,10 +43,6 @@ public class OKHTTPClient extends AbstractHttpClient {
     private static final Logger LOG = Logger.getLogger(OKHTTPClient.class);
     private OkHttpClient okHttpClient;
 
-    enum HttpContext {
-        SEARCH,
-        DOWNLOAD
-    }
 
     private static final Map<HttpContext, OKHTTPClient> okHttpClients;
 
@@ -272,7 +270,6 @@ public class OKHTTPClient extends AbstractHttpClient {
         return map;
     }
 
-
     private Request.Builder prepareRequestBuilder(String url, int timeout, String userAgent, String referrer, String cookie) {
         okHttpClient.setConnectTimeout(timeout, TimeUnit.MILLISECONDS);
         okHttpClient.setReadTimeout(timeout, TimeUnit.MILLISECONDS);
@@ -320,19 +317,4 @@ public class OKHTTPClient extends AbstractHttpClient {
         //searchClient.setConnectionPool(?);
         return searchClient;
     }
-
-    /**
-    private static SSLSocketFactory createCustomSSLSocketFactory() {
-        try {
-            SSLContext sc = SSLContext.getInstance("TLS");
-            sc.init(null, new TrustManager[]{new AllX509TrustManager()}, new SecureRandom());
-            SSLSocketFactory d = sc.getSocketFactory();
-            return new WrapSSLSocketFactory(d);
-        } catch (Throwable e) {
-            LOG.error("Unable to create custom SSL socket factory", e);
-        }
-
-        return null;
-    }*/
-
 }
