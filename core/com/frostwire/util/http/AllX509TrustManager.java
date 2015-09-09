@@ -1,7 +1,7 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
- *
+ * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
+
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,23 +15,24 @@
  * limitations under the License.
  */
 
-package com.frostwire.util;
+package com.frostwire.util.http;
 
-import com.frostwire.util.http.HttpClient;
-import com.frostwire.util.http.JdkHttpClient;
+import javax.net.ssl.X509TrustManager;
+import java.security.cert.X509Certificate;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
-public class HttpClientFactory {
+public final class AllX509TrustManager implements X509TrustManager {
 
-    private HttpClientFactory() {
+    public X509Certificate[] getAcceptedIssuers() {
+        return null;
     }
 
-    public static HttpClient newInstance() {
-        return new JdkHttpClient();
+    public void checkClientTrusted(X509Certificate[] certs, String authType) {
+    }
+
+    public void checkServerTrusted(X509Certificate[] certs, String authType) {
     }
 }

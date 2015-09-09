@@ -18,7 +18,7 @@
 package com.frostwire.search;
 
 import com.frostwire.logging.Logger;
-import com.frostwire.util.HttpClient;
+import com.frostwire.util.http.HttpClient;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.StringUtils;
 import com.frostwire.util.UserAgentGenerator;

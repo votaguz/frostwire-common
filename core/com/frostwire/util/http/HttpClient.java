@@ -15,11 +15,10 @@
  * limitations under the License.
  */
 
-package com.frostwire.util;
+package com.frostwire.util.http;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -46,60 +45,60 @@ public interface HttpClient {
     /**
      * Returns the HTTP response code
      */
-     int head(String url, int connectTimeoutInMillis) throws IOException;
+    int head(String url, int connectTimeoutInMillis) throws IOException;
 
-     String get(String url) throws IOException;
+    String get(String url) throws IOException;
 
-     String get(String url, int timeout) throws IOException;
+    String get(String url, int timeout) throws IOException;
 
-     String get(String url, int timeout, String userAgent) throws IOException;
+    String get(String url, int timeout, String userAgent) throws IOException;
 
-     String get(String url, int timeout, String userAgent, String referrer, String cookie) throws IOException;
+    String get(String url, int timeout, String userAgent, String referrer, String cookie) throws IOException;
 
-     String get(String url, int timeout, String userAgent, String referrer, String cookie, Map<String, String> customHeaders) throws IOException;
+    String get(String url, int timeout, String userAgent, String referrer, String cookie, Map<String, String> customHeaders) throws IOException;
 
-     byte[] getBytes(String url, int timeout, String userAgent, String referrer, String cookies);
+    byte[] getBytes(String url);
 
-     byte[] getBytes(String url, int timeout, String userAgent, String referrer);
+    byte[] getBytes(String url, int timeout);
 
-     byte[] getBytes(String url, int timeout, String referrer);
+    byte[] getBytes(String url, int timeout, String referrer);
 
-     byte[] getBytes(String url, int timeout);
+    byte[] getBytes(String url, int timeout, String userAgent, String referrer);
 
-     byte[] getBytes(String url);
+    byte[] getBytes(String url, int timeout, String userAgent, String referrer, String cookies);
 
-     void save(String url, File file) throws IOException;
+    void save(String url, File file) throws IOException;
 
-     void save(String url, File file, boolean resume) throws IOException;
+    void save(String url, File file, boolean resume) throws IOException;
 
-     void save(String url, File file, boolean resume, int timeout, String userAgent) throws IOException;
+    void save(String url, File file, boolean resume, int timeout, String userAgent) throws IOException;
 
-     void save(String url, File file, boolean resume, int timeout, String userAgent, String referrer) throws IOException;
+    void save(String url, File file, boolean resume, int timeout, String userAgent, String referrer) throws IOException;
 
-     String post(String url, int timeout, String userAgent, Map<String, String> formData);
+    String post(String url, int timeout, String userAgent, Map<String, String> formData);
 
-     String post(String url, int timeout, String userAgent, String content, boolean gzip) throws IOException;
+    String post(String url, int timeout, String userAgent, String content, boolean gzip) throws IOException;
 
-     String post(String url, int timeout, String userAgent, String content, String postContentType, boolean gzip) throws IOException;
+    String post(String url, int timeout, String userAgent, String content, String postContentType, boolean gzip) throws IOException;
 
-     void cancel();
+    void cancel();
 
-     boolean isCanceled();
+    boolean isCanceled();
 
-     interface HttpClientListener {
+    interface HttpClientListener {
 
-         void onError(HttpClient client, Throwable e);
+        void onError(HttpClient client, Throwable e);
 
-         void onData(HttpClient client, byte[] buffer, int offset, int length);
+        void onData(HttpClient client, byte[] buffer, int offset, int length);
 
-         void onComplete(HttpClient client);
+        void onComplete(HttpClient client);
 
-         void onCancel(HttpClient client);
+        void onCancel(HttpClient client);
 
-         void onHeaders(HttpClient httpClient, Map<String, List<String>> headerFields);
+        void onHeaders(HttpClient httpClient, Map<String, List<String>> headerFields);
     }
 
-     abstract class HttpClientListenerAdapter implements HttpClientListener {
+    abstract class HttpClientListenerAdapter implements HttpClientListener {
 
         public void onError(HttpClient client, Throwable e) {
         }
@@ -121,7 +120,7 @@ public interface HttpClient {
 
         private static final long serialVersionUID = 1891038288667531894L;
 
-         HttpRangeException(String message) {
+        HttpRangeException(String message) {
             super(message);
         }
     }
@@ -130,7 +129,7 @@ public interface HttpClient {
 
         private static final long serialVersionUID = -3356618211960630147L;
 
-         RangeNotSupportedException(String message) {
+        RangeNotSupportedException(String message) {
             super(message);
         }
     }
@@ -139,7 +138,7 @@ public interface HttpClient {
 
         private static final long serialVersionUID = -335661829606230147L;
 
-         HttpRangeOutOfBoundsException(int rangeStart, long expectedFileSize) {
+        HttpRangeOutOfBoundsException(int rangeStart, long expectedFileSize) {
             super("HttpRange Out of Bounds error: start=" + rangeStart + " expected file size=" + expectedFileSize);
         }
 
@@ -148,11 +147,11 @@ public interface HttpClient {
     final class ResponseCodeNotSupportedException extends IOException {
         private final int responseCode;
 
-         ResponseCodeNotSupportedException(int code) {
+        ResponseCodeNotSupportedException(int code) {
             responseCode = code;
         }
 
-         int getResponseCode() {
+        int getResponseCode() {
             return responseCode;
         }
     }

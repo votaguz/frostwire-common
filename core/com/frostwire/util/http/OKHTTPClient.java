@@ -16,19 +16,19 @@
  */
 
 
-package com.frostwire.util;
+package com.frostwire.util.http;
 
 import com.frostwire.logging.Logger;
-import com.squareup.okhttp.Dispatcher;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
+import com.frostwire.util.StringUtils;
+import com.frostwire.util.ThreadPool;
+import com.squareup.okhttp.*;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLSession;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -37,13 +37,9 @@ import java.util.concurrent.TimeUnit;
   * @author gubatron
   * @author aldenml
 */
-public class OKHTTPClient implements HttpClient {
-    private static final Logger LOG = Logger.getLogger(JdkHttpClient.class);
-    private static final int DEFAULT_TIMEOUT = 10000;
-    private static final String DEFAULT_USER_AGENT = UserAgentGenerator.getUserAgent();
-    private HttpClientListener listener;
+public class OKHTTPClient extends AbstractHttpClient {
+    private static final Logger LOG = Logger.getLogger(OKHTTPClient.class);
     private OkHttpClient okHttpClient;
-    private boolean canceled = false;
 
     enum HttpContext {
         SEARCH,
@@ -61,64 +57,8 @@ public class OKHTTPClient implements HttpClient {
     }
 
     @Override
-    public void setListener(HttpClientListener listener) {
-        this.listener = listener;
-    }
-
-    @Override
-    public HttpClientListener getListener() {
-        return listener;
-    }
-
-    @Override
-    public void onCancel() {
-        if (getListener() != null) {
-            try {
-                getListener().onCancel(this);
-            } catch (Exception e) {
-                LOG.warn(e.getMessage(), e);
-            }
-        }
-    }
-
-    @Override
-    public void onData(byte[] b, int i, int n) {
-        if (getListener() != null) {
-            try {
-                getListener().onData(this, b, 0, n);
-            } catch (Exception e) {
-                LOG.warn(e.getMessage(), e);
-            }
-        }
-    }
-
-    @Override
-    public void onError(Exception e) {
-        if (getListener() != null) {
-            try {
-                getListener().onError(this, e);
-            } catch (Exception e2) {
-                LOG.warn(e2.getMessage());
-            }
-        } else {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void onComplete() {
-        if (getListener() != null) {
-            try {
-                getListener().onComplete(this);
-            } catch (Exception e) {
-                LOG.warn(e.getMessage(), e);
-            }
-        }
-    }
-
-    @Override
     public int head(String url, int connectTimeoutInMillis) throws IOException {
-        okHttpClient.setConnectTimeout(connectTimeoutInMillis,TimeUnit.MILLISECONDS);
+        okHttpClient.setConnectTimeout(connectTimeoutInMillis, TimeUnit.MILLISECONDS);
         Request req = new Request.Builder().
                 url(url).
                 header("User-Agent", DEFAULT_USER_AGENT).
@@ -126,41 +66,6 @@ public class OKHTTPClient implements HttpClient {
                 build();
         Response resp = okHttpClient.newCall(req).execute();
         return resp.code();
-    }
-
-    @Override
-    public String get(String url) throws IOException {
-        return get(url, DEFAULT_TIMEOUT, DEFAULT_USER_AGENT);
-    }
-
-    @Override
-    public String get(String url, int timeout) throws IOException {
-        return get(url, timeout, DEFAULT_USER_AGENT);
-    }
-
-    @Override
-    public String get(String url, int timeout, String userAgent) throws IOException {
-        return get(url, timeout, userAgent, null, null);
-    }
-
-    @Override
-    public String get(String url, int timeout, String userAgent, String referrer, String cookie) throws IOException {
-        return get(url, timeout, userAgent, referrer, cookie, null);
-    }
-
-    @Override
-    public String get(String url, int timeout, String userAgent, String referrer, String cookie, Map<String, String> customHeaders) throws IOException {
-        String result = null;
-        final Request.Builder builder = prepareRequestBuilder(url, timeout, userAgent, referrer, cookie);
-        addCustomHeaders(customHeaders, builder);
-        try {
-            result = getSyncResponse(builder).body().string();
-        } catch (IOException ioe) {
-            throw ioe;
-        } catch (Throwable e) {
-            LOG.error(e.getMessage(), e);
-        }
-        return result;
     }
 
     @Override
@@ -176,39 +81,18 @@ public class OKHTTPClient implements HttpClient {
     }
 
     @Override
-    public byte[] getBytes(String url, int timeout, String userAgent, String referrer) {
-        return getBytes(url, timeout, userAgent, referrer, null);
-    }
-
-
-    @Override
-    public byte[] getBytes(String url, int timeout, String referrer) {
-        return getBytes(url, timeout, DEFAULT_USER_AGENT, referrer);
-    }
-
-    @Override
-    public byte[] getBytes(String url, int timeout) {
-        return getBytes(url, timeout, null);
-    }
-
-    @Override
-    public byte[] getBytes(String url) {
-        return getBytes(url, DEFAULT_TIMEOUT);
-    }
-
-    @Override
-    public void save(String url, File file) throws IOException {
-        save(url, file, false, DEFAULT_TIMEOUT, DEFAULT_USER_AGENT);
-    }
-
-    @Override
-    public void save(String url, File file, boolean resume) throws IOException {
-        save(url, file, resume, DEFAULT_TIMEOUT, DEFAULT_USER_AGENT);
-    }
-
-    @Override
-    public void save(String url, File file, boolean resume, int timeout, String userAgent) throws IOException {
-        save(url, file, resume, timeout, userAgent, null);
+    public String get(String url, int timeout, String userAgent, String referrer, String cookie, Map<String, String> customHeaders) throws IOException {
+        String result = null;
+        final Request.Builder builder = prepareRequestBuilder(url, timeout, userAgent, referrer, cookie);
+        addCustomHeaders(customHeaders, builder);
+        try {
+            result = getSyncResponse(builder).body().string();
+        } catch (IOException ioe) {
+            throw ioe;
+        } catch (Throwable e) {
+            LOG.error(e.getMessage(), e);
+        }
+        return result;
     }
 
     @Override
@@ -253,27 +137,118 @@ public class OKHTTPClient implements HttpClient {
 
     @Override
     public String post(String url, int timeout, String userAgent, Map<String, String> formData) {
-        return null;
-    }
+        /* TODO */
+        String result = null;
 
-    @Override
-    public String post(String url, int timeout, String userAgent, String content, boolean gzip) throws IOException {
-        return null;
+        ByteArrayOutputStream baos = null;
+
+        try {
+            baos = new ByteArrayOutputStream();
+            //post(url, baos, timeout, userAgent, formData);
+            //result = new String(baos.toByteArray(), "UTF-8");
+        } catch (Throwable e) {
+            LOG.error("Error posting data via http: " + e.getMessage(), e);
+        } finally {
+            closeQuietly(baos);
+        }
+
+        return result;
     }
 
     @Override
     public String post(String url, int timeout, String userAgent, String content, String postContentType, boolean gzip) throws IOException {
-        return null;
-    }
+        /* WIP */
+        String result = null;
+        canceled = false;
+        final Request.Builder builder = prepareRequestBuilder(url, timeout, userAgent, null, null);
+        if (!StringUtils.isNullOrEmpty(postContentType)) {
+            builder.addHeader("Content-type", postContentType);
+        }
+        final RequestBody requestBody = RequestBody.create(MediaType.parse(postContentType), content);
+        builder.post(requestBody);
+        okHttpClient.setFollowRedirects(false);
+        okHttpClient.setHostnameVerifier(new HostnameVerifier() {
+            @Override
+            public boolean verify(String hostname, SSLSession session) {
+                return true;
+            }
+        });
+        //okHttpClient.setSslSocketFactory()
 
-    @Override
-    public void cancel() {
-        canceled = true;
-    }
+//        final URL u = new URL(url);
+//        final HttpURLConnection conn = (HttpURLConnection) u.openConnection();
+//        conn.setDoOutput(true);
+//        conn.setConnectTimeout(timeout);
+//        conn.setReadTimeout(timeout);
+//        conn.setRequestProperty("User-Agent", userAgent);
+//        conn.setInstanceFollowRedirects(false);
 
-    @Override
-    public boolean isCanceled() {
-        return canceled;
+        /**
+        if (conn instanceof HttpsURLConnection) {
+            setHostnameVerifier((HttpsURLConnection) conn);
+        }
+
+        byte[] data = content.getBytes("UTF-8");
+
+        conn.setRequestMethod("POST");
+        conn.setRequestProperty("Content-Type", postContentType);
+        conn.setRequestProperty("charset", "utf-8");
+        conn.setUseCaches(false);
+
+        ByteArrayInputStream in = new ByteArrayInputStream(data);
+
+        try {
+            OutputStream out = null;
+            if (gzip) {
+                out = new GZIPOutputStream(conn.getOutputStream());
+            } else {
+                out = conn.getOutputStream();
+            }
+
+            byte[] b = new byte[4096];
+            int n = 0;
+            while (!canceled && (n = in.read(b, 0, b.length)) != -1) {
+                if (!canceled) {
+                    out.write(b, 0, n);
+                    out.flush();
+                    onData(b, 0, n);
+                }
+            }
+
+            closeQuietly(out);
+
+            conn.connect();
+            int httpResponseCode = getResponseCode(conn);
+
+            if (httpResponseCode != HttpURLConnection.HTTP_OK && httpResponseCode != HttpURLConnection.HTTP_PARTIAL) {
+                throw new ResponseCodeNotSupportedException(httpResponseCode);
+            }
+
+            if (canceled) {
+                onCancel();
+            } else {
+                BufferedInputStream bis = new BufferedInputStream(conn.getInputStream(), 4096);
+                ByteArrayBuffer baf = new ByteArrayBuffer(1024);
+                byte[] buffer = new byte[64];
+                int read = 0;
+                while (true) {
+                    read = bis.read(buffer);
+                    if (read == -1) {
+                        break;
+                    }
+                    baf.append(buffer, 0, read);
+                }
+                result = new String(baf.toByteArray());
+                onComplete();
+            }
+        } catch (Exception e) {
+            onError(e);
+        } finally {
+            closeQuietly(in);
+            closeQuietly(conn);
+        }
+         */
+        return result;
     }
 
     private void addRangeHeader(int rangeStart, int rangeEnd, Request.Builder builderRef) {
@@ -281,6 +256,7 @@ public class OKHTTPClient implements HttpClient {
             return;
         }
         StringBuilder sb = new StringBuilder();
+        sb.append("bytes=");
         sb.append(String.valueOf(rangeStart));
         sb.append('-');
         if (rangeEnd > 0 && rangeEnd > rangeStart) {
@@ -289,8 +265,18 @@ public class OKHTTPClient implements HttpClient {
         builderRef.addHeader("Range", sb.toString());
     }
 
+    private static Map<HttpContext, OKHTTPClient> buildOkHttpClients() {
+        final HashMap<HttpContext, OKHTTPClient> map = new HashMap<HttpContext, OKHTTPClient>();
+        map.put(HttpContext.SEARCH, new OKHTTPClient(newOkHttpClient(new ThreadPool("OkHttpClient-searches", 1, 4, 60, new LinkedBlockingQueue<Runnable>(), true))));
+        map.put(HttpContext.DOWNLOAD, new OKHTTPClient(newOkHttpClient(new ThreadPool("OkHttpClient-downloads", 1, 10, 5, new LinkedBlockingQueue<Runnable>(), true))));
+        return map;
+    }
+
+
     private Request.Builder prepareRequestBuilder(String url, int timeout, String userAgent, String referrer, String cookie) {
         okHttpClient.setConnectTimeout(timeout, TimeUnit.MILLISECONDS);
+        okHttpClient.setReadTimeout(timeout, TimeUnit.MILLISECONDS);
+        okHttpClient.setWriteTimeout(timeout, TimeUnit.MILLISECONDS);
         Request.Builder builder = new Request.Builder();
         builder.url(url);
         if (!StringUtils.isNullOrEmpty(userAgent)) {
@@ -324,13 +310,6 @@ public class OKHTTPClient implements HttpClient {
         return okHttpClient.newCall(request).execute();
     }
 
-    private static Map<HttpContext, OKHTTPClient> buildOkHttpClients() {
-        final HashMap<HttpContext, OKHTTPClient> map = new HashMap<HttpContext, OKHTTPClient>();
-        map.put(HttpContext.SEARCH, new OKHTTPClient(newOkHttpClient(new ThreadPool("OkHttpClient-searches", 1, 4, 60, new LinkedBlockingQueue<Runnable>(), true))));
-        map.put(HttpContext.DOWNLOAD, new OKHTTPClient(newOkHttpClient(new ThreadPool("OkHttpClient-downloads", 1, 10, 5, new LinkedBlockingQueue<Runnable>(), true))));
-        return map;
-    }
-
     private static OkHttpClient newOkHttpClient(ThreadPool pool) {
         OkHttpClient searchClient = new OkHttpClient();
         searchClient.setDispatcher(new Dispatcher(pool));
@@ -342,13 +321,18 @@ public class OKHTTPClient implements HttpClient {
         return searchClient;
     }
 
-    private static void closeQuietly(Closeable closeable) {
+    /**
+    private static SSLSocketFactory createCustomSSLSocketFactory() {
         try {
-            if (closeable != null) {
-                closeable.close();
-            }
-        } catch (IOException ioe) {
-            // ignore
+            SSLContext sc = SSLContext.getInstance("TLS");
+            sc.init(null, new TrustManager[]{new AllX509TrustManager()}, new SecureRandom());
+            SSLSocketFactory d = sc.getSocketFactory();
+            return new WrapSSLSocketFactory(d);
+        } catch (Throwable e) {
+            LOG.error("Unable to create custom SSL socket factory", e);
         }
-    }
+
+        return null;
+    }*/
+
 }

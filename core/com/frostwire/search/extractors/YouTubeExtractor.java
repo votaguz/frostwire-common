@@ -17,7 +17,7 @@ package com.frostwire.search.extractors;
 
 import com.frostwire.logging.Logger;
 import com.frostwire.search.FileSearchResult;
-import com.frostwire.util.HttpClient;
+import com.frostwire.util.http.HttpClient;
 import com.frostwire.util.HttpClientFactory;
 import jd.http.Browser;
 import jd.http.Request;
