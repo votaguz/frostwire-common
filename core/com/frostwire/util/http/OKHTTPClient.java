@@ -24,6 +24,7 @@ import static com.frostwire.util.HttpClientFactory.HttpContext;
 import com.frostwire.util.StringUtils;
 import com.frostwire.util.ThreadPool;
 import com.squareup.okhttp.*;
+import okio.Buffer;
 import okio.BufferedSink;
 import okio.GzipSink;
 import okio.Okio;
@@ -254,9 +255,8 @@ public class OKHTTPClient extends AbstractHttpClient {
     }
 
     /** This interceptor compresses the HTTP request body. Many webservers can't handle this! */
-    final class GzipRequestInterceptor implements Interceptor {
-        @Override
-        public Response intercept(Chain chain) throws IOException {
+    class GzipRequestInterceptor implements Interceptor {
+        @Override public Response intercept(Chain chain) throws IOException {
             Request originalRequest = chain.request();
             if (originalRequest.body() == null || originalRequest.header("Content-Encoding") != null) {
                 return chain.proceed(originalRequest);
@@ -264,9 +264,31 @@ public class OKHTTPClient extends AbstractHttpClient {
 
             Request compressedRequest = originalRequest.newBuilder()
                     .header("Content-Encoding", "gzip")
-                    .method(originalRequest.method(), gzip(originalRequest.body()))
+                    .method(originalRequest.method(), forceContentLength(gzip(originalRequest.body())))
                     .build();
             return chain.proceed(compressedRequest);
+        }
+
+        /** https://github.com/square/okhttp/issues/350 */
+        private RequestBody forceContentLength(final RequestBody requestBody) throws IOException {
+            final Buffer buffer = new Buffer();
+            requestBody.writeTo(buffer);
+            return new RequestBody() {
+                @Override
+                public MediaType contentType() {
+                    return requestBody.contentType();
+                }
+
+                @Override
+                public long contentLength() {
+                    return buffer.size();
+                }
+
+                @Override
+                public void writeTo(BufferedSink sink) throws IOException {
+                    sink.write(buffer.snapshot());
+                }
+            };
         }
 
         private RequestBody gzip(final RequestBody body) {
