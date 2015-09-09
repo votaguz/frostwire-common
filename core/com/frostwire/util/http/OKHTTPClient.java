@@ -24,10 +24,14 @@ import static com.frostwire.util.HttpClientFactory.HttpContext;
 import com.frostwire.util.StringUtils;
 import com.frostwire.util.ThreadPool;
 import com.squareup.okhttp.*;
+import okio.BufferedSink;
+import okio.GzipSink;
+import okio.Okio;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
 import java.io.*;
+import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -137,19 +141,6 @@ public class OKHTTPClient extends AbstractHttpClient {
     public String post(String url, int timeout, String userAgent, Map<String, String> formData) {
         /* TODO */
         String result = null;
-
-        ByteArrayOutputStream baos = null;
-
-        try {
-            baos = new ByteArrayOutputStream();
-            //post(url, baos, timeout, userAgent, formData);
-            //result = new String(baos.toByteArray(), "UTF-8");
-        } catch (Throwable e) {
-            LOG.error("Error posting data via http: " + e.getMessage(), e);
-        } finally {
-            closeQuietly(baos);
-        }
-
         return result;
     }
 
@@ -159,11 +150,7 @@ public class OKHTTPClient extends AbstractHttpClient {
         String result = null;
         canceled = false;
         final Request.Builder builder = prepareRequestBuilder(url, timeout, userAgent, null, null);
-        if (!StringUtils.isNullOrEmpty(postContentType)) {
-            builder.addHeader("Content-type", postContentType);
-        }
-        final RequestBody requestBody = RequestBody.create(MediaType.parse(postContentType), content);
-        builder.post(requestBody);
+        final RequestBody requestBody = RequestBody.create(MediaType.parse(postContentType), content.getBytes("UTF-8"));
         okHttpClient.setFollowRedirects(false);
         okHttpClient.setHostnameVerifier(new HostnameVerifier() {
             @Override
@@ -171,81 +158,28 @@ public class OKHTTPClient extends AbstractHttpClient {
                 return true;
             }
         });
-        //okHttpClient.setSslSocketFactory()
+        okHttpClient.setSslSocketFactory(CUSTOM_SSL_SOCKET_FACTORY);
 
-//        final URL u = new URL(url);
-//        final HttpURLConnection conn = (HttpURLConnection) u.openConnection();
-//        conn.setDoOutput(true);
-//        conn.setConnectTimeout(timeout);
-//        conn.setReadTimeout(timeout);
-//        conn.setRequestProperty("User-Agent", userAgent);
-//        conn.setInstanceFollowRedirects(false);
-
-        /**
-        if (conn instanceof HttpsURLConnection) {
-            setHostnameVerifier((HttpsURLConnection) conn);
+        if (gzip) {
+           okHttpClient.interceptors().remove(0);
+           okHttpClient.interceptors().add(0, new GzipRequestInterceptor());
         }
 
-        byte[] data = content.getBytes("UTF-8");
+        builder.post(requestBody);
 
-        conn.setRequestMethod("POST");
-        conn.setRequestProperty("Content-Type", postContentType);
-        conn.setRequestProperty("charset", "utf-8");
-        conn.setUseCaches(false);
+        final Response response = this.getSyncResponse(builder);
+        int httpResponseCode = response.code();
 
-        ByteArrayInputStream in = new ByteArrayInputStream(data);
-
-        try {
-            OutputStream out = null;
-            if (gzip) {
-                out = new GZIPOutputStream(conn.getOutputStream());
-            } else {
-                out = conn.getOutputStream();
-            }
-
-            byte[] b = new byte[4096];
-            int n = 0;
-            while (!canceled && (n = in.read(b, 0, b.length)) != -1) {
-                if (!canceled) {
-                    out.write(b, 0, n);
-                    out.flush();
-                    onData(b, 0, n);
-                }
-            }
-
-            closeQuietly(out);
-
-            conn.connect();
-            int httpResponseCode = getResponseCode(conn);
-
-            if (httpResponseCode != HttpURLConnection.HTTP_OK && httpResponseCode != HttpURLConnection.HTTP_PARTIAL) {
-                throw new ResponseCodeNotSupportedException(httpResponseCode);
-            }
-
-            if (canceled) {
-                onCancel();
-            } else {
-                BufferedInputStream bis = new BufferedInputStream(conn.getInputStream(), 4096);
-                ByteArrayBuffer baf = new ByteArrayBuffer(1024);
-                byte[] buffer = new byte[64];
-                int read = 0;
-                while (true) {
-                    read = bis.read(buffer);
-                    if (read == -1) {
-                        break;
-                    }
-                    baf.append(buffer, 0, read);
-                }
-                result = new String(baf.toByteArray());
-                onComplete();
-            }
-        } catch (Exception e) {
-            onError(e);
-        } finally {
-            closeQuietly(in);
-            closeQuietly(conn);
+        if ((httpResponseCode != HttpURLConnection.HTTP_OK) && (httpResponseCode != HttpURLConnection.HTTP_PARTIAL)) {
+            throw new ResponseCodeNotSupportedException(httpResponseCode);
         }
-         */
+
+        if (canceled) {
+            onCancel();
+        } else {
+            result = response.body().string();
+            onComplete();
+        }
         return result;
     }
 
@@ -274,6 +208,7 @@ public class OKHTTPClient extends AbstractHttpClient {
         okHttpClient.setConnectTimeout(timeout, TimeUnit.MILLISECONDS);
         okHttpClient.setReadTimeout(timeout, TimeUnit.MILLISECONDS);
         okHttpClient.setWriteTimeout(timeout, TimeUnit.MILLISECONDS);
+        okHttpClient.interceptors().clear();
         Request.Builder builder = new Request.Builder();
         builder.url(url);
         if (!StringUtils.isNullOrEmpty(userAgent)) {
@@ -316,5 +251,43 @@ public class OKHTTPClient extends AbstractHttpClient {
         // Maybe we should use a custom connection pool here. Using default.
         //searchClient.setConnectionPool(?);
         return searchClient;
+    }
+
+    /** This interceptor compresses the HTTP request body. Many webservers can't handle this! */
+    final class GzipRequestInterceptor implements Interceptor {
+        @Override
+        public Response intercept(Chain chain) throws IOException {
+            Request originalRequest = chain.request();
+            if (originalRequest.body() == null || originalRequest.header("Content-Encoding") != null) {
+                return chain.proceed(originalRequest);
+            }
+
+            Request compressedRequest = originalRequest.newBuilder()
+                    .header("Content-Encoding", "gzip")
+                    .method(originalRequest.method(), gzip(originalRequest.body()))
+                    .build();
+            return chain.proceed(compressedRequest);
+        }
+
+        private RequestBody gzip(final RequestBody body) {
+            return new RequestBody() {
+                @Override
+                public MediaType contentType() {
+                    return body.contentType();
+                }
+
+                @Override
+                public long contentLength() {
+                    return -1; // We don't know the compressed length in advance!
+                }
+
+                @Override
+                public void writeTo(BufferedSink sink) throws IOException {
+                    BufferedSink gzipSink = Okio.buffer(new GzipSink(sink));
+                    body.writeTo(gzipSink);
+                    gzipSink.close();
+                }
+            };
+        }
     }
 }
