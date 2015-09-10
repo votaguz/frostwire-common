@@ -18,7 +18,7 @@
 package com.frostwire.search;
 
 import com.frostwire.logging.Logger;
-import com.frostwire.util.HttpClient;
+import com.frostwire.util.http.HttpClient;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.StringUtils;
 import com.frostwire.util.UserAgentGenerator;
@@ -58,7 +58,7 @@ public abstract class WebSearchPerformer extends AbstractSearchPerformer {
         this.keywords = keywords;
         this.encodedKeywords = StringUtils.encodeUrl(keywords);
         this.timeout = timeout;
-        this.client = HttpClientFactory.newInstance();
+        this.client = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.SEARCH);
     }
 
     public final String getKeywords() {
@@ -89,7 +89,11 @@ public abstract class WebSearchPerformer extends AbstractSearchPerformer {
     }
 
     public String post(String url, Map<String, String> formData) {
-        return client.post(url, timeout, DEFAULT_USER_AGENT, formData);
+        try {
+            return client.post(url, timeout, DEFAULT_USER_AGENT, formData);
+        } catch (IOException throwable) {
+            return null;
+        }
     }
 
     /**

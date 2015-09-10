@@ -20,7 +20,7 @@ package com.frostwire.uxstats;
 import java.util.concurrent.ExecutorService;
 
 import com.frostwire.logging.Logger;
-import com.frostwire.util.HttpClient;
+import com.frostwire.util.http.HttpClient;
 import com.frostwire.util.HttpClientFactory;
 import com.frostwire.util.JsonUtils;
 
@@ -49,8 +49,7 @@ public final class UXStats {
     }
 
     private UXStats() {
-        this.httpClient = HttpClientFactory.newInstance();
-
+        this.httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC);
         this.executor = null;
         this.conf = null;
         this.data = null;

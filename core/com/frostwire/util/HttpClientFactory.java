@@ -17,6 +17,14 @@
 
 package com.frostwire.util;
 
+import com.frostwire.util.http.HttpClient;
+import com.frostwire.util.http.JdkHttpClient;
+import com.frostwire.util.http.OKHTTPClient;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
+
 /**
  * 
  * @author gubatron
@@ -24,11 +32,33 @@ package com.frostwire.util;
  *
  */
 public class HttpClientFactory {
+    public enum HttpContext {
+        SEARCH,
+        DOWNLOAD,
+        MISC
+    }
+
+    private static Map<HttpContext, OKHTTPClient> okHttpClients = null;
 
     private HttpClientFactory() {
     }
 
     public static HttpClient newInstance() {
         return new JdkHttpClient();
+    }
+
+    public static HttpClient getInstance(HttpContext context) {
+        if (okHttpClients == null) {
+            okHttpClients = buildOkHttpClients();
+        }
+        return okHttpClients.get(context);
+    }
+
+    private static Map<HttpContext, OKHTTPClient> buildOkHttpClients() {
+        final HashMap<HttpContext, OKHTTPClient> map = new HashMap<HttpContext, OKHTTPClient>();
+        map.put(HttpContext.SEARCH, new OKHTTPClient(new ThreadPool("OkHttpClient-searches", 1, 4, 60, new LinkedBlockingQueue<Runnable>(), true)));
+        map.put(HttpContext.DOWNLOAD, new OKHTTPClient(new ThreadPool("OkHttpClient-downloads", 1, 10, 5, new LinkedBlockingQueue<Runnable>(), true)));
+        map.put(HttpContext.MISC, new OKHTTPClient(new ThreadPool("OkHttpClient-suggestions",1,3,30, new LinkedBlockingQueue<Runnable>(),true)));
+        return map;
     }
 }

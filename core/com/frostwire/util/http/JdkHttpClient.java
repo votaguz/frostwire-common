@@ -15,15 +15,18 @@
  * limitations under the License.
  */
 
-package com.frostwire.util;
+package com.frostwire.util.http;
 
 import com.frostwire.logging.Logger;
+import com.frostwire.util.ByteArrayBuffer;
 
-import javax.net.ssl.*;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSession;
 import java.io.*;
-import java.net.*;
-import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -36,18 +39,8 @@ import java.util.zip.GZIPOutputStream;
  * @author gubatron
  * @author aldenml
  */
-final class JdkHttpClient implements HttpClient {
-
+public final class JdkHttpClient extends AbstractHttpClient {
     private static final Logger LOG = Logger.getLogger(JdkHttpClient.class);
-
-    private static final int DEFAULT_TIMEOUT = 10000;
-    private static final String DEFAULT_USER_AGENT = UserAgentGenerator.getUserAgent();
-
-    private static final SSLSocketFactory CUSTOM_SSL_SOCKET_FACTORY = createCustomSSLSocketFactory();
-
-    private HttpClientListener listener;
-
-    private boolean canceled;
 
     @Override
     public int head(String url, int connectTimeoutInMillis) throws IOException {
@@ -58,21 +51,24 @@ final class JdkHttpClient implements HttpClient {
         return connection.getResponseCode();
     }
 
+    @Override
+    public byte[] getBytes(String url, int timeout, String userAgent, String referrer, String cookies) {
+        byte[] result = null;
 
-    public String get(String url) throws IOException {
-        return get(url, DEFAULT_TIMEOUT, DEFAULT_USER_AGENT);
-    }
+        ByteArrayOutputStream baos = null;
 
-    public String get(String url, int timeout) throws IOException {
-        return get(url, timeout, DEFAULT_USER_AGENT);
-    }
+        try {
+            baos = new ByteArrayOutputStream();
+            get(url, baos, timeout, userAgent, referrer, cookies, -1);
 
-    public String get(String url, int timeout, String userAgent) throws IOException {
-        return get(url, timeout, userAgent, null, null);
-    }
+            result = baos.toByteArray();
+        } catch (Throwable e) {
+            LOG.error("Error getting bytes from http body response: " + e.getMessage(), e);
+        } finally {
+            closeQuietly(baos);
+        }
 
-    public String get(String url, int timeout, String userAgent, String referrer, String cookie) throws IOException {
-        return get(url, timeout, userAgent, referrer, cookie, null);
+        return result;
     }
 
     @Override
@@ -97,56 +93,7 @@ final class JdkHttpClient implements HttpClient {
         return result;
     }
 
-    public byte[] getBytes(String url, int timeout, String userAgent, String referrer) {
-        return getBytes(url, timeout, userAgent, referrer, null);
-    }
-
-    public byte[] getBytes(String url, int timeout, String userAgent, String referrer, String cookies) {
-        byte[] result = null;
-
-        ByteArrayOutputStream baos = null;
-
-        try {
-            baos = new ByteArrayOutputStream();
-            get(url, baos, timeout, userAgent, referrer, cookies, -1);
-
-            result = baos.toByteArray();
-        } catch (Throwable e) {
-            LOG.error("Error getting bytes from http body response: " + e.getMessage(), e);
-        } finally {
-            closeQuietly(baos);
-        }
-
-        return result;
-    }
-
     @Override
-    public byte[] getBytes(String url, int timeout, String referrer) {
-        return getBytes(url, timeout, DEFAULT_USER_AGENT, referrer);
-    }
-
-    @Override
-    public byte[] getBytes(String url, int timeout) {
-        return getBytes(url, timeout, null);
-    }
-
-    @Override
-    public byte[] getBytes(String url) {
-        return getBytes(url, DEFAULT_TIMEOUT);
-    }
-
-    public void save(String url, File file) throws IOException {
-        save(url, file, false, DEFAULT_TIMEOUT, DEFAULT_USER_AGENT);
-    }
-
-    public void save(String url, File file, boolean resume) throws IOException {
-        save(url, file, resume, DEFAULT_TIMEOUT, DEFAULT_USER_AGENT);
-    }
-
-    public void save(String url, File file, boolean resume, int timeout, String userAgent) throws IOException {
-        save(url, file, resume, timeout, userAgent, null);
-    }
-
     public void save(String url, File file, boolean resume, int timeout, String userAgent, String referrer) throws IOException {
         FileOutputStream fos = null;
         int rangeStart = 0;
@@ -164,6 +111,28 @@ final class JdkHttpClient implements HttpClient {
         } finally {
             closeQuietly(fos);
         }
+    }
+
+    /**
+     * Post a form Content-type: application/x-www-form-urlencoded
+     */
+    @Override
+    public String post(String url, int timeout, String userAgent, Map<String, String> formData) {
+        String result = null;
+
+        ByteArrayOutputStream baos = null;
+
+        try {
+            baos = new ByteArrayOutputStream();
+            post(url, baos, timeout, userAgent, formData);
+            result = new String(baos.toByteArray(), "UTF-8");
+        } catch (Throwable e) {
+            LOG.error("Error posting data via http: " + e.getMessage(), e);
+        } finally {
+            closeQuietly(baos);
+        }
+
+        return result;
     }
 
     @Override
@@ -245,37 +214,21 @@ final class JdkHttpClient implements HttpClient {
         return result;
     }
 
-
-    @Override
-    public String post(String url, int timeout, String userAgent, String content, boolean gzip) throws IOException {
-        return post(url, timeout, userAgent, content, "text/plain", gzip);
-    }
-
-    /**
-     * Post a form Content-type: application/x-www-form-urlencoded
-     */
-    @Override
-    public String post(String url, int timeout, String userAgent, Map<String, String> formData) {
-        String result = null;
-
-        ByteArrayOutputStream baos = null;
-
-        try {
-            baos = new ByteArrayOutputStream();
-            post(url, baos, timeout, userAgent, formData);
-            result = new String(baos.toByteArray(), "UTF-8");
-        } catch (Throwable e) {
-            LOG.error("Error posting data via http: " + e.getMessage(), e);
-        } finally {
-            closeQuietly(baos);
-        }
-
-        return result;
-    }
-
     private String buildRange(int rangeStart, int rangeLength) {
         String prefix = "bytes=" + rangeStart + "-";
         return prefix + ((rangeLength > -1) ? (rangeStart + rangeLength) : "");
+    }
+
+    private void checkRangeSupport(int rangeStart, URLConnection conn) throws HttpRangeOutOfBoundsException, RangeNotSupportedException {
+
+        boolean hasContentRange = conn.getHeaderField("Content-Range") != null;
+        boolean hasAcceptRanges = conn.getHeaderField("Accept-Ranges") != null && conn.getHeaderField("Accept-Ranges").equals("bytes");
+
+        if (rangeStart > 0 && !hasContentRange && !hasAcceptRanges) {
+            RangeNotSupportedException rangeNotSupportedException = new RangeNotSupportedException("Server does not support bytes range request");
+            onError(rangeNotSupportedException);
+            throw rangeNotSupportedException;
+        }
     }
 
     private void get(String url, OutputStream out, int timeout, String userAgent, String referrer, String cookie, int rangeStart) throws IOException {
@@ -378,18 +331,7 @@ final class JdkHttpClient implements HttpClient {
             setHostnameVerifier((HttpsURLConnection) conn);
         }
 
-        StringBuilder sb = new StringBuilder();
-        if (formData != null && formData.size() > 0) {
-            for (Entry<String, String> kv : formData.entrySet()) {
-                sb.append("&");
-                sb.append(kv.getKey());
-                sb.append("=");
-                sb.append(kv.getValue());
-            }
-            sb.deleteCharAt(0);
-        }
-
-        byte[] data = sb.toString().getBytes("UTF-8");
+        byte[] data = getFormDataBytes(formData);
 
         conn.setRequestMethod("POST");
         conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
@@ -472,19 +414,6 @@ final class JdkHttpClient implements HttpClient {
         }
     }
 
-    private static SSLSocketFactory createCustomSSLSocketFactory() {
-        try {
-            SSLContext sc = SSLContext.getInstance("TLS");
-            sc.init(null, new TrustManager[]{new AllX509TrustManager()}, new SecureRandom());
-            SSLSocketFactory d = sc.getSocketFactory();
-            return new WrapSSLSocketFactory(d);
-        } catch (Throwable e) {
-            LOG.error("Unable to create custom SSL socket factory", e);
-        }
-
-        return null;
-    }
-
     private int getResponseCode(URLConnection conn) {
         try {
             return ((HttpURLConnection) conn).getResponseCode();
@@ -492,18 +421,6 @@ final class JdkHttpClient implements HttpClient {
             e.printStackTrace();
             LOG.error("can't get response code ", e);
             return -1;
-        }
-    }
-
-    private void checkRangeSupport(int rangeStart, URLConnection conn) throws HttpRangeOutOfBoundsException, RangeNotSupportedException {
-
-        boolean hasContentRange = conn.getHeaderField("Content-Range") != null;
-        boolean hasAcceptRanges = conn.getHeaderField("Accept-Ranges") != null && conn.getHeaderField("Accept-Ranges").equals("bytes");
-
-        if (rangeStart > 0 && !hasContentRange && !hasAcceptRanges) {
-            RangeNotSupportedException rangeNotSupportedException = new RangeNotSupportedException("Server does not support bytes range request");
-            onError(rangeNotSupportedException);
-            throw rangeNotSupportedException;
         }
     }
 
@@ -517,7 +434,8 @@ final class JdkHttpClient implements HttpClient {
         }
     }
 
-    private void onCancel() {
+    @Override
+    public void onCancel() {
         if (getListener() != null) {
             try {
                 getListener().onCancel(this);
@@ -527,7 +445,8 @@ final class JdkHttpClient implements HttpClient {
         }
     }
 
-    private void onData(byte[] b, int i, int n) {
+    @Override
+    public void onData(byte[] b, int i, int n) {
         if (getListener() != null) {
             try {
                 getListener().onData(this, b, 0, n);
@@ -537,7 +456,8 @@ final class JdkHttpClient implements HttpClient {
         }
     }
 
-    protected void onError(Exception e) {
+    @Override
+    public void onError(Exception e) {
         if (getListener() != null) {
             try {
                 getListener().onError(this, e);
@@ -549,23 +469,14 @@ final class JdkHttpClient implements HttpClient {
         }
     }
 
-    protected void onComplete() {
+    @Override
+    public void onComplete() {
         if (getListener() != null) {
             try {
                 getListener().onComplete(this);
             } catch (Exception e) {
                 LOG.warn(e.getMessage(), e);
             }
-        }
-    }
-
-    private static void closeQuietly(Closeable closeable) {
-        try {
-            if (closeable != null) {
-                closeable.close();
-            }
-        } catch (IOException ioe) {
-            // ignore
         }
     }
 
@@ -576,83 +487,6 @@ final class JdkHttpClient implements HttpClient {
             } catch (Throwable e) {
                 LOG.debug("Error closing http connection", e);
             }
-        }
-    }
-
-    @Override
-    public void setListener(HttpClientListener listener) {
-        this.listener = listener;
-    }
-
-    @Override
-    public HttpClientListener getListener() {
-        return listener;
-    }
-
-    @Override
-    public void cancel() {
-        canceled = true;
-    }
-
-    @Override
-    public boolean isCanceled() {
-        return canceled;
-    }
-
-    private static final class AllX509TrustManager implements X509TrustManager {
-
-        public X509Certificate[] getAcceptedIssuers() {
-            return null;
-        }
-
-        public void checkClientTrusted(X509Certificate[] certs, String authType) {
-        }
-
-        public void checkServerTrusted(X509Certificate[] certs, String authType) {
-        }
-    }
-
-    private static final class WrapSSLSocketFactory extends SSLSocketFactory {
-
-        private final SSLSocketFactory d;
-
-        public WrapSSLSocketFactory(SSLSocketFactory d) {
-            this.d = d;
-        }
-
-        @Override
-        public Socket createSocket(String s, int i) throws IOException, UnknownHostException {
-            return d.createSocket(s, i);
-        }
-
-        @Override
-        public Socket createSocket(String s, int i, InetAddress inetAddress, int i1) throws IOException, UnknownHostException {
-            return d.createSocket(s, i, inetAddress, i1);
-        }
-
-        @Override
-        public Socket createSocket(InetAddress inetAddress, int i) throws IOException {
-            return d.createSocket(inetAddress, i);
-        }
-
-        @Override
-        public Socket createSocket(InetAddress inetAddress, int i, InetAddress inetAddress1, int i1) throws IOException {
-            return d.createSocket(inetAddress, i, inetAddress1, i1);
-        }
-
-        @Override
-        public String[] getDefaultCipherSuites() {
-            return d.getDefaultCipherSuites();
-        }
-
-        @Override
-        public String[] getSupportedCipherSuites() {
-            return d.getSupportedCipherSuites();
-        }
-
-        @Override
-        public Socket createSocket(Socket socket, String s, int i, boolean b) throws IOException {
-            return d.createSocket(socket, s, i, b);
         }
     }
 }
