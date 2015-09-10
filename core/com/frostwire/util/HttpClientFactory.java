@@ -34,7 +34,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class HttpClientFactory {
     public enum HttpContext {
         SEARCH,
-        DOWNLOAD
+        DOWNLOAD,
+        MISC
     }
 
     private static Map<HttpContext, OKHTTPClient> okHttpClients = null;
@@ -57,6 +58,7 @@ public class HttpClientFactory {
         final HashMap<HttpContext, OKHTTPClient> map = new HashMap<HttpContext, OKHTTPClient>();
         map.put(HttpContext.SEARCH, new OKHTTPClient(new ThreadPool("OkHttpClient-searches", 1, 4, 60, new LinkedBlockingQueue<Runnable>(), true)));
         map.put(HttpContext.DOWNLOAD, new OKHTTPClient(new ThreadPool("OkHttpClient-downloads", 1, 10, 5, new LinkedBlockingQueue<Runnable>(), true)));
+        map.put(HttpContext.MISC, new OKHTTPClient(new ThreadPool("OkHttpClient-suggestions",1,3,30, new LinkedBlockingQueue<Runnable>(),true)));
         return map;
     }
 }

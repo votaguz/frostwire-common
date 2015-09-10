@@ -49,8 +49,7 @@ public final class UXStats {
     }
 
     private UXStats() {
-        this.httpClient = HttpClientFactory.newInstance();
-
+        this.httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.MISC);
         this.executor = null;
         this.conf = null;
         this.data = null;

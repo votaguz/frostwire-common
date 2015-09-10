@@ -130,7 +130,7 @@ public final class YouTubeExtractor {
             return Collections.emptyList();
         }
 
-        HttpClient httpClient = HttpClientFactory.newInstance();
+        HttpClient httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.SEARCH);
         String dashDoc = httpClient.get(dashManifestUrl);
 
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -450,7 +450,7 @@ public final class YouTubeExtractor {
             String jscode = "";
             try {
                 html5playerUrl = html5playerUrl.replace("\\", "");
-                HttpClient httpClient = HttpClientFactory.newInstance();
+                HttpClient httpClient = HttpClientFactory.getInstance(HttpClientFactory.HttpContext.SEARCH);
                 jscode = httpClient.get(html5playerUrl);
                 sig = new YouTubeSig(jscode);
                 YT_SIG_MAP.put(html5playerUrl, sig);
