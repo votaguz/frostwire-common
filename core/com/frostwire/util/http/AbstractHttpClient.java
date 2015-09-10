@@ -26,6 +26,7 @@ import javax.net.ssl.TrustManager;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
 import java.util.Map;
 
@@ -165,7 +166,7 @@ public abstract class AbstractHttpClient implements HttpClient {
     abstract public void save(String url, File file, boolean resume, int timeout, String userAgent, String referrer) throws IOException;
 
     @Override
-    abstract public String post(String url, int timeout, String userAgent, Map<String, String> formData);
+    abstract public String post(String url, int timeout, String userAgent, Map<String, String> formData) throws IOException;
 
     @Override
     public String post(String url, int timeout, String userAgent, String content, boolean gzip) throws IOException {
@@ -182,6 +183,20 @@ public abstract class AbstractHttpClient implements HttpClient {
     @Override
     public boolean isCanceled() {
         return canceled;
+    }
+
+    protected byte[] getFormDataBytes(Map<String, String> formData) throws UnsupportedEncodingException {
+        StringBuilder sb = new StringBuilder();
+        if (formData != null && formData.size() > 0) {
+            for (Map.Entry<String, String> kv : formData.entrySet()) {
+                sb.append("&");
+                sb.append(kv.getKey());
+                sb.append("=");
+                sb.append(kv.getValue());
+            }
+            sb.deleteCharAt(0);
+        }
+        return sb.toString().getBytes("UTF-8");
     }
 
     protected static void closeQuietly(Closeable closeable) {

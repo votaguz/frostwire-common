@@ -75,7 +75,7 @@ public interface HttpClient {
 
     void save(String url, File file, boolean resume, int timeout, String userAgent, String referrer) throws IOException;
 
-    String post(String url, int timeout, String userAgent, Map<String, String> formData);
+    String post(String url, int timeout, String userAgent, Map<String, String> formData) throws IOException;
 
     String post(String url, int timeout, String userAgent, String content, boolean gzip) throws IOException;
 

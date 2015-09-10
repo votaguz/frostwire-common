@@ -331,18 +331,7 @@ public final class JdkHttpClient extends AbstractHttpClient {
             setHostnameVerifier((HttpsURLConnection) conn);
         }
 
-        StringBuilder sb = new StringBuilder();
-        if (formData != null && formData.size() > 0) {
-            for (Entry<String, String> kv : formData.entrySet()) {
-                sb.append("&");
-                sb.append(kv.getKey());
-                sb.append("=");
-                sb.append(kv.getValue());
-            }
-            sb.deleteCharAt(0);
-        }
-
-        byte[] data = sb.toString().getBytes("UTF-8");
+        byte[] data = getFormDataBytes(formData);
 
         conn.setRequestMethod("POST");
         conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");

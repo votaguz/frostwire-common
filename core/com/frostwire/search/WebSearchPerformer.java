@@ -89,7 +89,11 @@ public abstract class WebSearchPerformer extends AbstractSearchPerformer {
     }
 
     public String post(String url, Map<String, String> formData) {
-        return client.post(url, timeout, DEFAULT_USER_AGENT, formData);
+        try {
+            return client.post(url, timeout, DEFAULT_USER_AGENT, formData);
+        } catch (IOException throwable) {
+            return null;
+        }
     }
 
     /**

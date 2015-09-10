@@ -19,8 +19,6 @@
 package com.frostwire.util.http;
 
 import com.frostwire.logging.Logger;
-import com.frostwire.util.HttpClientFactory;
-import static com.frostwire.util.HttpClientFactory.HttpContext;
 import com.frostwire.util.StringUtils;
 import com.frostwire.util.ThreadPool;
 import com.squareup.okhttp.*;
@@ -31,13 +29,18 @@ import okio.Okio;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+
+import static com.frostwire.util.HttpClientFactory.HttpContext;
 
 /** An OkHttpClient based HTTP Client.
   *
@@ -46,17 +49,10 @@ import java.util.concurrent.TimeUnit;
 */
 public class OKHTTPClient extends AbstractHttpClient {
     private static final Logger LOG = Logger.getLogger(OKHTTPClient.class);
-    private OkHttpClient okHttpClient;
+    private final OkHttpClient okHttpClient;
 
-
-    private static final Map<HttpContext, OKHTTPClient> okHttpClients;
-
-    static {
-        okHttpClients = buildOkHttpClients();
-    }
-
-    private OKHTTPClient(OkHttpClient okHttpClient) {
-        this.okHttpClient = okHttpClient;
+    public OKHTTPClient(final ThreadPool pool) {
+        this.okHttpClient = newOkHttpClient(pool);
     }
 
     @Override
@@ -139,35 +135,26 @@ public class OKHTTPClient extends AbstractHttpClient {
     }
 
     @Override
-    public String post(String url, int timeout, String userAgent, Map<String, String> formData) {
-        /* TODO */
-        String result = null;
-        return result;
+    public String post(String url, int timeout, String userAgent, Map<String, String> formData) throws IOException {
+        return post(url, timeout, userAgent, "application/x-www-form-urlencoded; charset=utf-8", getFormDataBytes(formData), false);
     }
 
     @Override
     public String post(String url, int timeout, String userAgent, String content, String postContentType, boolean gzip) throws IOException {
-        /* WIP */
-        String result = null;
+        return post(url, timeout, userAgent, postContentType, content.getBytes("UTF-8"), gzip);
+    }
+
+    private String post(String url, int timeout, String userAgent, String postContentType, byte[] postData, boolean gzip) throws IOException {
         canceled = false;
         final Request.Builder builder = prepareRequestBuilder(url, timeout, userAgent, null, null);
-        final RequestBody requestBody = RequestBody.create(MediaType.parse(postContentType), content.getBytes("UTF-8"));
-        okHttpClient.setFollowRedirects(false);
-        okHttpClient.setHostnameVerifier(new HostnameVerifier() {
-            @Override
-            public boolean verify(String hostname, SSLSession session) {
-                return true;
-            }
-        });
-        okHttpClient.setSslSocketFactory(CUSTOM_SSL_SOCKET_FACTORY);
-
-        if (gzip) {
-           okHttpClient.interceptors().remove(0);
-           okHttpClient.interceptors().add(0, new GzipRequestInterceptor());
-        }
-
+        final RequestBody requestBody = RequestBody.create(MediaType.parse(postContentType), postData);
+        prepareOkHttpClientForPost(gzip);
         builder.post(requestBody);
+        return getPostSyncResponse(builder);
+    }
 
+    private String getPostSyncResponse(Request.Builder builder) throws IOException {
+        String result = null;
         final Response response = this.getSyncResponse(builder);
         int httpResponseCode = response.code();
 
@@ -184,6 +171,21 @@ public class OKHTTPClient extends AbstractHttpClient {
         return result;
     }
 
+    private void prepareOkHttpClientForPost(boolean gzip) {
+        okHttpClient.setFollowRedirects(false);
+        okHttpClient.setHostnameVerifier(new HostnameVerifier() {
+            @Override
+            public boolean verify(String hostname, SSLSession session) {
+                return true;
+            }
+        });
+        okHttpClient.setSslSocketFactory(CUSTOM_SSL_SOCKET_FACTORY);
+        if (gzip) {
+           okHttpClient.interceptors().remove(0);
+           okHttpClient.interceptors().add(0, new GzipRequestInterceptor());
+        }
+    }
+
     private void addRangeHeader(int rangeStart, int rangeEnd, Request.Builder builderRef) {
         if (rangeStart < 0) {
             return;
@@ -196,13 +198,6 @@ public class OKHTTPClient extends AbstractHttpClient {
             sb.append(String.valueOf(rangeEnd));
         }
         builderRef.addHeader("Range", sb.toString());
-    }
-
-    private static Map<HttpContext, OKHTTPClient> buildOkHttpClients() {
-        final HashMap<HttpContext, OKHTTPClient> map = new HashMap<HttpContext, OKHTTPClient>();
-        map.put(HttpContext.SEARCH, new OKHTTPClient(newOkHttpClient(new ThreadPool("OkHttpClient-searches", 1, 4, 60, new LinkedBlockingQueue<Runnable>(), true))));
-        map.put(HttpContext.DOWNLOAD, new OKHTTPClient(newOkHttpClient(new ThreadPool("OkHttpClient-downloads", 1, 10, 5, new LinkedBlockingQueue<Runnable>(), true))));
-        return map;
     }
 
     private Request.Builder prepareRequestBuilder(String url, int timeout, String userAgent, String referrer, String cookie) {
@@ -243,7 +238,7 @@ public class OKHTTPClient extends AbstractHttpClient {
         return okHttpClient.newCall(request).execute();
     }
 
-    private static OkHttpClient newOkHttpClient(ThreadPool pool) {
+    public static OkHttpClient newOkHttpClient(ThreadPool pool) {
         OkHttpClient searchClient = new OkHttpClient();
         searchClient.setDispatcher(new Dispatcher(pool));
         searchClient.setFollowRedirects(true);
