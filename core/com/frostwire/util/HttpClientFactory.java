@@ -37,18 +37,20 @@ public class HttpClientFactory {
         DOWNLOAD
     }
 
-    private static final Map<HttpContext, OKHTTPClient> okHttpClients;
-
-    static {
-        okHttpClients = buildOkHttpClients();
-    }
-
+    private static Map<HttpContext, OKHTTPClient> okHttpClients = null;
 
     private HttpClientFactory() {
     }
 
     public static HttpClient newInstance() {
         return new JdkHttpClient();
+    }
+
+    public static HttpClient getInstance(HttpContext context) {
+        if (okHttpClients == null) {
+            okHttpClients = buildOkHttpClients();
+        }
+        return okHttpClients.get(context);
     }
 
     private static Map<HttpContext, OKHTTPClient> buildOkHttpClients() {

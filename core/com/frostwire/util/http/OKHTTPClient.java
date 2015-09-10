@@ -34,13 +34,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-
-import static com.frostwire.util.HttpClientFactory.HttpContext;
 
 /** An OkHttpClient based HTTP Client.
   *
