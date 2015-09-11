@@ -25,7 +25,7 @@
  *
  */
 
-package com.frostwire.util;
+package com.frostwire.util.http;
 
 import java.io.Serializable;
 
@@ -34,7 +34,7 @@ import java.io.Serializable;
  *
  * @since 4.0
  */
-public final class ByteArrayBuffer implements Serializable {
+final class ByteArrayBuffer implements Serializable {
 
     private static final long serialVersionUID = 4359112959524048036L;
 
