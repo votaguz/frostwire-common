@@ -38,7 +38,7 @@ public class HttpClientFactory {
         MISC
     }
 
-    private static Map<HttpContext, OKHTTPClient> okHttpClients = null;
+    private static Map<HttpContext, ThreadPool> okHttpClientPools = null;
 
     private HttpClientFactory() {
     }
@@ -48,17 +48,17 @@ public class HttpClientFactory {
     }
 
     public static HttpClient getInstance(HttpContext context) {
-        if (okHttpClients == null) {
-            okHttpClients = buildOkHttpClients();
+        if (okHttpClientPools == null) {
+            okHttpClientPools = buildThreadPools();
         }
-        return okHttpClients.get(context);
+        return new OKHTTPClient(okHttpClientPools.get(context));
     }
 
-    private static Map<HttpContext, OKHTTPClient> buildOkHttpClients() {
-        final HashMap<HttpContext, OKHTTPClient> map = new HashMap<HttpContext, OKHTTPClient>();
-        map.put(HttpContext.SEARCH, new OKHTTPClient(new ThreadPool("OkHttpClient-searches", 1, 4, 60, new LinkedBlockingQueue<Runnable>(), true)));
-        map.put(HttpContext.DOWNLOAD, new OKHTTPClient(new ThreadPool("OkHttpClient-downloads", 1, 10, 5, new LinkedBlockingQueue<Runnable>(), true)));
-        map.put(HttpContext.MISC, new OKHTTPClient(new ThreadPool("OkHttpClient-suggestions",1,3,30, new LinkedBlockingQueue<Runnable>(),true)));
+    private static Map<HttpContext, ThreadPool> buildThreadPools() {
+        final HashMap<HttpContext, ThreadPool> map = new HashMap<HttpContext, ThreadPool>();
+        map.put(HttpContext.SEARCH, new ThreadPool("OkHttpClient-searches", 1, 5, 60, new LinkedBlockingQueue<Runnable>(), true));
+        map.put(HttpContext.DOWNLOAD, new ThreadPool("OkHttpClient-downloads", 1, 10, 5, new LinkedBlockingQueue<Runnable>(), true));
+        map.put(HttpContext.MISC, new ThreadPool("OkHttpClient-misc", 2, 10, 30, new LinkedBlockingQueue<Runnable>(), true));
         return map;
     }
 }
