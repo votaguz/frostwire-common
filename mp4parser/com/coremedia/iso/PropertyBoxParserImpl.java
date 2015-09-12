@@ -16,8 +16,10 @@
 package com.coremedia.iso;
 
 import com.coremedia.iso.boxes.Box;
+import org.limewire.util.FileUtils;
+import org.limewire.util.OSUtils;
 
-import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
@@ -36,6 +38,7 @@ public class PropertyBoxParserImpl extends AbstractBoxParser {
     Pattern constuctorPattern = Pattern.compile("(.*)\\((.*?)\\)");
 
     public PropertyBoxParserImpl(String... customProperties) {
+        attemptCopyIsoParserPropertiesFromResourcesToClasses();
         InputStream is = getClass().getResourceAsStream("/isoparser-default.properties");
         try {
             mapping = new Properties();
@@ -70,6 +73,18 @@ public class PropertyBoxParserImpl extends AbstractBoxParser {
             } catch (IOException e) {
                 e.printStackTrace();
                 // ignore - I can't help
+            }
+        }
+    }
+
+    private void attemptCopyIsoParserPropertiesFromResourcesToClasses() {
+        final URL resource = getClass().getResource("/isoparser-default.properties");
+        if (resource == null) {
+            // we are running from intellij, let's copy:
+            final String userDir = System.getProperty("user.dir");
+            final File source = new File(userDir, "build/resources/main/isoparser-default.properties");
+            if (source.exists()) {
+                FileUtils.copy(source, new File(userDir, "build/classes/main/isoparser-default.properties"));
             }
         }
     }
