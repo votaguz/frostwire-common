@@ -16,8 +16,7 @@
 package com.coremedia.iso;
 
 import com.coremedia.iso.boxes.Box;
-import org.limewire.util.FileUtils;
-import org.limewire.util.OSUtils;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -84,7 +83,11 @@ public class PropertyBoxParserImpl extends AbstractBoxParser {
             final String userDir = System.getProperty("user.dir");
             final File source = new File(userDir, "build/resources/main/isoparser-default.properties");
             if (source.exists()) {
-                FileUtils.copy(source, new File(userDir, "build/classes/main/isoparser-default.properties"));
+                try {
+                    FileUtils.copyFile(source, new File(userDir, "build/classes/main/isoparser-default.properties"));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
