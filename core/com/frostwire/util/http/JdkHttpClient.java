@@ -95,12 +95,12 @@ public final class JdkHttpClient extends AbstractHttpClient {
     @Override
     public void save(String url, File file, boolean resume, int timeout, String userAgent, String referrer) throws IOException {
         FileOutputStream fos = null;
-        int rangeStart = 0;
+        long rangeStart;
 
         try {
             if (resume && file.exists()) {
                 fos = new FileOutputStream(file, true);
-                rangeStart = (int) file.length();
+                rangeStart = file.length();
             } else {
                 fos = new FileOutputStream(file, false);
                 rangeStart = -1;
@@ -161,7 +161,7 @@ public final class JdkHttpClient extends AbstractHttpClient {
         ByteArrayInputStream in = new ByteArrayInputStream(data);
 
         try {
-            OutputStream out = null;
+            OutputStream out;
             if (gzip) {
                 out = new GZIPOutputStream(conn.getOutputStream());
             } else {
@@ -169,7 +169,7 @@ public final class JdkHttpClient extends AbstractHttpClient {
             }
 
             byte[] b = new byte[4096];
-            int n = 0;
+            int n;
             while (!canceled && (n = in.read(b, 0, b.length)) != -1) {
                 if (!canceled) {
                     out.write(b, 0, n);
@@ -193,7 +193,7 @@ public final class JdkHttpClient extends AbstractHttpClient {
                 BufferedInputStream bis = new BufferedInputStream(conn.getInputStream(), 4096);
                 ByteArrayBuffer baf = new ByteArrayBuffer(1024);
                 byte[] buffer = new byte[64];
-                int read = 0;
+                int read;
                 while (true) {
                     read = bis.read(buffer);
                     if (read == -1) {
@@ -213,12 +213,12 @@ public final class JdkHttpClient extends AbstractHttpClient {
         return result;
     }
 
-    private String buildRange(int rangeStart, int rangeLength) {
+    private String buildRange(long rangeStart, long rangeLength) {
         String prefix = "bytes=" + rangeStart + "-";
         return prefix + ((rangeLength > -1) ? (rangeStart + rangeLength) : "");
     }
 
-    private void checkRangeSupport(int rangeStart, URLConnection conn) throws HttpRangeOutOfBoundsException, RangeNotSupportedException {
+    private void checkRangeSupport(long rangeStart, URLConnection conn) throws HttpRangeOutOfBoundsException, RangeNotSupportedException {
 
         boolean hasContentRange = conn.getHeaderField("Content-Range") != null;
         boolean hasAcceptRanges = conn.getHeaderField("Accept-Ranges") != null && conn.getHeaderField("Accept-Ranges").equals("bytes");
@@ -230,11 +230,11 @@ public final class JdkHttpClient extends AbstractHttpClient {
         }
     }
 
-    private void get(String url, OutputStream out, int timeout, String userAgent, String referrer, String cookie, int rangeStart) throws IOException {
+    private void get(String url, OutputStream out, int timeout, String userAgent, String referrer, String cookie, long rangeStart) throws IOException {
         get(url, out, timeout, userAgent, referrer, cookie, rangeStart, -1, null);
     }
 
-    private void get(String url, OutputStream out, int timeout, String userAgent, String referrer, String cookie, int rangeStart, int rangeLength, final Map<String, String> customHeaders) throws IOException {
+    private void get(String url, OutputStream out, int timeout, String userAgent, String referrer, String cookie, long rangeStart, long rangeLength, final Map<String, String> customHeaders) throws IOException {
         canceled = false;
         final URL u = new URL(url);
         final URLConnection conn = u.openConnection();
@@ -286,13 +286,12 @@ public final class JdkHttpClient extends AbstractHttpClient {
                 httpResponseCode != HttpURLConnection.HTTP_MOVED_PERM) {
             throw new ResponseCodeNotSupportedException(httpResponseCode);
         }
-
         onHeaders(conn.getHeaderFields());
         checkRangeSupport(rangeStart, conn);
 
         try {
             byte[] b = new byte[4096];
-            int n = 0;
+            int n;
             while (!canceled && (n = in.read(b, 0, b.length)) != -1) {
                 if (!canceled) {
                     out.write(b, 0, n);
@@ -343,7 +342,7 @@ public final class JdkHttpClient extends AbstractHttpClient {
             OutputStream postOut = conn.getOutputStream();
 
             byte[] b = new byte[4096];
-            int n = 0;
+            int n;
             while (!canceled && (n = in.read(b, 0, b.length)) != -1) {
                 if (!canceled) {
                     postOut.write(b, 0, n);
@@ -368,7 +367,6 @@ public final class JdkHttpClient extends AbstractHttpClient {
             }
 
             b = new byte[4096];
-            n = 0;
             while (!canceled && (n = in.read(b, 0, b.length)) != -1) {
                 if (!canceled) {
                     out.write(b, 0, n);

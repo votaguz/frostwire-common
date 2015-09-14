@@ -34,7 +34,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -95,42 +94,48 @@ public class OKHTTPClient extends AbstractHttpClient {
 
     @Override
     public void save(String url, File file, boolean resume, int timeout, String userAgent, String referrer) throws IOException {
-        FileOutputStream fos = null;
-        int rangeStart = 0;
+        FileOutputStream fos;
+        long rangeStart;
+        canceled = false;
+        if (resume && file.exists()) {
+            fos = new FileOutputStream(file, true);
+            rangeStart = file.length();
+        } else {
+            fos = new FileOutputStream(file, false);
+            rangeStart = -1;
+        }
 
-        try {
-            if (resume && file.exists()) {
-                fos = new FileOutputStream(file, true);
-                rangeStart = (int) file.length();
-            } else {
-                fos = new FileOutputStream(file, false);
-                rangeStart = -1;
-            }
+        final OkHttpClient okHttpClient = newOkHttpClient();
+        final Request.Builder builder = prepareRequestBuilder(okHttpClient, url, timeout, userAgent, referrer, null);
+        addRangeHeader(rangeStart, -1, builder);
+        final Response response = getSyncResponse(okHttpClient, builder);
+        final Headers headers = response.headers();
+        onHeaders(headers);
+        final InputStream in = response.body().byteStream();
 
-            final OkHttpClient okHttpClient = newOkHttpClient();
-            final Request.Builder builder = prepareRequestBuilder(okHttpClient, url, timeout, userAgent, referrer, null);
-            addRangeHeader(rangeStart, -1, builder);
-            final Response response = getSyncResponse(okHttpClient, builder);
-            final InputStream in = response.body().byteStream();
+        byte[] b = new byte[4096];
+        int n;
+        while (!canceled && (n = in.read(b, 0, b.length)) != -1) {
+            if (!canceled) {
+                fos.write(b, 0, n);
+                onData(b, 0, n);
+            }
+        }
+        closeQuietly(fos);
+        if (canceled) {
+            onCancel();
+        } else {
+            onComplete();
+        }
+    }
 
-            byte[] b = new byte[4096];
-            int n;
-            while (!canceled && (n = in.read(b, 0, b.length)) != -1) {
-                if (!canceled) {
-                    fos.write(b, 0, n);
-                    onData(b, 0, n);
-                }
+    private void onHeaders(Headers headers) {
+        if (getListener() != null) {
+            try {
+                getListener().onHeaders(this, headers.toMultimap());
+            } catch (Exception e) {
+                LOG.warn(e.getMessage(), e);
             }
-            closeQuietly(fos);
-            if (canceled) {
-                onCancel();
-            } else {
-                onComplete();
-            }
-        } catch (IOException ioe) {
-            throw ioe;
-        } finally {
-            closeQuietly(fos);
         }
     }
 
@@ -190,7 +195,7 @@ public class OKHTTPClient extends AbstractHttpClient {
         }
     }
 
-    private void addRangeHeader(int rangeStart, int rangeEnd, Request.Builder builderRef) {
+    private void addRangeHeader(long rangeStart, long rangeEnd, Request.Builder builderRef) {
         if (rangeStart < 0) {
             return;
         }
@@ -226,9 +231,7 @@ public class OKHTTPClient extends AbstractHttpClient {
     private void addCustomHeaders(Map<String, String> customHeaders, Request.Builder builder) {
         if (customHeaders != null && customHeaders.size() > 0) {
             try {
-                final Iterator<Map.Entry<String, String>> iterator = customHeaders.entrySet().iterator();
-                while (iterator.hasNext()) {
-                    final Map.Entry<String, String> header = iterator.next();
+                for (Map.Entry<String, String> header : customHeaders.entrySet()) {
                     builder.header(header.getKey(), header.getValue());
                 }
             } catch (Throwable e) {
@@ -257,7 +260,7 @@ public class OKHTTPClient extends AbstractHttpClient {
         return searchClient;
     }
 
-    /** This interceptor compresses the HTTP request body. Many webservers can't handle this! */
+    /** This interceptor compresses the HTTP request body. Many web servers can't handle this! */
     class GzipRequestInterceptor implements Interceptor {
         @Override public Response intercept(Chain chain) throws IOException {
             Request originalRequest = chain.request();
