@@ -219,8 +219,10 @@ public final class MP4Muxer {
         IsoFile isoFile = new IsoFile(new FileDataSourceImpl(channel), parser);
         Movie m = new Movie();
         List<TrackBox> trackBoxes = isoFile.getMovieBox().getBoxes(TrackBox.class);
+        int n = 1;
         for (TrackBox trackBox : trackBoxes) {
-            m.addTrack(new Mp4TrackImpl(trackBox));
+            m.addTrack(new Mp4TrackImpl("track"+ n, trackBox));
+            n++;
         }
 
         return m;
