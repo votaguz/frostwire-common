@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,10 +19,8 @@
 package com.frostwire.localpeer;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public final class Finger {
 
@@ -33,8 +31,6 @@ public final class Finger {
     public String nickname;
 
     public String frostwireVersion;
-
-    public int totalShared;
 
     // device data
 
@@ -50,20 +46,6 @@ public final class Finger {
 
     public String deviceBrand;
 
-    // shared data
-
-    public int numSharedAudioFiles;
-
-    public int numSharedVideoFiles;
-
-    public int numSharedPictureFiles;
-
-    public int numSharedDocumentFiles;
-
-    public int numSharedApplicationFiles;
-
-    public int numSharedRingtoneFiles;
-
     // total data
 
     public int numTotalAudioFiles;
@@ -74,7 +56,7 @@ public final class Finger {
 
     public int numTotalDocumentFiles;
 
-    public int numTotalApplicationFiles;
+    public int numTotalTorrentFiles;
 
     public int numTotalRingtoneFiles;
 
@@ -83,14 +65,14 @@ public final class Finger {
         StringBuilder sb = new StringBuilder();
 
         sb.append("(");
-        sb.append(nickname + ", " + totalShared);
+        sb.append(nickname);
         sb.append("[");
-        sb.append("aud:" + numSharedAudioFiles + "/" + numTotalAudioFiles + ", ");
-        sb.append("vid:" + numSharedVideoFiles + "/" + numTotalVideoFiles + ", ");
-        sb.append("pic:" + numSharedPictureFiles + "/" + numTotalPictureFiles + ", ");
-        sb.append("doc:" + numSharedDocumentFiles + "/" + numTotalDocumentFiles + ", ");
-        sb.append("app:" + numSharedApplicationFiles + "/" + numTotalApplicationFiles + ", ");
-        sb.append("rng:" + numSharedRingtoneFiles + "/" + numTotalRingtoneFiles);
+        sb.append("aud:" + numTotalAudioFiles + ", ");
+        sb.append("vid:" + numTotalVideoFiles + ", ");
+        sb.append("pic:" + numTotalPictureFiles + ", ");
+        sb.append("doc:" + numTotalDocumentFiles + ", ");
+        sb.append("app:" + numTotalTorrentFiles + ", ");
+        sb.append("rng:" + numTotalRingtoneFiles);
         sb.append("]");
         sb.append(")");
 

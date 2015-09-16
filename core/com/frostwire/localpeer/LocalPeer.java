@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
  
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,28 +19,19 @@ package com.frostwire.localpeer;
 
 /**
  * Immutable class, share and thread safe.
- * 
+ *
  * @author gubatron
  * @author aldenml
- *
  */
 public final class LocalPeer implements Cloneable {
 
-    public LocalPeer(String address, int port, boolean local, String nickname, int numSharedFiles, String clientVersion) {
+    public LocalPeer(String address, int port, boolean local, String nickname, String clientVersion) {
         this.address = address;
         this.port = port;
         this.local = local;
 
         this.nickname = nickname;
-        this.numSharedFiles = numSharedFiles;
         this.clientVersion = clientVersion;
-    }
-
-    /**
-     * Empty constructor for json serialization
-     */
-    public LocalPeer() {
-        this(null, 0, false, null, 0, null);
     }
 
     public final String address;
@@ -48,11 +39,10 @@ public final class LocalPeer implements Cloneable {
     public final boolean local;
 
     public final String nickname;
-    public final int numSharedFiles;
     public final String clientVersion;
 
     @Override
     public Object clone() {
-        return new LocalPeer(address, port, local, nickname, numSharedFiles, clientVersion);
+        return new LocalPeer(address, port, local, nickname, clientVersion);
     }
 }
