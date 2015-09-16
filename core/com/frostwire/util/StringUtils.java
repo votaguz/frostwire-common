@@ -435,20 +435,6 @@ public class StringUtils {
         return s != null ? s.replaceAll("\\s+", " ") : null;
     }
 
-    public static String buildSet(List<?> list) {
-        StringBuilder sb = new StringBuilder("(");
-        int i = 0;
-        for (Object id : list) {
-            sb.append(id);
-            if (i++ < (list.size() - 1)) {
-                sb.append(",");
-            }
-        }
-        sb.append(")");
-
-        return sb.toString();
-    }
-
     public static String getLocaleString(Map<String, String> strMap, String defaultStr) {
         String localeLanguageCode = Locale.getDefault().getLanguage();
         if (StringUtils.isNullOrEmpty(localeLanguageCode, true)) {
