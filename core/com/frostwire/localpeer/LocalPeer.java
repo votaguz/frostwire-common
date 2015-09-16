@@ -26,14 +26,13 @@ package com.frostwire.localpeer;
  */
 public final class LocalPeer implements Cloneable {
 
-    public LocalPeer(String address, int port, boolean local, String nickname, int numSharedFiles, int deviceType, String clientVersion) {
+    public LocalPeer(String address, int port, boolean local, String nickname, int numSharedFiles, String clientVersion) {
         this.address = address;
         this.port = port;
         this.local = local;
 
         this.nickname = nickname;
         this.numSharedFiles = numSharedFiles;
-        this.deviceType = deviceType;
         this.clientVersion = clientVersion;
     }
 
@@ -41,7 +40,7 @@ public final class LocalPeer implements Cloneable {
      * Empty constructor for json serialization
      */
     public LocalPeer() {
-        this(null, 0, false, null, 0, 0, null);
+        this(null, 0, false, null, 0, null);
     }
 
     public final String address;
@@ -50,27 +49,10 @@ public final class LocalPeer implements Cloneable {
 
     public final String nickname;
     public final int numSharedFiles;
-    public final int deviceType;
     public final String clientVersion;
-
-    public LocalPeer withAddress(String address) {
-        return new LocalPeer(address, port, local, nickname, numSharedFiles, deviceType, clientVersion);
-    }
-
-    public LocalPeer withPort(int port) {
-        return new LocalPeer(address, port, local, nickname, numSharedFiles, deviceType, clientVersion);
-    }
-
-    public LocalPeer withLocal(boolean local) {
-        return new LocalPeer(address, port, local, nickname, numSharedFiles, deviceType, clientVersion);
-    }
-
-    public LocalPeer withNumSharedFiles(int numSharedFiles) {
-        return new LocalPeer(address, port, local, nickname, numSharedFiles, deviceType, clientVersion);
-    }
 
     @Override
     public Object clone() {
-        return new LocalPeer(address, port, local, nickname, numSharedFiles, deviceType, clientVersion);
+        return new LocalPeer(address, port, local, nickname, numSharedFiles, clientVersion);
     }
 }
