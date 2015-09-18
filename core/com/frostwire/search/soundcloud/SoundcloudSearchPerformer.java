@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
 
 package com.frostwire.search.soundcloud;
 
-import com.frostwire.core.CommonConstants;
 import com.frostwire.search.PagedWebSearchPerformer;
 import com.frostwire.search.SearchResult;
 import com.frostwire.util.JsonUtils;
@@ -33,6 +32,9 @@ import java.util.List;
  */
 public class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
 
+    public static final String SOUNDCLOUD_CLIENTID = "b45b1aa10f1ac2941910a7f0d10f8e28";
+    public static final String SOUNDCLOUD_APP_VERSION = "f7ca286";
+
     public SoundcloudSearchPerformer(String domainName, long token, String keywords, int timeout) {
         super(domainName, token, keywords, timeout, 1);
     }
@@ -40,7 +42,7 @@ public class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
     @Override
     protected String getUrl(int page, String encodedKeywords) {
         https://api-v2.soundcloud.com/search?q=love&limit=50&offset=0&client_id=b45b1aa10f1ac2941910a7f0d10f8e28
-        return "https://api-v2.soundcloud.com/search?q=" + encodedKeywords + "&limit=50&offset=0&client_id=" + CommonConstants.SOUNDCLOUD_CLIENTID;
+        return "https://api-v2.soundcloud.com/search?q=" + encodedKeywords + "&limit=50&offset=0&client_id=" + SOUNDCLOUD_CLIENTID;
     }
 
     @Override
@@ -51,7 +53,7 @@ public class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
 
         for (SoundcloudItem item : response.collection) {
             if (!isStopped() && item.downloadable) {
-                SoundcloudSearchResult sr = new SoundcloudSearchResult(item, CommonConstants.SOUNDCLOUD_CLIENTID, CommonConstants.SOUNDCLOUD_APP_VERSION);
+                SoundcloudSearchResult sr = new SoundcloudSearchResult(item, SOUNDCLOUD_CLIENTID, SOUNDCLOUD_APP_VERSION);
                 result.add(sr);
             }
         }
