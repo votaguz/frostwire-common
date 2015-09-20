@@ -63,6 +63,10 @@ public abstract class TorrentRegexSearchPerformer<T extends CrawlableSearchResul
 
     @Override
     protected List<? extends SearchResult> crawlResult(CrawlableSearchResult sr, byte[] data) throws Exception {
+        return crawlResult(sr, data, false);
+    }
+
+    protected List<? extends SearchResult> crawlResult(CrawlableSearchResult sr, byte[] data, boolean detectAlbums) throws Exception {
         List<SearchResult> list = new LinkedList<SearchResult>();
 
         if (data == null) {
@@ -71,7 +75,7 @@ public abstract class TorrentRegexSearchPerformer<T extends CrawlableSearchResul
 
         if (sr instanceof TorrentCrawlableSearchResult) {
             //in case we fetched a torrent's info (magnet, or the .torrent itself) to obtain 
-            list.addAll(PerformersHelper.crawlTorrent(this, (TorrentCrawlableSearchResult) sr, data));
+            list.addAll(PerformersHelper.crawlTorrent(this, (TorrentCrawlableSearchResult) sr, data, detectAlbums));
         } else {
             String unreducedHtml = new String(data, "UTF-8");
             String html = PerformersHelper.reduceHtml(unreducedHtml, htmlPrefixOffset(unreducedHtml), htmlSuffixOffset(unreducedHtml));

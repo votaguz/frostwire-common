@@ -71,6 +71,10 @@ public class ExtratorrentSearchPerformer extends TorrentJsonSearchPerformer<Extr
 
     @Override
     protected List<? extends SearchResult> crawlResult(TorrentCrawlableSearchResult sr, byte[] data) throws Exception {
+        return crawlResult(sr, data, false);
+    }
+
+    protected List<? extends SearchResult> crawlResult(TorrentCrawlableSearchResult sr, byte[] data, boolean detectAlbums) throws Exception {
         if (!(sr instanceof ExtratorrentSearchResult)) {
             return Collections.emptyList();
         }
@@ -105,10 +109,14 @@ public class ExtratorrentSearchPerformer extends TorrentJsonSearchPerformer<Extr
             }
         }
 
-        LinkedList<SearchResult> temp = new LinkedList<SearchResult>();
-        temp.addAll(result);
-        temp.addAll(new AlbumCluster().detect(sr, result));
-        return temp;
+        if (detectAlbums) {
+            LinkedList<SearchResult> temp = new LinkedList<SearchResult>();
+            temp.addAll(result);
+            temp.addAll(new AlbumCluster().detect(sr, result));
+            return temp;
+        } else {
+            return result;
+        }
     }
 
 

@@ -40,7 +40,7 @@ import org.apache.commons.io.FilenameUtils;
  * @author gubatron
  * @author aldenml
  */
-public class ScrapedTorrentFileSearchResult<T extends AbstractTorrentSearchResult> extends AbstractCrawledSearchResult<T> implements TorrentItemSearchResult {
+public class ScrapedTorrentFileSearchResult<T extends AbstractTorrentSearchResult> extends AbstractCrawledSearchResult<T> implements TorrentItemSearchResult, ReferrerSearchResult {
 
     private final String filePath;
     private final String filename;

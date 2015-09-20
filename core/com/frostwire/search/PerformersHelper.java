@@ -104,7 +104,7 @@ public final class PerformersHelper {
     }
 
     public static List<? extends SearchResult> crawlTorrent(SearchPerformer performer, TorrentCrawlableSearchResult sr, byte[] data) {
-        return crawlTorrent(performer, sr, data, true);
+        return crawlTorrent(performer, sr, data, false);
     }
 
     public static String parseInfoHash(String url) {

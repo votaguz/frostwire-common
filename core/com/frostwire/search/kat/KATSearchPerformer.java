@@ -19,7 +19,10 @@
 package com.frostwire.search.kat;
 
 import com.frostwire.logging.Logger;
-import com.frostwire.search.*;
+import com.frostwire.search.AlbumCluster;
+import com.frostwire.search.ScrapedTorrentFileSearchResult;
+import com.frostwire.search.SearchMatcher;
+import com.frostwire.search.SearchResult;
 import com.frostwire.search.torrent.TorrentCrawlableSearchResult;
 import com.frostwire.search.torrent.TorrentJsonSearchPerformer;
 import com.frostwire.util.HtmlManipulator;
@@ -98,17 +101,18 @@ public class KATSearchPerformer extends TorrentJsonSearchPerformer<KATItem, KATS
                     size = -1;
                 }
 
-                result.add(new ScrapedTorrentFileSearchResult<KATSearchResult>(ksr, filename, (long) size));
+                result.add(new ScrapedTorrentFileSearchResult<KATSearchResult>(ksr, filename, (long) size, "https://torcache.net/", null));
 
             } catch (Throwable e) {
                 LOG.warn("Error creating single file search result", e);
             }
         }
 
-        LinkedList<SearchResult> temp = new LinkedList<SearchResult>();
+        /**LinkedList<SearchResult> temp = new LinkedList<SearchResult>();
         temp.addAll(result);
         temp.addAll(new AlbumCluster().detect(sr, result));
-        return temp;
+         */
+        return result;
     }
 
     private void fixItems(List<KATItem> list) {
@@ -119,6 +123,11 @@ public class KATSearchPerformer extends TorrentJsonSearchPerformer<KATItem, KATS
 
                 if (next.verified == 0) {
                     iterator.remove();
+                }
+
+                if (next.torrentLink.contains("torcache.net") &&
+                    next.torrentLink.contains(".torrent?title=")) {
+                    next.torrentLink = next.torrentLink.substring(0, next.torrentLink.indexOf("?title"));
                 }
             }
         }

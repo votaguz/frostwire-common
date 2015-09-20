@@ -169,7 +169,7 @@ public class BitSnoopSearchPerformer extends TorrentRegexSearchPerformer<BitSnoo
         // sr is a temp result.
         if (!sr.isComplete()) {
             detailPageData = fetchBytes(sr.getDetailsUrl());
-            searchResults.addAll(super.crawlResult(sr, detailPageData));
+            searchResults.addAll(super.crawlResult(sr, detailPageData, false));
 
             if (searchResults == null || searchResults.isEmpty()) {
                 return Collections.emptyList();

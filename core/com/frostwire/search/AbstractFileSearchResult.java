@@ -24,5 +24,4 @@ package com.frostwire.search;
  *
  */
 public abstract class AbstractFileSearchResult extends AbstractSearchResult implements FileSearchResult {
-
 }

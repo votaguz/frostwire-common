@@ -18,6 +18,7 @@
 
 package com.frostwire.search.kat;
 
+import com.frostwire.search.ReferrerSearchResult;
 import com.frostwire.search.torrent.AbstractTorrentSearchResult;
 import com.frostwire.util.HtmlManipulator;
 
@@ -29,7 +30,7 @@ import java.util.Locale;
  * @author gubatron
  * @author aldenml
  */
-public class KATSearchResult extends AbstractTorrentSearchResult {
+public class KATSearchResult extends AbstractTorrentSearchResult implements ReferrerSearchResult {
 
     private final KATItem item;
     private final String filename;
@@ -37,7 +38,6 @@ public class KATSearchResult extends AbstractTorrentSearchResult {
 
     public KATSearchResult(KATItem item) {
         this.item = item;
-
         this.filename = buildFilename(item);
         this.creationTime = buildCreationTime(item);
     }
@@ -101,5 +101,10 @@ public class KATSearchResult extends AbstractTorrentSearchResult {
         } catch (ParseException e) {
         }
         return result;
+    }
+
+    @Override
+    public String getReferrerUrl() {
+        return "https://torcache.net/";
     }
 }
