@@ -18,7 +18,6 @@
 
 package com.frostwire.search.kat;
 
-import com.frostwire.search.ReferrerSearchResult;
 import com.frostwire.search.torrent.AbstractTorrentSearchResult;
 import com.frostwire.util.HtmlManipulator;
 
@@ -30,7 +29,7 @@ import java.util.Locale;
  * @author gubatron
  * @author aldenml
  */
-public class KATSearchResult extends AbstractTorrentSearchResult implements ReferrerSearchResult {
+public class KATSearchResult extends AbstractTorrentSearchResult {
 
     private final KATItem item;
     private final String filename;

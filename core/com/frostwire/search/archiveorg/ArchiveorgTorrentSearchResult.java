@@ -41,6 +41,11 @@ public class ArchiveorgTorrentSearchResult extends ArchiveorgCrawledSearchResult
     }
 
     @Override
+    public String getReferrerUrl() {
+        return getDetailsUrl();
+    }
+
+    @Override
     public int getSeeds() {
         return 3;
     }

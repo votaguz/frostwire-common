@@ -37,6 +37,13 @@ public interface TorrentSearchResult extends FileSearchResult {
      */
     String getTorrentUrl();
 
+    /**
+     * Returns a URL to be used as an HTTP "Referer" (sic) header
+     * when requesting the .torrent file.
+     * @return
+     */
+    String getReferrerUrl();
+
     int getSeeds();
 
     /**

@@ -49,4 +49,9 @@ public abstract class AbstractTorrentSearchResult extends AbstractFileSearchResu
         }
         return uid;
     }
+
+    @Override
+    public String getReferrerUrl() {
+        return getDetailsUrl();
+    }
 }

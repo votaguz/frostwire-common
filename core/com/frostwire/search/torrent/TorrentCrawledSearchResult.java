@@ -79,6 +79,11 @@ public final class TorrentCrawledSearchResult extends AbstractCrawledSearchResul
     }
 
     @Override
+    public String getReferrerUrl() {
+        return parent.getReferrerUrl();
+    }
+
+    @Override
     public int getSeeds() {
         return parent.getSeeds();
     }
