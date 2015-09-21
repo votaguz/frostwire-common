@@ -194,7 +194,7 @@ public class BitSnoopSearchPerformer extends TorrentRegexSearchPerformer<BitSnoo
                         new ScrapedTorrentFileSearchResult<BitSnoopSearchResult>(parent,
                                 filePath,
                                 fileSize,
-                                null,
+                                "https://torcache.net/",
                                 null
                         );
 
