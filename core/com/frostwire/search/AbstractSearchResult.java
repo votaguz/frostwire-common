@@ -62,11 +62,8 @@ public abstract class AbstractSearchResult implements SearchResult {
     @Override
     public int uid() {
         if (uid == -1) {
-            StringBuilder key = new StringBuilder();
-            key.append(getDisplayName());
-            key.append(getDetailsUrl());
-            key.append(getSource());
-            uid = Digests.fnvhash32(key.toString().getBytes());
+            String key = getDisplayName() + getDetailsUrl() + getSource();
+            uid = key.hashCode();
         }
         return uid;
     }

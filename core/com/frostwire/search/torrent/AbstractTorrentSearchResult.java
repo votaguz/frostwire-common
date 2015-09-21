@@ -40,12 +40,8 @@ public abstract class AbstractTorrentSearchResult extends AbstractFileSearchResu
     @Override
     public int uid() {
         if (uid == -1) {
-            StringBuilder key = new StringBuilder();
-            key.append(getDisplayName());
-            key.append(getDetailsUrl());
-            key.append(getSource());
-            key.append(getHash());
-            uid = Digests.fnvhash32(key.toString().getBytes());
+            String key = getDisplayName() + getDetailsUrl() + getSource() + getHash();
+            uid = key.hashCode();
         }
         return uid;
     }
