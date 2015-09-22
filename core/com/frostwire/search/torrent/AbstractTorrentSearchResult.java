@@ -18,13 +18,10 @@
 package com.frostwire.search.torrent;
 
 import com.frostwire.search.AbstractFileSearchResult;
-import com.frostwire.util.Digests;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public abstract class AbstractTorrentSearchResult extends AbstractFileSearchResult implements TorrentCrawlableSearchResult {
 
@@ -34,8 +31,6 @@ public abstract class AbstractTorrentSearchResult extends AbstractFileSearchResu
     public boolean isComplete() {
         return true;
     }
-
-    public String getCookies() { return null; }
 
     @Override
     public int uid() {

@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
  
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,10 @@
 package com.frostwire.search;
 
 import com.frostwire.licences.License;
-import com.frostwire.search.torrent.TorrentSearchResult;
-import com.frostwire.util.Digests;
 
 /**
- * 
  * @author gubatron
  * @author aldenml
- *
  */
 public abstract class AbstractSearchResult implements SearchResult {
 
@@ -45,15 +41,15 @@ public abstract class AbstractSearchResult implements SearchResult {
     public String toString() {
         return getDetailsUrl();
     }
-    
+
     public int getDaysOld() {
-        int daysOld =(int) ((System.currentTimeMillis() - getCreationTime())/86400000);
+        int daysOld = (int) ((System.currentTimeMillis() - getCreationTime()) / 86400000);
         if (daysOld < 0) {
             daysOld = 1;
         }
         return daysOld;
     }
-    
+
     @Override
     public String getThumbnailUrl() {
         return null;
