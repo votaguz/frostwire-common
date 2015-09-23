@@ -20,7 +20,7 @@ package com.frostwire.search;
 
 import com.frostwire.logging.Logger;
 import com.frostwire.search.torrent.TorrentSearchResult;
-import com.frostwire.util.ByteUtils;
+import org.apache.commons.lang3.Conversion;
 
 import java.util.Collections;
 import java.util.List;
@@ -71,7 +71,7 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
 
                 byte[] failed = cacheGet("failed:" + url);
                 if (failed != null) {
-                    long failedWhen = ByteUtils.byteArrayToLong(failed);
+                    long failedWhen = array2long(failed);
                     if ((System.currentTimeMillis() - failedWhen) < FAILED_CRAWL_URL_CACHE_LIFETIME) {
                         //if the failed request is still fresh we stop
                         LOG.info("CrawlPagedWebSearchPerformer::crawl() - hit failed cache url");
@@ -119,7 +119,7 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
                             }
                         } else {
                             LOG.warn("Failed to download data: " + url);
-                            cachePut("failed:" + url, ByteUtils.longToByteArray(System.currentTimeMillis()));
+                            cachePut("failed:" + url, long2array(System.currentTimeMillis()));
                         }
                     }
 
@@ -197,6 +197,17 @@ public abstract class CrawlPagedWebSearchPerformer<T extends CrawlableSearchResu
 
         return null;
     }
+
+    private static byte[] long2array(long l) {
+        byte[] arr = new byte[Long.SIZE / Byte.SIZE];
+        Conversion.longToByteArray(l, 0, arr, 0, arr.length);
+        return arr;
+    }
+
+    private static long array2long(byte[] arr) {
+        return Conversion.byteArrayToLong(arr, 0, 0, 0, Long.SIZE / Byte.SIZE);
+    }
+
 
     public static void clearCache() {
         if (cache != null) {
