@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -99,7 +100,7 @@ public abstract class AbstractHttpClient implements HttpClient {
     }
 
     @Override
-    abstract public int head(String url, int connectTimeoutInMillis) throws IOException;
+    abstract public int head(String url, int connectTimeoutInMillis, Map<String, List<String>> outputHeaders) throws IOException;
 
     @Override
     public String get(String url) throws IOException {
@@ -220,5 +221,15 @@ public abstract class AbstractHttpClient implements HttpClient {
         }
 
         return null;
+    }
+
+    protected static void copyMultiMap(Map<String, List<String>> origin, Map<String, List<String>> destination) {
+        if (origin == null || destination == null){
+            return;
+        }
+
+        for (String key : origin.keySet()) {
+            destination.put(key, origin.get(key));
+        }
     }
 }

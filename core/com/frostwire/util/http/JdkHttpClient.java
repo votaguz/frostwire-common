@@ -42,11 +42,12 @@ public final class JdkHttpClient extends AbstractHttpClient {
     private static final Logger LOG = Logger.getLogger(JdkHttpClient.class);
 
     @Override
-    public int head(String url, int connectTimeoutInMillis) throws IOException {
+    public int head(String url, int connectTimeoutInMillis, Map<String, List<String>> outputHeaders) throws IOException {
         HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
         connection.setConnectTimeout(connectTimeoutInMillis);
         connection.setReadTimeout(connectTimeoutInMillis);
         connection.setRequestMethod("HEAD");
+        copyMultiMap(connection.getHeaderFields(), outputHeaders);
         return connection.getResponseCode();
     }
 

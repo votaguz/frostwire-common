@@ -34,6 +34,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -51,15 +52,17 @@ public class OKHTTPClient extends AbstractHttpClient {
     }
 
     @Override
-    public int head(String url, int connectTimeoutInMillis) throws IOException {
+    public int head(String url, int connectTimeoutInMillis, Map<String, List<String>> outputHeaders) throws IOException {
         final OkHttpClient okHttpClient = newOkHttpClient();
         okHttpClient.setConnectTimeout(connectTimeoutInMillis, TimeUnit.MILLISECONDS);
+        okHttpClient.setFollowRedirects(false);
         Request req = new Request.Builder().
                 url(url).
                 header("User-Agent", DEFAULT_USER_AGENT).
                 head().
                 build();
         Response resp = okHttpClient.newCall(req).execute();
+        copyMultiMap(resp.headers().toMultimap(), outputHeaders);
         return resp.code();
     }
 

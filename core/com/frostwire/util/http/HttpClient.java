@@ -45,7 +45,7 @@ public interface HttpClient {
     /**
      * Returns the HTTP response code
      */
-    int head(String url, int connectTimeoutInMillis) throws IOException;
+    int head(String url, int connectTimeoutInMillis, Map<String, List<String>> outputHeaders) throws IOException;
 
     String get(String url) throws IOException;
 
