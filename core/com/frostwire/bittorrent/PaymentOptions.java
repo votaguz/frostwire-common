@@ -38,7 +38,7 @@ public class PaymentOptions implements Mappable<String, Map<String, String>> {
      * 
      * To be serialized as dictionary in the .torrent as follows
      *     paymentOptions: {
-     *        bitcoin: "bitcoin:14F6JPXK2fR5b4gZp3134qLRGgYtvabMWL",
+     *        bitcoin: "bitcoin:13hbpRfDT1HKmK4jejHgh7MM9W1NCPFT8v",
      *        paypalUrl: "http://frostwire.com/donate"
      *     }
      * 
