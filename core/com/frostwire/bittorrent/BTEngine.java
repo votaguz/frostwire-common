@@ -837,7 +837,12 @@ public final class BTEngine {
     }
 
     private void runNextRestoreDownloadTask() {
-        RestoreDownloadTask task = restoreDownloadsQueue.poll();
+        try {
+            RestoreDownloadTask task = restoreDownloadsQueue.poll();
+        } catch (Throwable t) {
+            // on Android, LinkedList's .poll() implementation throws a NoSuchElementException
+            return;
+        }
         if (task != null) {
             task.run();
         }
