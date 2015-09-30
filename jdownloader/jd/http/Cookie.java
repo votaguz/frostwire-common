@@ -16,9 +16,11 @@
 
 package jd.http;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 
-import org.appwork.utils.formatter.TimeFormatter;
 import org.appwork.utils.logging.Log;
 
 public class Cookie {
@@ -147,7 +149,7 @@ public class Cookie {
             // this.host + " " + this.key);
             return;
         }
-        final Date expireDate = TimeFormatter.parseDateString(expires);
+        final Date expireDate = parseDateString(expires);
         if (expireDate != null) {
             this.expireTime = expireDate.getTime();
             return;
@@ -172,7 +174,7 @@ public class Cookie {
             // " " + this.key);
             return;
         }
-        final Date responseDate = TimeFormatter.parseDateString(date);
+        final Date responseDate = parseDateString(date);
         if (responseDate != null) {
             this.hostTime = responseDate.getTime();
             return;
@@ -214,4 +216,42 @@ public class Cookie {
         this.setHostTime(cookie2.hostTime);
     }
 
+    private static final java.util.List<SimpleDateFormat> dateformats  = new ArrayList<SimpleDateFormat>();
+    static {
+        try {
+            SimpleDateFormat sdf;
+            dateformats.add(sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss yyyy z", Locale.UK));
+            sdf.setLenient(false);
+            dateformats.add(sdf = new SimpleDateFormat("EEE, dd-MMM-yy HH:mm:ss z", Locale.UK));
+            sdf.setLenient(false);
+            dateformats.add(sdf = new SimpleDateFormat("EEE, dd-MMM-yyyy HH:mm:ss z", Locale.UK));
+            sdf.setLenient(false);
+            dateformats.add(sdf = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.UK));
+            sdf.setLenient(false);
+            dateformats.add(sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.UK));
+            sdf.setLenient(false);
+            dateformats.add(sdf = new SimpleDateFormat("EEE, dd-MMM-yyyy HH:mm:ss z", Locale.UK));
+            sdf.setLenient(false);
+            dateformats.add(sdf = new SimpleDateFormat("EEEE, dd-MMM-yy HH:mm:ss z", Locale.UK));
+            sdf.setLenient(false);
+            dateformats.add(sdf = new SimpleDateFormat("EEE, dd-MMM-yyyy HH:mm:ss z", Locale.UK));
+            sdf.setLenient(true);
+        } catch (final Throwable e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static Date parseDateString(final String date) {
+        if (date == null) { return null; }
+        Date expireDate = null;
+        for (final SimpleDateFormat format : dateformats) {
+            try {
+                expireDate = format.parse(date);
+                break;
+            } catch (final Throwable e2) {
+            }
+        }
+        if (expireDate == null) { return null; }
+        return expireDate;
+    }
 }

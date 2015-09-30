@@ -11,7 +11,6 @@ public interface HTTPConnection {
 
     public static enum RequestMethod {
         GET,
-        POST,
         HEAD
     }
 
