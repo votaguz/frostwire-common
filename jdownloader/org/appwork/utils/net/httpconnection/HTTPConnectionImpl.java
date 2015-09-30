@@ -21,7 +21,6 @@ import java.util.zip.GZIPInputStream;
 
 import org.appwork.utils.LowerCaseHashMap;
 import org.appwork.utils.Regex;
-import org.appwork.utils.net.Base64InputStream;
 import org.appwork.utils.net.ChunkedInputStream;
 import org.appwork.utils.net.CountingOutputStream;
 
@@ -34,7 +33,6 @@ public class HTTPConnectionImpl implements HTTPConnection {
 
     protected Socket                         httpSocket                 = null;
     protected URL                            httpURL                    = null;
-    protected HTTPProxy                      proxy                      = null;
     protected String                         httpPath                   = null;
 
     protected RequestMethod                  httpMethod                 = RequestMethod.GET;
@@ -58,12 +56,7 @@ public class HTTPConnectionImpl implements HTTPConnection {
     protected InetSocketAddress              connectedInetSocketAddress = null;
 
     public HTTPConnectionImpl(final URL url) {
-        this(url, null);
-    }
-
-    public HTTPConnectionImpl(final URL url, final HTTPProxy p) {
         this.httpURL = url;
-        this.proxy = p;
         this.requestProperties = new LinkedHashMap<String, String>();
         this.headers = new LowerCaseHashMap<List<String>>();
     }
@@ -119,18 +112,6 @@ public class HTTPConnectionImpl implements HTTPConnection {
                 port = this.httpURL.getDefaultPort();
             }
             final long startTime = System.currentTimeMillis();
-            if (this.proxy != null && this.proxy.isDirect()) {
-                /* bind socket to given interface */
-                try {
-                    if (this.proxy.getLocalIP() == null) { throw new IOException("Invalid localIP"); }
-                    this.httpSocket.bind(this.proxyInetSocketAddress = new InetSocketAddress(this.proxy.getLocalIP(), 0));
-                } catch (final IOException e) {
-                    this.proxyInetSocketAddress = null;
-                    throw new IOException(e);
-                }
-            } else if (this.proxy != null && this.proxy.isNone()) {
-                /* none is also allowed here */
-            } else if (this.proxy != null) { throw new RuntimeException("Invalid Direct Proxy"); }
 
             try {
                 /* try to connect to given host now */
@@ -320,10 +301,6 @@ public class HTTPConnectionImpl implements HTTPConnection {
             if (this.convertedInputStream != null) { return this.convertedInputStream; }
             if (this.contentDecoded) {
                 final String encodingTransfer = this.getHeaderField("Content-Transfer-Encoding");
-                if ("base64".equalsIgnoreCase(encodingTransfer)) {
-                    /* base64 encoded content */
-                    this.inputStream = new Base64InputStream(this.inputStream);
-                }
                 /* we convert different content-encodings to normal inputstream */
                 final String encoding = this.getHeaderField("Content-Encoding");
                 if (encoding == null || encoding.length() == 0 || "none".equalsIgnoreCase(encoding)) {

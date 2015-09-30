@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.net.URL;
 
 import org.appwork.utils.net.httpconnection.HTTPConnectionImpl;
-import org.appwork.utils.net.httpconnection.HTTPProxy;
 
 public class URLConnectionAdapterDirectImpl extends HTTPConnectionImpl implements URLConnectionAdapter {
 
@@ -13,10 +12,6 @@ public class URLConnectionAdapterDirectImpl extends HTTPConnectionImpl implement
 
     public URLConnectionAdapterDirectImpl(final URL url) {
         super(url);
-    }
-
-    public URLConnectionAdapterDirectImpl(final URL url, final HTTPProxy proxy) {
-        super(url, proxy);
     }
 
     @Override

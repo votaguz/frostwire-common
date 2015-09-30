@@ -39,7 +39,6 @@ import jd.parser.Regex;
 import org.appwork.utils.ReusableByteArrayOutputStreamPool;
 import org.appwork.utils.ReusableByteArrayOutputStreamPool.ReusableByteArrayOutputStream;
 import org.appwork.utils.StringUtils;
-import org.appwork.utils.net.httpconnection.HTTPProxy;
 
 public abstract class Request {
     // public static int MAX_REDIRECTS = 30;
@@ -167,7 +166,6 @@ public abstract class Request {
     private long                   readTime       = -1;
 
     protected boolean              requested      = false;
-    private HTTPProxy              proxy;
     private String                 orgURL;
     private String                 customCharset  = null;
     private byte[]                 byteArray      = null;
@@ -368,10 +366,6 @@ public abstract class Request {
 
     }
 
-    public HTTPProxy getProxy() {
-        return this.proxy;
-    }
-
     /**
      * tries to generate an image out of the loaded bytes
      * 
@@ -489,10 +483,6 @@ public abstract class Request {
      */
     public void setHeaders(final RequestHeader headers) {
         this.headers = headers;
-    }
-
-    public void setProxy(final HTTPProxy proxy) {
-        this.proxy = proxy;
     }
 
     public void setReadTimeout(final int readTimeout) {

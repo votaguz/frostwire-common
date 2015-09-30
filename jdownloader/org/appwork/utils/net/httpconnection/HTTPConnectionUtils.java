@@ -5,9 +5,9 @@ import java.io.InputStream;
 import java.net.URLDecoder;
 import java.nio.ByteBuffer;
 
+import org.apache.commons.codec.binary.Base64;
 import org.appwork.utils.Regex;
 import org.appwork.utils.StringUtils;
-import org.appwork.utils.encoding.Base64;
 import org.appwork.utils.logging.Log;
 
 public class HTTPConnectionUtils {
@@ -66,7 +66,7 @@ public class HTTPConnectionUtils {
                 if (tokens.length == 1 && tokens[0].length == 3 && tokens[0][1].trim().equalsIgnoreCase("B")) {
                     /* Base64 Encoded */
                     try {
-                        filename = URLDecoder.decode(new String(Base64.decode(tokens[0][2].trim()), tokens[0][0].trim()), tokens[0][0].trim());
+                        filename = URLDecoder.decode(new String(Base64.decodeBase64(tokens[0][2].trim()), tokens[0][0].trim()), tokens[0][0].trim());
                     } catch (final Exception e) {
                         Log.L.severe("Content-Disposition: could not decode filename: " + header);
                         filename = null;
