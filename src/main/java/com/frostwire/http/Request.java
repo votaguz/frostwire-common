@@ -22,7 +22,30 @@ package com.frostwire.http;
  * @author gubatron
  * @author aldenml
  */
-public interface Request {
+public final class Request {
 
-    String url();
+    private Method method;
+    private String url;
+
+    public Request(Method method, String url) {
+        this.method = method;
+        this.url = url;
+    }
+
+    public Request(String url) {
+        this(Method.GET, url);
+    }
+
+    public Method method() {
+        return method;
+    }
+
+    public String url() {
+        return url;
+    }
+
+    enum Method {
+        GET,
+        POST
+    }
 }
