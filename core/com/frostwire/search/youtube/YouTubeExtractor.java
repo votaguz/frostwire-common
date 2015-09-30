@@ -13,7 +13,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.frostwire.search.extractors;
+package com.frostwire.search.youtube;
 
 import com.frostwire.logging.Logger;
 import com.frostwire.search.FileSearchResult;
@@ -110,7 +110,7 @@ public final class YouTubeExtractor {
             return infos;
 
         } catch (Throwable e) {
-            throw new ExtractorException("General extractor error", e);
+            throw new RuntimeException("General extractor error", e);
         }
     }
 
@@ -211,7 +211,7 @@ public final class YouTubeExtractor {
             if (error != null) {
                 error = error.trim();
             }
-            throw new ExtractorException("Reasig: " + error.trim());
+            throw new RuntimeException("Reasig: " + error.trim());
         }
     }
 

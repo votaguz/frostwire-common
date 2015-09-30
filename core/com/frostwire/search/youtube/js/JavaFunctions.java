@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.frostwire.search.extractors.js;
+package com.frostwire.search.youtube.js;
 
 import java.util.ArrayList;
 import java.util.Arrays;

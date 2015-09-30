@@ -16,20 +16,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.frostwire.search.extractors;
+package com.frostwire.search.youtube.js;
 
 /**
  * @author gubatron
  * @author aldenml
  *
  */
-public class ExtractorException extends RuntimeException {
+interface LambdaN {
 
-    public ExtractorException(String message) {
-        super(message);
-    }
-
-    public ExtractorException(String message, Throwable cause) {
-        super(message, cause);
-    }
+    public Object eval(Object[] arr);
 }

@@ -18,8 +18,6 @@
 
 package com.frostwire.search.youtube;
 
-import com.frostwire.search.extractors.YouTubeExtractor;
-
 /**
  * @author gubatron
  * @author aldenml

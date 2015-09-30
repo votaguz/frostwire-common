@@ -20,7 +20,7 @@ package com.frostwire.search.youtube;
 
 import com.frostwire.search.AbstractCrawledSearchResult;
 import com.frostwire.search.HttpSearchResult;
-import com.frostwire.search.extractors.YouTubeExtractor.LinkInfo;
+import com.frostwire.search.youtube.YouTubeExtractor.LinkInfo;
 import com.frostwire.util.StringUtils;
 import org.apache.commons.io.FilenameUtils;
 

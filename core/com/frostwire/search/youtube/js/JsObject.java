@@ -16,14 +16,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.frostwire.search.extractors.js;
+package com.frostwire.search.youtube.js;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author gubatron
  * @author aldenml
  *
  */
-interface Lambda1 {
+class JsObject {
 
-    public Object eval(Object obj);
+    public JsObject() {
+        this.functions = new HashMap<String, LambdaN>();
+    }
+
+    public final Map<String, LambdaN> functions;
 }

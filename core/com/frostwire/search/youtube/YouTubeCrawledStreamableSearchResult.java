@@ -19,7 +19,7 @@
 package com.frostwire.search.youtube;
 
 import com.frostwire.search.StreamableSearchResult;
-import com.frostwire.search.extractors.YouTubeExtractor.LinkInfo;
+import com.frostwire.search.youtube.YouTubeExtractor.LinkInfo;
 
 import static com.frostwire.search.youtube.YouTubeUtils.buildDownloadUrl;
 import static com.frostwire.search.youtube.YouTubeUtils.isDash;

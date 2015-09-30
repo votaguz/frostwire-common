@@ -16,30 +16,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.frostwire.search.extractors.js;
+package com.frostwire.search.youtube;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import com.frostwire.search.youtube.js.JsFunction;
 
 /**
  * @author gubatron
  * @author aldenml
  *
  */
-class JsContext {
+public final class YouTubeSig {
 
-    public JsContext(String jscode) {
-        this.jscode = new StringBuilder(jscode);
-        this.functions = new HashMap<String, LambdaN>();
-        this.objects = new HashMap<String, JsObject>();
+	private final JsFunction<String> fn;
+
+	public YouTubeSig(String jscode) {
+		Matcher m = Pattern.compile("\\.sig\\|\\|([$a-zA-Z0-9]+)\\(").matcher(jscode);
+        m.find();
+        String funcname = m.group(1);
+        this.fn = new JsFunction<String>(jscode, funcname);
     }
 
-    public final StringBuilder jscode;
-    public final Map<String, LambdaN> functions;
-    public final Map<String, JsObject> objects;
-
-    public void free() {
-        jscode.setLength(0);
-        jscode.trimToSize();
-    }
+	public String calc(String sig) {
+		return fn.eval(sig);
+	}
 }

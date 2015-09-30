@@ -21,8 +21,7 @@ package com.frostwire.search.youtube;
 import com.frostwire.search.CrawlRegexSearchPerformer;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.SearchResult;
-import com.frostwire.search.extractors.YouTubeExtractor;
-import com.frostwire.search.extractors.YouTubeExtractor.LinkInfo;
+import com.frostwire.search.youtube.YouTubeExtractor.LinkInfo;
 import com.frostwire.util.HtmlManipulator;
 import com.google.code.regexp.Pattern;
 
