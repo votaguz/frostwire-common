@@ -1,6 +1,6 @@
 /*
  * Created by Angel Leon (@gubatron), Alden Torres (aldenml)
- * Copyright (c) 2011-2014, FrostWire(R). All rights reserved.
+ * Copyright (c) 2011-2015, FrostWire(R). All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,16 +21,18 @@ package com.frostwire.search.archiveorg;
 import com.frostwire.search.CrawlPagedWebSearchPerformer;
 import com.frostwire.search.SearchResult;
 import com.frostwire.util.JsonUtils;
-import org.json.JSONObject;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author gubatron
  * @author aldenml
- *
  */
 public class ArchiveorgSearchPerformer extends CrawlPagedWebSearchPerformer<ArchiveorgSearchResult> {
 
@@ -96,17 +98,19 @@ public class ArchiveorgSearchPerformer extends CrawlPagedWebSearchPerformer<Arch
     }
 
     private List<ArchiveorgFile> readFiles(String json) throws Exception {
-        List<ArchiveorgFile> result = new LinkedList<ArchiveorgFile>();
+        List<ArchiveorgFile> result = new LinkedList<>();
 
-        JSONObject obj = new JSONObject(json);
-        JSONObject files = obj.getJSONObject("files");
+        JsonElement element = new JsonParser().parse(json);
+        JsonObject obj = element.getAsJsonObject();
+        JsonObject files = obj.getAsJsonObject("files");
 
-        @SuppressWarnings("unchecked")
-        Iterator<String> it = (Iterator<String>) files.keys();
+        Iterator<Map.Entry<String, JsonElement>> it = files.entrySet().iterator();
 
         while (it.hasNext() && !isStopped()) {
-            String name = it.next();
-            ArchiveorgFile file = JsonUtils.toObject(files.getJSONObject(name).toString(), ArchiveorgFile.class);
+            Map.Entry<String, JsonElement> e = it.next();
+            String name = e.getKey();
+            String value = e.getValue().toString();
+            ArchiveorgFile file = JsonUtils.toObject(value, ArchiveorgFile.class);
             if (filter(file)) {
                 file.filename = cleanName(name);
                 result.add(file);
