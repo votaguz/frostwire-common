@@ -21,7 +21,6 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 
 import com.frostwire.search.youtube.HTMLEntities;
-import org.appwork.utils.logging.Log;
 
 public class Encoding {
 
@@ -37,7 +36,7 @@ public class Encoding {
         try {
             str = URLDecoder.decode(str, "UTF-8");
         } catch (final Throwable e) {
-            Log.exception(e);
+            e.printStackTrace();
         }
         return Encoding.htmlOnlyDecode(str);
     }
@@ -84,24 +83,10 @@ public class Encoding {
             try {
                 urlcoded = URLDecoder.decode(urlcoded, "UTF-8");
             } catch (final Exception e) {
-                Log.exception(e);
+                e.printStackTrace();
             }
         }
         return urlcoded;
-    }
-
-    /**
-     * WARNING: we MUST use the encoding given in charset info by webserver!
-     * else missmatch will happen eg UTF8 vs ISO-8859-15
-     **/
-    public static String urlEncode(final String str) {
-        if (str == null) { return null; }
-        try {
-            return URLEncoder.encode(str, "UTF-8");
-        } catch (final Exception e) {
-            Log.exception(e);
-        }
-        return str;
     }
 
     public static String urlEncode_light(final String url) {
@@ -130,7 +115,7 @@ public class Encoding {
                 try {
                     sb.append(URLEncoder.encode(String.valueOf(ch), "UTF-8"));
                 } catch (final Exception e) {
-                    Log.exception(e);
+                    e.printStackTrace();
                     return url;
                 }
             }
@@ -147,7 +132,7 @@ public class Encoding {
                 return new String(str.getBytes(), "UTF-8");
             }
         } catch (final UnsupportedEncodingException e) {
-            Log.exception(e);
+            e.printStackTrace();
             return str;
         }
     }

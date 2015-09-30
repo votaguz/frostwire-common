@@ -21,8 +21,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
-import org.appwork.utils.logging.Log;
-
 public class Cookie {
 
     private String path;
@@ -111,7 +109,7 @@ public class Cookie {
             return false;
         }
         if (this.hostTime == -1) {
-            Log.L.severe("Cookie: no HostTime found! ExpireStatus cannot be checked " + this.host + " " + this.key);
+            System.out.println("Cookie: no HostTime found! ExpireStatus cannot be checked " + this.host + " " + this.key);
             return false;
         } else {
             final long timediff = this.creationTime - this.hostTime;
@@ -155,7 +153,7 @@ public class Cookie {
             return;
         }
         this.expireTime = -1;
-        Log.L.severe("Cookie: no Format for " + expires + " found!");
+        System.out.println("Cookie: no Format for " + expires + " found!");
         return;
     }
 
@@ -180,7 +178,7 @@ public class Cookie {
             return;
         }
         this.hostTime = -1;
-        Log.L.severe("Cookie: no Format for " + date + " found!");
+        System.out.println("Cookie: no Format for " + date + " found!");
         return;
     }
 

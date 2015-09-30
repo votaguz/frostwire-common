@@ -23,7 +23,6 @@ import jd.http.Request;
 import org.appwork.utils.LowerCaseHashMap;
 import org.appwork.utils.Regex;
 import org.appwork.utils.net.ChunkedInputStream;
-import org.appwork.utils.net.CountingOutputStream;
 
 public class HTTPConnectionImpl implements HTTPConnection {
 
