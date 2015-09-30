@@ -11,6 +11,9 @@ import java.net.Socket;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -23,6 +26,11 @@ import jd.http.Request;
 import org.appwork.utils.LowerCaseHashMap;
 import org.appwork.utils.Regex;
 import org.appwork.utils.net.ChunkedInputStream;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 public class HTTPConnectionImpl implements HTTPConnection {
 
@@ -82,7 +90,7 @@ public class HTTPConnectionImpl implements HTTPConnection {
         for (final InetAddress host : hosts) {
             if (this.httpURL.getProtocol().startsWith("https")) {
                 /* https */
-                this.httpSocket = TrustALLSSLFactory.getSSLFactoryTrustALL().createSocket();
+                this.httpSocket = getSSLFactoryTrustALL().createSocket();
                 /*
                  * http://twelve-programmers.blogspot.de/2010/01/limitations-in-jsse
                  * -tls-implementation.html
@@ -625,5 +633,38 @@ public class HTTPConnectionImpl implements HTTPConnection {
 
     public void setRequest(final Request request) {
         this.request = request;
+    }
+
+    private static TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
+
+        @Override
+        public void checkClientTrusted(final java.security.cert.X509Certificate[] chain, final String authType) throws CertificateException {
+        }
+
+        @Override
+        public void checkServerTrusted(final java.security.cert.X509Certificate[] chain, final String authType) throws CertificateException {
+        }
+
+        @Override
+        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                                                        /*
+                                                         * returning null here
+                                                         * can cause a NPE in
+                                                         * some java versions!
+                                                         */
+            return new java.security.cert.X509Certificate[0];
+        }
+    } };
+
+    public static SSLSocketFactory getSSLFactoryTrustALL() throws IOException {
+        try {
+            final SSLContext sc = SSLContext.getInstance("SSL");
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            return sc.getSocketFactory();
+        } catch (final NoSuchAlgorithmException e) {
+            throw new IOException(e.toString());
+        } catch (final KeyManagementException e) {
+            throw new IOException(e.toString());
+        }
     }
 }
