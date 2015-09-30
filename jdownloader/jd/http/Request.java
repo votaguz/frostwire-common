@@ -39,6 +39,7 @@ import jd.parser.Regex;
 import org.appwork.utils.ReusableByteArrayOutputStreamPool;
 import org.appwork.utils.ReusableByteArrayOutputStreamPool.ReusableByteArrayOutputStream;
 import org.appwork.utils.StringUtils;
+import org.appwork.utils.net.httpconnection.HTTPConnectionImpl;
 
 public abstract class Request {
     // public static int MAX_REDIRECTS = 30;
@@ -94,7 +95,7 @@ public abstract class Request {
         return ret;
     }
 
-    public static byte[] read(final URLConnectionAdapter con) throws IOException {
+    public static byte[] read(final HTTPConnectionImpl con) throws IOException {
         final InputStream is = con.getInputStream();
         byte[] ret = null;
         if (is == null) {
@@ -162,7 +163,7 @@ public abstract class Request {
 
     private String                 htmlCode;
 
-    protected URLConnectionAdapter httpConnection;
+    protected HTTPConnectionImpl httpConnection;
     private long                   readTime       = -1;
 
     protected boolean              requested      = false;
@@ -179,7 +180,7 @@ public abstract class Request {
         this.initDefaultHeader();
     }
 
-    public Request(final URLConnectionAdapter con) {
+    public Request(final HTTPConnectionImpl con) {
         this.httpConnection = con;
         this.collectCookiesFromConnection();
     }
@@ -311,7 +312,7 @@ public abstract class Request {
         return this.htmlCode;
     }
 
-    public URLConnectionAdapter getHttpConnection() {
+    public HTTPConnectionImpl getHttpConnection() {
         return this.httpConnection;
     }
 
@@ -425,7 +426,7 @@ public abstract class Request {
     }
 
     private void openConnection() throws IOException {
-        this.httpConnection = new URLConnectionAdapterDirectImpl(new URL(this.orgURL));
+        this.httpConnection = new HTTPConnectionImpl(new URL(this.orgURL));
         this.httpConnection.setRequest(this);
         this.httpConnection.setReadTimeout(this.readTimeout);
         this.httpConnection.setConnectTimeout(this.connectTimeout);
@@ -487,7 +488,7 @@ public abstract class Request {
 
     public void setReadTimeout(final int readTimeout) {
         this.readTimeout = readTimeout;
-        final URLConnectionAdapter con = this.httpConnection;
+        final HTTPConnectionImpl con = this.httpConnection;
         if (con != null) {
             con.setReadTimeout(readTimeout);
         }

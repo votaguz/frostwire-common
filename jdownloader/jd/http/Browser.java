@@ -19,6 +19,7 @@ package jd.http;
 import jd.http.requests.GetRequest;
 import jd.nutils.encoding.Encoding;
 import jd.parser.Regex;
+import org.appwork.utils.net.httpconnection.HTTPConnectionImpl;
 
 import java.io.*;
 import java.net.MalformedURLException;
@@ -37,19 +38,19 @@ public class Browser {
     public class BrowserException extends IOException {
 
         private static final long    serialVersionUID = 1509988898224037320L;
-        private URLConnectionAdapter connection;
+        private HTTPConnectionImpl connection;
         private Exception            e                = null;
 
         public BrowserException(final String string) {
             super(string);
         }
 
-        public BrowserException(final String message, final URLConnectionAdapter con) {
+        public BrowserException(final String message, final HTTPConnectionImpl con) {
             this(message);
             this.connection = con;
         }
 
-        public BrowserException(final String message, final URLConnectionAdapter con, final Exception e) {
+        public BrowserException(final String message, final HTTPConnectionImpl con, final Exception e) {
             this(message, con);
             this.e = e;
         }
@@ -59,7 +60,7 @@ public class Browser {
          * 
          * @return
          */
-        public URLConnectionAdapter getConnection() {
+        public HTTPConnectionImpl getConnection() {
             return this.connection;
         }
 
@@ -255,7 +256,7 @@ public class Browser {
      * @return Erfolg true/false
      * @throws IOException
      */
-    public static void download(final File file, final URLConnectionAdapter con) throws IOException {
+    public static void download(final File file, final HTTPConnectionImpl con) throws IOException {
         if (file.isFile()) {
             if (!file.delete()) {
                 System.out.println("Konnte Datei nicht löschen " + file);
@@ -534,7 +535,7 @@ public class Browser {
     }
 
     public void getDownload(final File file, final String urlString) throws IOException {
-        final URLConnectionAdapter con = this.openGetConnection(URLDecoder.decode(urlString, "UTF-8"));
+        final HTTPConnectionImpl con = this.openGetConnection(URLDecoder.decode(urlString, "UTF-8"));
         Browser.download(file, con);
     }
 
@@ -657,7 +658,7 @@ public class Browser {
      * @return
      * @throws IOException
      */
-    public Request loadConnection(URLConnectionAdapter con) throws IOException {
+    public Request loadConnection(HTTPConnectionImpl con) throws IOException {
 
         Request requ;
         if (con == null) {
@@ -726,7 +727,7 @@ public class Browser {
      * @return
      * @throws IOException
      */
-    public URLConnectionAdapter openGetConnection(final String string) throws IOException {
+    public HTTPConnectionImpl openGetConnection(final String string) throws IOException {
         return this.openRequestConnection(this.createGetRequest(string));
 
     }
@@ -734,7 +735,7 @@ public class Browser {
     /**
      * Opens a connection based on the requets object
      */
-    public URLConnectionAdapter openRequestConnection(final Request request) throws IOException {
+    public HTTPConnectionImpl openRequestConnection(final Request request) throws IOException {
         this.connect(request);
         this.updateCookies(request);
         this.request = request;

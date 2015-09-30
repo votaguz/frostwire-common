@@ -148,8 +148,8 @@ class HTMLEntities {
      * @return string with replaced quotes
      */
     public static String htmlQuotes(String str) {
-        str = jd.nutils.encoding.HTMLEntities.htmlDoubleQuotes(str); // convert double quotes
-        str = jd.nutils.encoding.HTMLEntities.htmlSingleQuotes(str); // convert single quotes
+        str = htmlDoubleQuotes(str); // convert double quotes
+        str = htmlSingleQuotes(str); // convert single quotes
         return str;
     }
 
@@ -175,13 +175,13 @@ class HTMLEntities {
      */
     public static String htmlTotal(String format) {
 
-        format = jd.nutils.encoding.HTMLEntities.htmlentities(format);
-        format = jd.nutils.encoding.HTMLEntities.htmlAmpersand(format);
-        format = jd.nutils.encoding.HTMLEntities.htmlAngleBrackets(format);
-        format = jd.nutils.encoding.HTMLEntities.htmlDoubleQuotes(format);
+        format = htmlentities(format);
+        format = htmlAmpersand(format);
+        format = htmlAngleBrackets(format);
+        format = htmlDoubleQuotes(format);
 
-        format = jd.nutils.encoding.HTMLEntities.htmlQuotes(format);
-        format = jd.nutils.encoding.HTMLEntities.htmlSingleQuotes(format);
+        format = htmlQuotes(format);
+        format = htmlSingleQuotes(format);
 
         return format;
     }
@@ -296,8 +296,8 @@ class HTMLEntities {
      * @return string with replaced quotes
      */
     public static String unhtmlQuotes(String str) {
-        str = jd.nutils.encoding.HTMLEntities.unhtmlDoubleQuotes(str); // convert double quotes
-        str = jd.nutils.encoding.HTMLEntities.unhtmlSingleQuotes(str); // convert single quotes
+        str = unhtmlDoubleQuotes(str); // convert double quotes
+        str = unhtmlSingleQuotes(str); // convert single quotes
         return str;
     }
 

@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.zip.GZIPInputStream;
 
+import jd.http.Request;
 import org.appwork.utils.LowerCaseHashMap;
 import org.appwork.utils.Regex;
 import org.appwork.utils.net.ChunkedInputStream;
@@ -613,4 +614,25 @@ public class HTTPConnectionImpl implements HTTPConnection {
         return sb.toString();
     }
 
+    private Request request;
+
+    public InputStream getErrorStream() {
+        try {
+            return this.getInputStream();
+        } catch (final IOException e) {
+            return null;
+        }
+    }
+
+    public long getLongContentLength() {
+        return this.getContentLength();
+    }
+
+    public Request getRequest() {
+        return this.request;
+    }
+
+    public void setRequest(final Request request) {
+        this.request = request;
+    }
 }
