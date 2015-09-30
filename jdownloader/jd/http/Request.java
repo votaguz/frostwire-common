@@ -34,11 +34,11 @@ import java.util.regex.Pattern;
 //import javax.imageio.ImageIO;
 
 import jd.nutils.encoding.Encoding;
-import jd.parser.Regex;
 
+import org.apache.commons.lang3.StringUtils;
+import org.appwork.utils.Regex;
 import org.appwork.utils.ReusableByteArrayOutputStreamPool;
 import org.appwork.utils.ReusableByteArrayOutputStreamPool.ReusableByteArrayOutputStream;
-import org.appwork.utils.StringUtils;
 import org.appwork.utils.net.httpconnection.HTTPConnectionImpl;
 
 public abstract class Request {
@@ -319,14 +319,14 @@ public abstract class Request {
     public String getLocation() {
         if (this.httpConnection == null) { return null; }
         String red = this.httpConnection.getHeaderField("Location");
-        if (StringUtils.isEmpty(red)) {
+        if (StringUtils.isEmpty(StringUtils.trim(red))) {
             /* check if we have an old-school refresh header */
             red = this.httpConnection.getHeaderField("refresh");
             if (red != null) {
                 // we need to filter the time count from the url
                 red = new Regex(red, "url=(.+);?").getMatch(0);
             }
-            if (StringUtils.isEmpty(red)) { return null; }
+            if (StringUtils.isEmpty(StringUtils.trim(red))) { return null; }
         }
         final String encoding = this.httpConnection.getHeaderField("Content-Type");
         if (encoding != null && encoding.contains("UTF-8")) {

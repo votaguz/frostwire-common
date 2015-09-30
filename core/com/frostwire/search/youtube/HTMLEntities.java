@@ -21,7 +21,7 @@ import java.util.Hashtable;
  * 
  *          added htmlTotal Method
  */
-class HTMLEntities {
+public class HTMLEntities {
 
     /**
      * Translation table for HTML entities.<br>

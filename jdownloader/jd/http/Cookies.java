@@ -16,12 +16,12 @@
 
 package jd.http;
 
+import org.appwork.utils.Regex;
+
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map.Entry;
 import java.util.StringTokenizer;
-
-import jd.parser.Regex;
 
 public class Cookies {
 

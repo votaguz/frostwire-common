@@ -18,7 +18,7 @@ package jd.http;
 
 import jd.http.requests.GetRequest;
 import jd.nutils.encoding.Encoding;
-import jd.parser.Regex;
+import org.appwork.utils.Regex;
 import org.appwork.utils.net.httpconnection.HTTPConnectionImpl;
 
 import java.io.*;

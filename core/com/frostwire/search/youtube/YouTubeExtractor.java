@@ -20,7 +20,8 @@ import com.frostwire.search.FileSearchResult;
 import com.frostwire.util.http.HttpClient;
 import com.frostwire.util.HttpClientFactory;
 import jd.http.Browser;
-import jd.parser.Regex;
+import jd.nutils.encoding.Encoding;
+import org.appwork.utils.Regex;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -174,7 +175,7 @@ public final class YouTubeExtractor {
         }
 
         if ((LinksFound == null || LinksFound.isEmpty()) && error != null) {
-            error = urlDecode(error, false);
+            error = Encoding.urlDecode(error, false);
             if (error != null) {
                 error = error.trim();
             }
@@ -199,7 +200,7 @@ public final class YouTubeExtractor {
         boolean fileNameFound = false;
         String filename = videoId;
         if (br.containsHTML("&title=")) {
-            filename = htmlDecode(br.getRegex("&title=([^&$]+)").getMatch(0).replaceAll("\\+", " ").trim());
+            filename = Encoding.htmlDecode(br.getRegex("&title=([^&$]+)").getMatch(0).replaceAll("\\+", " ").trim());
             fileNameFound = true;
         }
 
@@ -209,7 +210,7 @@ public final class YouTubeExtractor {
 
         /* html5_fmt_map */
         if (br.getRegex(FILENAME_PATTERN).count() != 0 && fileNameFound == false) {
-            filename = htmlDecode(br.getRegex(FILENAME_PATTERN).getMatch(0).trim());
+            filename = Encoding.htmlDecode(br.getRegex(FILENAME_PATTERN).getMatch(0).trim());
             fileNameFound = true;
         }
 
@@ -228,7 +229,7 @@ public final class YouTubeExtractor {
                     String hitFmt = new Regex(hit, "itag\": (\\d+)").getMatch(0);
                     if (hitUrl != null && hitFmt != null) {
                         hitUrl = unescape(hitUrl.replaceAll("\\\\/", "/"));
-                        links.put(Integer.parseInt(hitFmt), htmlDecode(urlDecode(hitUrl, true)));
+                        links.put(Integer.parseInt(hitFmt), Encoding.htmlDecode(Encoding.urlDecode(hitUrl, true)));
                     }
                 }
             }
@@ -303,7 +304,7 @@ public final class YouTubeExtractor {
                 if (hitUrl != null && hitQ != null) {
                     hitUrl = unescape(hitUrl.replaceAll("\\\\/", "/"));
                     if (fmt_list_map.length >= index) {
-                        links.put(Integer.parseInt(fmt_list_map[index][0]), htmlDecode(urlDecode(hitUrl, false)));
+                        links.put(Integer.parseInt(fmt_list_map[index][0]), Encoding.htmlDecode(Encoding.urlDecode(hitUrl, false)));
                         index++;
                     }
                 }
@@ -341,13 +342,13 @@ public final class YouTubeExtractor {
                     if (hitUrl != null && hitFmt != null) {
                         hitUrl = unescape(hitUrl.replaceAll("\\\\/", "/"));
                         if (hitUrl.startsWith("http%253A")) {
-                            hitUrl = htmlDecode(hitUrl);
+                            hitUrl = Encoding.htmlDecode(hitUrl);
                         }
                         String inst = null;
                         if (hitUrl.contains("sig")) {
-                            inst = htmlDecode(urlDecode(hitUrl, true));
+                            inst = Encoding.htmlDecode(Encoding.urlDecode(hitUrl, true));
                         } else {
-                            inst = htmlDecode(urlDecode(hitUrl, true) + "&signature=" + sig);
+                            inst = Encoding.htmlDecode(Encoding.urlDecode(hitUrl, true) + "&signature=" + sig);
                         }
                         links.put(Integer.parseInt(hitFmt), inst);
                     }
@@ -570,46 +571,5 @@ public final class YouTubeExtractor {
         protected boolean removeEldestEntry(java.util.Map.Entry<K, V> eldest) {
             return size() > capacity;
         }
-    }
-
-    private static String urlDecode(String urlcoded, final boolean isUrl) {
-        if (urlcoded == null) { return null; }
-        if (isUrl) {
-            urlcoded = urlcoded.replaceAll("%2F", "/");
-            urlcoded = urlcoded.replaceAll("%3A", ":");
-            urlcoded = urlcoded.replaceAll("%3F", "?");
-            urlcoded = urlcoded.replaceAll("%3D", "=");
-            urlcoded = urlcoded.replaceAll("%26", "&");
-            urlcoded = urlcoded.replaceAll("%23", "#");
-        } else {
-            try {
-                urlcoded = URLDecoder.decode(urlcoded, "UTF-8");
-            } catch (final Exception e) {
-                //Log.exception(e);
-            }
-        }
-        return urlcoded;
-    }
-
-    private static String htmlDecode(String str) {
-        if (str == null) { return null; }
-        try {
-            str = URLDecoder.decode(str, "UTF-8");
-        } catch (final Throwable e) {
-            //Log.exception(e);
-        }
-        return htmlOnlyDecode(str);
-    }
-
-    private static String htmlOnlyDecode(String str) {
-        if (str == null) { return null; }
-        str = HTMLEntities.unhtmlentities(str);
-
-        str = HTMLEntities.unhtmlAmpersand(str);
-        str = HTMLEntities.unhtmlAngleBrackets(str);
-        str = HTMLEntities.unhtmlDoubleQuotes(str);
-        str = HTMLEntities.unhtmlQuotes(str);
-        str = HTMLEntities.unhtmlSingleQuotes(str);
-        return str;
     }
 }

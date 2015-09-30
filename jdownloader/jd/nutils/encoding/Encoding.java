@@ -20,22 +20,38 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 
+import com.frostwire.search.youtube.HTMLEntities;
 import org.appwork.utils.logging.Log;
 
 public class Encoding {
 
     /**
-     * WARNING: we MUST use the encoding given in charset info by webserver!
-     * else missmatch will happen eg UTF8 vs ISO-8859-15
-     **/
-    public static String formEncoding(final String str) {
-        /* Form Variablen dürfen keine Leerzeichen haben */
+     * "http://rapidshare.com&#x2F;&#x66;&#x69;&#x6C;&#x65;&#x73;&#x2F;&#x35;&#x34;&#x35;&#x34;&#x31;&#x34;&#x38;&#x35;&#x2F;&#x63;&#x63;&#x66;&#x32;&#x72;&#x73;&#x64;&#x66;&#x2E;&#x72;&#x61;&#x72;"
+     * ; Wandelt alle hexkodierten zeichen in diesem Format in normalen text um
+     *
+     * @param str
+     * @return decoded string
+     */
+    public static String htmlDecode(String str) {
         if (str == null) { return null; }
-        if (Encoding.isUrlCoded(str)) {
-            return str.replaceAll(" ", "+");
-        } else {
-            return Encoding.urlEncode(str);
+        try {
+            str = URLDecoder.decode(str, "UTF-8");
+        } catch (final Throwable e) {
+            Log.exception(e);
         }
+        return Encoding.htmlOnlyDecode(str);
+    }
+
+    public static String htmlOnlyDecode(String str) {
+        if (str == null) { return null; }
+        str = HTMLEntities.unhtmlentities(str);
+
+        str = HTMLEntities.unhtmlAmpersand(str);
+        str = HTMLEntities.unhtmlAngleBrackets(str);
+        str = HTMLEntities.unhtmlDoubleQuotes(str);
+        str = HTMLEntities.unhtmlQuotes(str);
+        str = HTMLEntities.unhtmlSingleQuotes(str);
+        return str;
     }
 
     public static void main(String[] args) {
