@@ -1,4 +1,4 @@
-package org.appwork.utils;
+package com.frostwire.search.youtube.jd;
 
 import java.io.ByteArrayOutputStream;
 import java.lang.ref.SoftReference;

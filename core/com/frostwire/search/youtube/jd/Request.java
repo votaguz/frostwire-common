@@ -14,7 +14,7 @@
 //    You should have received a copy of the GNU General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package jd.http;
+package com.frostwire.search.youtube.jd;
 
 //import java.awt.Image;
 //import java.awt.image.BufferedImage;
@@ -28,18 +28,12 @@ import java.nio.charset.CharacterCodingException;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 //import javax.imageio.ImageIO;
 
-import jd.nutils.encoding.Encoding;
-
 import org.apache.commons.lang3.StringUtils;
-import org.appwork.utils.Regex;
-import org.appwork.utils.ReusableByteArrayOutputStreamPool;
-import org.appwork.utils.ReusableByteArrayOutputStreamPool.ReusableByteArrayOutputStream;
-import org.appwork.utils.net.httpconnection.HTTPConnectionImpl;
+import com.frostwire.search.youtube.jd.ReusableByteArrayOutputStreamPool.ReusableByteArrayOutputStream;
 
 public abstract class Request {
     // public static int MAX_REDIRECTS = 30;

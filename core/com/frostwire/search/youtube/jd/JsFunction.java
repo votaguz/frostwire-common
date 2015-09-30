@@ -16,18 +16,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.frostwire.search.youtube.js;
+package com.frostwire.search.youtube.jd;
 
-import static com.frostwire.search.youtube.js.JavaFunctions.escape;
-import static com.frostwire.search.youtube.js.JavaFunctions.isalpha;
-import static com.frostwire.search.youtube.js.JavaFunctions.isdigit;
-import static com.frostwire.search.youtube.js.JavaFunctions.join;
-import static com.frostwire.search.youtube.js.JavaFunctions.json_loads;
-import static com.frostwire.search.youtube.js.JavaFunctions.len;
-import static com.frostwire.search.youtube.js.JavaFunctions.list;
-import static com.frostwire.search.youtube.js.JavaFunctions.mscpy;
-import static com.frostwire.search.youtube.js.JavaFunctions.reverse;
-import static com.frostwire.search.youtube.js.JavaFunctions.slice;
+import static com.frostwire.search.youtube.jd.JavaFunctions.escape;
+import static com.frostwire.search.youtube.jd.JavaFunctions.isalpha;
+import static com.frostwire.search.youtube.jd.JavaFunctions.isdigit;
+import static com.frostwire.search.youtube.jd.JavaFunctions.join;
+import static com.frostwire.search.youtube.jd.JavaFunctions.json_loads;
+import static com.frostwire.search.youtube.jd.JavaFunctions.len;
+import static com.frostwire.search.youtube.jd.JavaFunctions.list;
+import static com.frostwire.search.youtube.jd.JavaFunctions.mscpy;
+import static com.frostwire.search.youtube.jd.JavaFunctions.reverse;
+import static com.frostwire.search.youtube.jd.JavaFunctions.slice;
 
 import java.util.ArrayList;
 import java.util.HashMap;

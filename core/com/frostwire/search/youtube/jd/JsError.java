@@ -16,21 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.frostwire.search.youtube.js;
-
-import java.util.HashMap;
-import java.util.Map;
+package com.frostwire.search.youtube.jd;
 
 /**
  * @author gubatron
  * @author aldenml
  *
  */
-class JsObject {
+final class JsError extends RuntimeException {
 
-    public JsObject() {
-        this.functions = new HashMap<String, LambdaN>();
+    public JsError(String message) {
+        super(message);
     }
-
-    public final Map<String, LambdaN> functions;
 }

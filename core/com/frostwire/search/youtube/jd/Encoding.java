@@ -14,13 +14,11 @@
 //    You should have received a copy of the GNU General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package jd.nutils.encoding;
+package com.frostwire.search.youtube.jd;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-
-import com.frostwire.search.youtube.HTMLEntities;
 
 public class Encoding {
 

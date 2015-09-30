@@ -1,4 +1,4 @@
-package org.appwork.utils.net.httpconnection;
+package com.frostwire.search.youtube.jd;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,11 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.zip.GZIPInputStream;
-
-import jd.http.Request;
-import org.appwork.utils.LowerCaseHashMap;
-import org.appwork.utils.Regex;
-import org.appwork.utils.net.ChunkedInputStream;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
@@ -137,7 +132,7 @@ public class HTTPConnectionImpl implements HTTPConnection {
             }
         }
         if (ee != null) { throw ee; }
-        this.httpPath = new org.appwork.utils.Regex(this.httpURL.toString(), "https?://.*?(/.+)").getMatch(0);
+        this.httpPath = new Regex(this.httpURL.toString(), "https?://.*?(/.+)").getMatch(0);
         if (this.httpPath == null) {
             this.httpPath = "/";
         }

@@ -1,4 +1,4 @@
-package org.appwork.utils.net.httpconnection;
+package com.frostwire.search.youtube.jd;
 
 import java.io.IOException;
 import java.io.InputStream;

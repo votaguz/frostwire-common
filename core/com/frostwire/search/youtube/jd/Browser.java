@@ -14,12 +14,7 @@
 //    You should have received a copy of the GNU General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package jd.http;
-
-import jd.http.requests.GetRequest;
-import jd.nutils.encoding.Encoding;
-import org.appwork.utils.Regex;
-import org.appwork.utils.net.httpconnection.HTTPConnectionImpl;
+package com.frostwire.search.youtube.jd;
 
 import java.io.*;
 import java.net.MalformedURLException;

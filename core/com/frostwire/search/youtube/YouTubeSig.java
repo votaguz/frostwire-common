@@ -21,7 +21,7 @@ package com.frostwire.search.youtube;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.frostwire.search.youtube.js.JsFunction;
+import com.frostwire.search.youtube.jd.JsFunction;
 
 /**
  * @author gubatron

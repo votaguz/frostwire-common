@@ -16,16 +16,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.frostwire.search.youtube.js;
+package com.frostwire.search.youtube.jd;
 
 /**
  * @author gubatron
  * @author aldenml
  *
  */
-final class JsError extends RuntimeException {
+interface Lambda1 {
 
-    public JsError(String message) {
-        super(message);
-    }
+    public Object eval(Object obj);
 }

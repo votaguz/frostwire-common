@@ -14,15 +14,13 @@
 //    You should have received a copy of the GNU General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package jd.http.requests;
+package com.frostwire.search.youtube.jd;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 
-import jd.http.Browser;
-import jd.http.Request;
-
-import org.appwork.utils.net.httpconnection.HTTPConnection.RequestMethod;
+import com.frostwire.search.youtube.jd.Browser;
+import com.frostwire.search.youtube.jd.Request;
 
 public class GetRequest extends Request {
 
@@ -37,7 +35,7 @@ public class GetRequest extends Request {
 
     @Override
     public void preRequest() throws IOException {
-        this.httpConnection.setRequestMethod(RequestMethod.GET);
+        this.httpConnection.setRequestMethod(HTTPConnection.RequestMethod.GET);
     }
 
 }

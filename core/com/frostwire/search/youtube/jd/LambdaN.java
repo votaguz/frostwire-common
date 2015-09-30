@@ -16,14 +16,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.frostwire.search.youtube.js;
+package com.frostwire.search.youtube.jd;
 
 /**
  * @author gubatron
  * @author aldenml
  *
  */
-interface Lambda1 {
+interface LambdaN {
 
-    public Object eval(Object obj);
+    public Object eval(Object[] arr);
 }

@@ -1,4 +1,4 @@
-package com.frostwire.search.youtube;
+package com.frostwire.search.youtube.jd;
 
 import java.util.Hashtable;
 

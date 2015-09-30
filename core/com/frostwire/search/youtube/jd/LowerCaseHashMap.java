@@ -1,4 +1,4 @@
-package org.appwork.utils;
+package com.frostwire.search.youtube.jd;
 
 import java.util.LinkedHashMap;
 import java.util.Locale;
