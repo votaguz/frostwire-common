@@ -18,7 +18,7 @@
 
 package com.frostwire.search;
 
-import com.google.code.regexp.Pattern;
+import com.frostwire.regex.Pattern;
 
 /**
  * 

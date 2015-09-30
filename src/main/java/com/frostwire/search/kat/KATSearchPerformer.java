@@ -19,7 +19,6 @@
 package com.frostwire.search.kat;
 
 import com.frostwire.logging.Logger;
-import com.frostwire.search.AlbumCluster;
 import com.frostwire.search.ScrapedTorrentFileSearchResult;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.SearchResult;
@@ -27,7 +26,7 @@ import com.frostwire.search.torrent.TorrentCrawlableSearchResult;
 import com.frostwire.search.torrent.TorrentJsonSearchPerformer;
 import com.frostwire.util.HtmlManipulator;
 import com.frostwire.util.JsonUtils;
-import com.google.code.regexp.Pattern;
+import com.frostwire.regex.Pattern;
 
 import java.util.*;
 

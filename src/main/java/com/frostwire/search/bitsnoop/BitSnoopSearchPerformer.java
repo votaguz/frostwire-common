@@ -22,8 +22,8 @@ import com.frostwire.logging.Logger;
 import com.frostwire.search.*;
 import com.frostwire.search.torrent.TorrentRegexSearchPerformer;
 import com.frostwire.util.HtmlManipulator;
-import com.google.code.regexp.Matcher;
-import com.google.code.regexp.Pattern;
+import com.frostwire.regex.Matcher;
+import com.frostwire.regex.Pattern;
 
 import java.util.*;
 

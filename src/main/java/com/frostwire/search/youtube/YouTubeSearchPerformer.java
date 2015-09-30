@@ -23,7 +23,7 @@ import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.SearchResult;
 import com.frostwire.search.youtube.YouTubeExtractor.LinkInfo;
 import com.frostwire.util.HtmlManipulator;
-import com.google.code.regexp.Pattern;
+import com.frostwire.regex.Pattern;
 
 import java.io.IOException;
 import java.util.LinkedList;

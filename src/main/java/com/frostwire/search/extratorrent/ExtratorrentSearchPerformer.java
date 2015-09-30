@@ -24,7 +24,7 @@ import com.frostwire.search.torrent.TorrentCrawlableSearchResult;
 import com.frostwire.search.torrent.TorrentJsonSearchPerformer;
 import com.frostwire.util.HtmlManipulator;
 import com.frostwire.util.JsonUtils;
-import com.google.code.regexp.Pattern;
+import com.frostwire.regex.Pattern;
 
 import java.util.*;
 

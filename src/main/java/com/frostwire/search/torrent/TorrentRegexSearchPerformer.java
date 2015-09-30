@@ -19,8 +19,8 @@ package com.frostwire.search.torrent;
 
 import com.frostwire.logging.Logger;
 import com.frostwire.search.*;
-import com.google.code.regexp.Matcher;
-import com.google.code.regexp.Pattern;
+import com.frostwire.regex.Matcher;
+import com.frostwire.regex.Pattern;
 
 import java.util.LinkedList;
 import java.util.List;

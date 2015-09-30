@@ -22,7 +22,7 @@ import com.frostwire.jlibtorrent.TorrentInfo;
 import com.frostwire.logging.Logger;
 import com.frostwire.search.torrent.TorrentCrawlableSearchResult;
 import com.frostwire.search.torrent.TorrentCrawledSearchResult;
-import com.google.code.regexp.Pattern;
+import com.frostwire.regex.Pattern;
 
 import java.util.LinkedList;
 import java.util.List;

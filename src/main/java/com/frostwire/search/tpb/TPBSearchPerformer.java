@@ -22,7 +22,7 @@ import com.frostwire.search.CrawlRegexSearchPerformer;
 import com.frostwire.search.PerformersHelper;
 import com.frostwire.search.SearchMatcher;
 import com.frostwire.search.SearchResult;
-import com.google.code.regexp.Pattern;
+import com.frostwire.regex.Pattern;
 
 import java.util.List;
 

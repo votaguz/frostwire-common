@@ -18,7 +18,7 @@
 
 package com.frostwire.search;
 
-import com.google.code.regexp.Matcher;
+import com.frostwire.regex.Matcher;
 
 /**
  * <strong>A memory conscious Matcher</strong><br/>

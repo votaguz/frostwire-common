@@ -19,7 +19,7 @@
 package com.frostwire.search.btjunkie;
 
 import com.frostwire.search.*;
-import com.google.code.regexp.Pattern;
+import com.frostwire.regex.Pattern;
 
 import java.util.Calendar;
 import java.util.HashMap;
