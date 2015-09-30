@@ -27,7 +27,6 @@ import java.util.Map.Entry;
 import jd.http.Browser;
 import jd.http.Request;
 import jd.http.URLConnectionAdapter;
-import jd.parser.html.Form;
 
 import org.appwork.utils.StringUtils;
 import org.appwork.utils.net.CountingOutputStream;
@@ -56,11 +55,6 @@ public class PostRequest extends Request {
     private String                           contentType = null;
     private byte[]                           postBytes   = null;
     private SEND                             sendWHAT    = null;
-
-    public PostRequest(final Form form) throws MalformedURLException {
-        super(form.getAction(null));
-        this.postVariables = new ArrayList<RequestVariable>();
-    }
 
     public PostRequest(final String url) throws MalformedURLException {
         super(Browser.correctURL(url));

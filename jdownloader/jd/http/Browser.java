@@ -19,7 +19,6 @@ package jd.http;
 import jd.http.requests.GetRequest;
 import jd.nutils.encoding.Encoding;
 import jd.parser.Regex;
-import org.appwork.utils.net.httpconnection.HTTPProxy;
 
 import java.io.*;
 import java.net.MalformedURLException;
@@ -606,10 +605,6 @@ public class Browser {
      */
     public Request getRequest() {
         return this.request;
-    }
-
-    public HTTPProxy getThreadProxy() {
-        return null;
     }
 
     public String getURL() {
