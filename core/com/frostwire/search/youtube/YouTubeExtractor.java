@@ -23,8 +23,6 @@ import jd.http.Browser;
 import jd.http.Request;
 import jd.nutils.encoding.Encoding;
 import jd.parser.Regex;
-import jd.parser.html.Form;
-import jd.parser.html.Form.MethodType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -164,36 +162,6 @@ public final class YouTubeExtractor {
         return infos;
     }
 
-    private boolean testConnection(Browser br, String link) {
-        boolean connected = false;
-        try {
-            if (br.openGetConnection(link).getResponseCode() == 200) {
-                br.getHttpConnection().getLongContentLength();
-                connected = true;
-            }
-        } catch (Throwable e) {
-            log("Failed link url: " + link);
-        } finally {
-            try {
-                br.getHttpConnection().disconnect();
-            } catch (final Throwable e) {
-            }
-        }
-        return connected;
-    }
-
-    private String getFirstLink(Map<Integer, String> linksFound) {
-        for (int fmt : linksFound.keySet()) {
-            Format format = FORMATS.get(fmt);
-            if (format == null) {
-                continue;
-            }
-
-            return linksFound.get(fmt);
-        }
-        return null;
-    }
-
     private void checkError(String videoUrl, Browser br, HashMap<Integer, String> LinksFound) {
 
         String error = br.getRegex("<div id=\"unavailable\\-message\" class=\"\">[\t\n\r ]+<span class=\"yt\\-alert\\-vertical\\-trick\"></span>[\t\n\r ]+<div class=\"yt\\-alert\\-message\">([^<>\"]*?)</div>").getMatch(0);
@@ -236,52 +204,7 @@ public final class YouTubeExtractor {
             fileNameFound = true;
         }
 
-        String url = br.getURL();
-        boolean ythack = false;
-        if (url != null && !url.equals(video)) {
-            /* age verify with activated premium? */
-            if (url.toLowerCase(Locale.ENGLISH).indexOf("youtube.com/verify_age?next_url=") != -1) {
-                //verifyAge = true;
-            }
-            if (url.toLowerCase(Locale.ENGLISH).indexOf("youtube.com/verify_age?next_url=") != -1 && prem) {
-                final String session_token = br.getRegex("onLoadFunc.*?gXSRF_token = '(.*?)'").getMatch(0);
-                final LinkedHashMap<String, String> p = Request.parseQuery(url);
-                final String next = p.get("next_url");
-                final Form form = new Form();
-                form.setAction(url);
-                form.setMethod(MethodType.POST);
-                form.put("next_url", "%2F" + next.substring(1));
-                form.put("action_confirm", "Confirm+Birth+Date");
-                form.put("session_token", Encoding.urlEncode(session_token));
-                br.submitForm(form);
-                if (br.getCookie("http://www.youtube.com", "is_adult") == null) {
-                    return null;
-                }
-            } else if (url.toLowerCase(Locale.ENGLISH).indexOf("youtube.com/index?ytsession=") != -1 || url.toLowerCase(Locale.ENGLISH).indexOf("youtube.com/verify_age?next_url=") != -1 && !prem) {
-                ythack = true;
-                br.getPage("http://www.youtube.com/get_video_info?video_id=" + videoId);
-                if (br.containsHTML("&title=") && fileNameFound == false) {
-                    filename = Encoding.htmlDecode(br.getRegex("&title=([^&$]+)").getMatch(0).replaceAll("\\+", " ").trim());
-                    fileNameFound = true;
-                }
-            } else if (url.toLowerCase(Locale.ENGLISH).indexOf("google.com/accounts/servicelogin?") != -1) {
-                // private videos
-                return null;
-            }
-        }
-
-        Form forms[] = br.getForms();
-        if (forms != null) {
-            for (Form form : forms) {
-                if (form.getAction() != null && form.getAction().contains("verify_age")) {
-                    log("Verify Age");
-                    br.submitForm(form);
-                    break;
-                }
-            }
-        }
-
-        String html5player = br.getRegex("(?s)(html5player\\-.+?\\.js)").getMatch(0);
+       String html5player = br.getRegex("(?s)(html5player\\-.+?\\.js)").getMatch(0);
         YouTubeSig ytSig = getYouTubeSig("http://s.ytimg.com/yts/jsbin/" + html5player);
         currentYTSig = ytSig;
 
@@ -291,7 +214,7 @@ public final class YouTubeExtractor {
             fileNameFound = true;
         }
 
-        return parseLinks(br, video, filename, ythack, false, ytSig);
+        return parseLinks(br, video, filename, false, false, ytSig);
     }
 
     private HashMap<Integer, String> parseLinks(Browser br, final String videoURL, String filename, boolean ythack, boolean tryGetDetails, YouTubeSig ytSig) throws Exception {
