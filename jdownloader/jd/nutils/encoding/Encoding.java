@@ -24,15 +24,6 @@ import org.appwork.utils.logging.Log;
 
 public class Encoding {
 
-    public static String Base64Encode(final String plain) {
-
-        if (plain == null) { return null; }
-
-        // String base64 = new BASE64Encoder().encode(plain.getBytes());
-        final String base64 = new String(Base64.encodeToByte(plain.getBytes(), false));
-        return base64;
-    }
-
     /**
      * WARNING: we MUST use the encoding given in charset info by webserver!
      * else missmatch will happen eg UTF8 vs ISO-8859-15

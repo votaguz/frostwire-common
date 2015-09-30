@@ -126,7 +126,7 @@ public class HTTPConnectionImpl implements HTTPConnection {
                     this.httpSocket.bind(this.proxyInetSocketAddress = new InetSocketAddress(this.proxy.getLocalIP(), 0));
                 } catch (final IOException e) {
                     this.proxyInetSocketAddress = null;
-                    throw new ProxyConnectException(e, this.proxy);
+                    throw new IOException(e);
                 }
             } else if (this.proxy != null && this.proxy.isNone()) {
                 /* none is also allowed here */

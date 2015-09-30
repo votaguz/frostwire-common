@@ -300,13 +300,6 @@ public class Browser {
         }
     }
 
-    public static String getBasicAuthfromURL(final String url) {
-        if (url == null) { return null; }
-        final String basicauth = new Regex(url, "http.*?/([^/]{1}.*?)@").getMatch(0);
-        if (basicauth != null && basicauth.contains(":")) { return Encoding.Base64Encode(basicauth); }
-        return null;
-    }
-
     private String                   acceptLanguage      = "de, en-gb;q=0.9, en;q=0.8";
 
     /*

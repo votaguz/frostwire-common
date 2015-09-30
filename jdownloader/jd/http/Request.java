@@ -179,10 +179,6 @@ public abstract class Request {
     public Request(final String url) throws MalformedURLException {
         this.orgURL = Browser.correctURL(url);
         this.initDefaultHeader();
-        final String basicAuth = Browser.getBasicAuthfromURL(url);
-        if (basicAuth != null) {
-            this.getHeaders().put("Authorization", "Basic " + basicAuth);
-        }
     }
 
     public Request(final URLConnectionAdapter con) {
@@ -435,7 +431,7 @@ public abstract class Request {
     }
 
     private void openConnection() throws IOException {
-        this.httpConnection = HTTPConnectionFactory.createHTTPConnection(new URL(this.orgURL), this.proxy);
+        this.httpConnection = new URLConnectionAdapterDirectImpl(new URL(this.orgURL));
         this.httpConnection.setRequest(this);
         this.httpConnection.setReadTimeout(this.readTimeout);
         this.httpConnection.setConnectTimeout(this.connectTimeout);
