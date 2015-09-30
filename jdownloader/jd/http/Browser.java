@@ -16,35 +16,22 @@
 
 package jd.http;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import jd.http.requests.GetRequest;
+import jd.nutils.encoding.Encoding;
+import jd.parser.Regex;
+import org.appwork.utils.net.httpconnection.HTTPProxy;
+
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.Locale;
-import java.util.Map.Entry;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
-import jd.http.requests.FormData;
-import jd.http.requests.GetRequest;
-import jd.http.requests.PostFormDataRequest;
-import jd.http.requests.PostRequest;
-import jd.http.requests.RequestVariable;
-import jd.nutils.encoding.Encoding;
-import jd.parser.Regex;
-import jd.parser.html.Form;
-import jd.parser.html.InputField;
-
 //import org.appwork.utils.logging2.LogSource;
-import org.appwork.utils.net.httpconnection.HTTPProxy;
 
 public class Browser {
     // we need this class in here due to jdownloader stable 0.9 compatibility
@@ -84,7 +71,6 @@ public class Browser {
     }
 
     private static final HashMap<String, Cookies> COOKIES         = new HashMap<String, Cookies>();
-    private static HTTPProxy                      GLOBAL_PROXY    = null;
     private static Logger                         LOGGER          = null;
 
     // added proxy map to find proxy passwords.
@@ -340,7 +326,6 @@ public class Browser {
     private RequestHeader            headers;
     private int                      limit               = 1 * 1024 * 1024;
     private Logger                   logger              = null;
-    private HTTPProxy                proxy;
     private int                      readTimeout         = -1;
 
     private int                      redirectLoopCounter = 0;
@@ -466,9 +451,6 @@ public class Browser {
 
         final GetRequest request = new GetRequest(string);
         request.setCustomCharset(this.customCharset);
-        if (this.selectProxy() != null) {
-            request.setProxy(this.selectProxy());
-        }
 
         // if old request is set, use it's cookies for the new request
         if (oldRequest != null && oldRequest.hasCookies()) {
@@ -588,10 +570,6 @@ public class Browser {
     public String getPage(final String string) throws IOException {
         this.openRequestConnection(this.createGetRequest(string));
         return this.loadConnection(null).getHtmlCode();
-    }
-
-   public HTTPProxy getProxy() {
-        return this.proxy;
     }
 
     /**
@@ -802,14 +780,6 @@ public class Browser {
         return this.request.getHttpConnection();
     }
 
-    private HTTPProxy selectProxy() {
-        if (this.proxy != null) {
-            if (this.proxy == HTTPProxy.NONE) { return HTTPProxy.NONE; }
-            return this.proxy;
-        }
-        return Browser.GLOBAL_PROXY;
-    }
-
     public void setCookie(final String url, final String key, final String value) {
         final String host = Browser.getHost(url);
         Cookies cookies;
@@ -834,20 +804,6 @@ public class Browser {
 
     public void setLogger(final Logger logger) {
         this.logger = logger;
-    }
-
-    public void setProxy(HTTPProxy proxy) {
-        final HTTPProxy wished = proxy;
-        if (proxy == null) {
-            proxy = this.getThreadProxy();
-        }
-        this.proxy = proxy;
-        if (this.debug) {
-            final Logger llogger = this.getLogger();
-            if (llogger != null) {
-                llogger.info("Use local proxy: " + proxy + " wished: " + wished);
-            }
-        }
     }
 
     public void setRequest(final Request request) {
