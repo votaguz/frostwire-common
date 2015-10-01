@@ -18,6 +18,9 @@
 
 package com.frostwire.http;
 
+import java.util.Collections;
+import java.util.Map;
+
 /**
  * @author gubatron
  * @author aldenml
@@ -26,18 +29,24 @@ public final class Request {
 
     private final Method method;
     private final String url;
+    private final Map<String, String> headers;
     private final String mime;
     private final String body;
 
-    public Request(Method method, String url, String mime, String body) {
+    public Request(Method method, String url, Map<String, String> headers, String mime, String body) {
         this.method = method;
         this.url = url;
+        this.headers = headers;
         this.mime = mime;
         this.body = body;
     }
 
+    public Request(Method method, String url, Map<String, String> headers) {
+        this(method, url, headers, null, null);
+    }
+
     public Request(Method method, String url) {
-        this(method, url, null, null);
+        this(method, url, Collections.<String, String>emptyMap());
     }
 
     public Request(String url) {
@@ -50,6 +59,10 @@ public final class Request {
 
     public String url() {
         return url;
+    }
+
+    public Map<String, String> headers() {
+        return headers;
     }
 
     public String mime() {

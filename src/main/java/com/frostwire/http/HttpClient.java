@@ -19,13 +19,16 @@
 package com.frostwire.http;
 
 import com.frostwire.logging.Logger;
-import com.squareup.okhttp.Callback;
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.RequestBody;
+import com.frostwire.util.ThreadPool;
+import com.frostwire.util.http.AllX509TrustManager;
+import com.frostwire.util.http.WrapSSLSocketFactory;
+import com.squareup.okhttp.*;
 import org.apache.commons.io.IOUtils;
 
+import javax.net.ssl.*;
 import java.io.IOException;
+import java.security.SecureRandom;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author gubatron
@@ -34,6 +37,12 @@ import java.io.IOException;
 public final class HttpClient {
 
     private static final Logger LOG = Logger.getLogger(HttpClient.class);
+
+    protected static final int DEFAULT_TIMEOUT = 10000;
+
+    private static class Loader {
+        static final OkHttpClient DEFAULT_CLIENT = buildDefaultClient();
+    }
 
     private final OkHttpClient c;
 
@@ -65,15 +74,44 @@ public final class HttpClient {
         });
     }
 
+    public static HttpClient get() {
+        return with(null);
+    }
+
     public static HttpClient with(Params params) {
-        return new HttpClient(null);
+        return new HttpClient(params != null ? buildClient(params) : Loader.DEFAULT_CLIENT);
+    }
+
+    private static OkHttpClient buildDefaultClient() {
+        OkHttpClient c = new OkHttpClient();
+
+        c.setFollowRedirects(true);
+        c.setFollowSslRedirects(true);
+        c.setConnectTimeout(DEFAULT_TIMEOUT, TimeUnit.MILLISECONDS);
+        c.setReadTimeout(DEFAULT_TIMEOUT, TimeUnit.MILLISECONDS);
+        c.setWriteTimeout(DEFAULT_TIMEOUT, TimeUnit.MILLISECONDS);
+        c.setHostnameVerifier(buildHostnameVerifier());
+        c.setSslSocketFactory(buildSSLSocketFactory());
+        c.interceptors().add(new GzipInterceptor());
+
+        return c;
+    }
+
+    private static OkHttpClient buildClient(Params params) {
+        OkHttpClient c = Loader.DEFAULT_CLIENT.clone();
+
+        if (params.pool != null) {
+            c.setDispatcher(new Dispatcher(params.pool));
+        }
+
+        return c;
     }
 
     private com.squareup.okhttp.Request buildReq(Request request) {
         return new com.squareup.okhttp.Request.Builder()
                 .method(request.method().toString(), buildReqBody(request))
-                .url(request.url())
-                .build();
+                .headers(Headers.of(request.headers()))
+                .url(request.url()).build();
     }
 
     private RequestBody buildReqBody(Request request) {
@@ -84,7 +122,34 @@ public final class HttpClient {
         }
     }
 
+    private static HostnameVerifier buildHostnameVerifier() {
+        return new HostnameVerifier() {
+            @Override
+            public boolean verify(String hostname, SSLSession session) {
+                return true;
+            }
+        };
+    }
+
+    private static SSLSocketFactory buildSSLSocketFactory() {
+        try {
+            SSLContext sc = SSLContext.getInstance("TLS");
+            sc.init(null, new TrustManager[]{new AllX509TrustManager()}, new SecureRandom());
+            SSLSocketFactory d = sc.getSocketFactory();
+            return new WrapSSLSocketFactory(d);
+        } catch (Throwable e) {
+            LOG.error("Unable to create custom SSL socket factory", e);
+        }
+
+        return null;
+    }
+
     public static final class Params {
 
+        public Params(ThreadPool pool) {
+            this.pool = pool;
+        }
+
+        public final ThreadPool pool;
     }
 }
