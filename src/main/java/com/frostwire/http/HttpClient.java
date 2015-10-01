@@ -18,11 +18,73 @@
 
 package com.frostwire.http;
 
+import com.frostwire.logging.Logger;
+import com.squareup.okhttp.Callback;
+import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.RequestBody;
+import org.apache.commons.io.IOUtils;
+
+import java.io.IOException;
+
 /**
  * @author gubatron
  * @author aldenml
  */
-public interface HttpClient {
+public final class HttpClient {
 
-    void send(Request request, RequestListener listener);
+    private static final Logger LOG = Logger.getLogger(HttpClient.class);
+
+    private final OkHttpClient c;
+
+    HttpClient(OkHttpClient c) {
+        this.c = c;
+    }
+
+    public void send(final Request request, final RequestListener listener) {
+        c.newCall(buildReq(request)).enqueue(new Callback() {
+            @Override
+            public void onFailure(com.squareup.okhttp.Request r, IOException e) {
+                try {
+                    listener.onFailure(request, e);
+                } catch (Throwable t) {
+                    LOG.warn("Error invoking listener", t);
+                }
+            }
+
+            @Override
+            public void onResponse(com.squareup.okhttp.Response r) throws IOException {
+                try {
+                    listener.onResponse(new Response(r));
+                } catch (Throwable t) {
+                    LOG.warn("Error invoking listener", t);
+                } finally {
+                    IOUtils.closeQuietly(r.body());
+                }
+            }
+        });
+    }
+
+    public static HttpClient with(Params params) {
+        return new HttpClient(null);
+    }
+
+    private com.squareup.okhttp.Request buildReq(Request request) {
+        return new com.squareup.okhttp.Request.Builder()
+                .method(request.method().toString(), buildReqBody(request))
+                .url(request.url())
+                .build();
+    }
+
+    private RequestBody buildReqBody(Request request) {
+        if (request.mime() != null && request.body() != null) {
+            return RequestBody.create(MediaType.parse(request.mime()), request.body());
+        } else {
+            return null;
+        }
+    }
+
+    public static final class Params {
+
+    }
 }

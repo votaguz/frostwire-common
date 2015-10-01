@@ -24,12 +24,20 @@ package com.frostwire.http;
  */
 public final class Request {
 
-    private Method method;
-    private String url;
+    private final Method method;
+    private final String url;
+    private final String mime;
+    private final String body;
 
-    public Request(Method method, String url) {
+    public Request(Method method, String url, String mime, String body) {
         this.method = method;
         this.url = url;
+        this.mime = mime;
+        this.body = body;
+    }
+
+    public Request(Method method, String url) {
+        this(method, url, null, null);
     }
 
     public Request(String url) {
@@ -44,8 +52,28 @@ public final class Request {
         return url;
     }
 
-    enum Method {
-        GET,
-        POST
+    public String mime() {
+        return mime;
+    }
+
+    public String body() {
+        return body;
+    }
+
+    public enum Method {
+        GET("GET"),
+        HEAD("HEAD"),
+        POST("POST");
+
+        private final String str;
+
+        Method(String str) {
+            this.str = str;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
     }
 }

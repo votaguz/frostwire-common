@@ -18,9 +18,43 @@
 
 package com.frostwire.http;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+
 /**
  * @author gubatron
  * @author aldenml
  */
-public interface Response {
+public final class Response {
+
+    private final com.squareup.okhttp.Response r;
+
+    Response(com.squareup.okhttp.Response r) {
+        this.r = r;
+    }
+
+    public InputStream stream() throws IOException {
+        if (r.body() == null) {
+            throw new IOException("response body is null");
+        }
+
+        return r.body().byteStream();
+    }
+
+    public Reader reader() throws IOException {
+        if (r.body() == null) {
+            throw new IOException("response body is null");
+        }
+
+        return r.body().charStream();
+    }
+
+    public String string() throws IOException {
+        if (r.body() == null) {
+            throw new IOException("response body is null");
+        }
+
+        return r.body().string();
+    }
 }
