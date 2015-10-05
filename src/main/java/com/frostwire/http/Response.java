@@ -50,6 +50,14 @@ public final class Response {
         return r.body().charStream();
     }
 
+    public byte[] bytes() throws IOException {
+        if (r.body() == null) {
+            throw new IOException("response body is null");
+        }
+
+        return r.body().bytes();
+    }
+
     public String string() throws IOException {
         if (r.body() == null) {
             throw new IOException("response body is null");

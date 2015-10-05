@@ -19,7 +19,6 @@
 package com.frostwire.http;
 
 import com.frostwire.logging.Logger;
-import com.frostwire.util.ThreadPool;
 import com.frostwire.util.http.AllX509TrustManager;
 import com.frostwire.util.http.WrapSSLSocketFactory;
 import com.squareup.okhttp.*;
@@ -28,6 +27,7 @@ import org.apache.commons.io.IOUtils;
 import javax.net.ssl.*;
 import java.io.IOException;
 import java.security.SecureRandom;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -64,7 +64,11 @@ public final class HttpClient {
             @Override
             public void onResponse(com.squareup.okhttp.Response r) throws IOException {
                 try {
-                    listener.onResponse(new Response(r));
+                    if (r != null) {
+                        listener.onResponse(new Response(r));
+                    } else {
+                        listener.onFailure(request, new IOException("response is null, review internal okhttp framework."));
+                    }
                 } catch (Throwable t) {
                     LOG.warn("Error invoking listener", t);
                 } finally {
@@ -99,10 +103,12 @@ public final class HttpClient {
 
     private static OkHttpClient buildClient(Params params) {
         OkHttpClient c = Loader.DEFAULT_CLIENT.clone();
+        ExecutorService pool = params.pool != null ? params.pool : c.getDispatcher().getExecutorService();
 
-        if (params.pool != null) {
-            c.setDispatcher(new Dispatcher(params.pool));
-        }
+        Dispatcher d = new Dispatcher(pool);
+        d.setMaxRequests(params.maxRequests);
+        d.setMaxRequestsPerHost(params.maxRequestsPerHost);
+        c.setDispatcher(d);
 
         return c;
     }
@@ -146,10 +152,26 @@ public final class HttpClient {
 
     public static final class Params {
 
-        public Params(ThreadPool pool) {
-            this.pool = pool;
-        }
+        public ExecutorService pool;
 
-        public final ThreadPool pool;
+        /**
+         * Set the maximum number of requests to execute concurrently. Above this
+         * requests queue in memory, waiting for the running calls to complete.
+         * <p/>
+         * <p>If more than {@code maxRequests} requests are in flight when this is
+         * invoked, those requests will remain in flight.
+         */
+        public int maxRequests = 64;
+
+        /**
+         * Set the maximum number of requests for each host to execute concurrently.
+         * This limits requests by the URL's host name. Note that concurrent requests
+         * to a single IP address may still exceed this limit: multiple hostnames may
+         * share an IP address or be routed through the same HTTP proxy.
+         * <p/>
+         * <p>If more than {@code maxRequestsPerHost} requests are in flight when this
+         * is invoked, those requests will remain in flight.
+         */
+        public int maxRequestsPerHost = 5;
     }
 }
