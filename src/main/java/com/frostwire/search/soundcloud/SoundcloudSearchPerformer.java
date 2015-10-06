@@ -51,7 +51,7 @@ public class SoundcloudSearchPerformer extends PagedWebSearchPerformer {
         SoundcloudResponse response = JsonUtils.toObject(page, SoundcloudResponse.class);
 
         for (SoundcloudItem item : response.collection) {
-            if (!isStopped() && item.downloadable) {
+            if (!isStopped() && item != null && item.downloadable) {
                 SoundcloudSearchResult sr = new SoundcloudSearchResult(item, SOUNDCLOUD_CLIENTID, SOUNDCLOUD_APP_VERSION);
                 result.add(sr);
             }
