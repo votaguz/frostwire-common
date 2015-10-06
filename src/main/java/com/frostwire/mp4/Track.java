@@ -15,12 +15,6 @@
  */
 package com.frostwire.mp4;
 
-import com.coremedia.iso.boxes.CompositionTimeToSample;
-import com.coremedia.iso.boxes.SampleDependencyTypeBox;
-import com.coremedia.iso.boxes.SampleDescriptionBox;
-import com.coremedia.iso.boxes.SubSampleInformationBox;
-import com.googlecode.mp4parser.boxes.mp4.samplegrouping.GroupEntry;
-
 import java.io.Closeable;
 import java.util.List;
 import java.util.Map;

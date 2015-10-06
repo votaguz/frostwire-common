@@ -16,8 +16,6 @@
 
 package com.frostwire.mp4;
 
-import com.googlecode.mp4parser.AbstractContainerBox;
-
 import java.util.List;
 
 /**

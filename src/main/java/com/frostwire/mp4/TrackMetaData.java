@@ -15,8 +15,6 @@
  */
 package com.frostwire.mp4;
 
-import com.googlecode.mp4parser.util.Matrix;
-
 import java.util.Date;
 
 /**
