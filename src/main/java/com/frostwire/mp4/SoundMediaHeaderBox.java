@@ -18,53 +18,41 @@ package com.frostwire.mp4;
 
 import java.nio.ByteBuffer;
 
-import static com.frostwire.mp4.CastUtils.l2i;
-
 /**
  * <h1>4cc = "{@value #TYPE}"</h1>
- * The chunk offset table gives the index of each chunk into the containing file. Defined in ISO/IEC 14496-12.
  */
-public class StaticChunkOffsetBox extends ChunkOffsetBox {
-    public static final String TYPE = "stco";
+public class SoundMediaHeaderBox extends AbstractMediaHeaderBox {
 
-    private long[] chunkOffsets = new long[0];
+    public static final String TYPE = "smhd";
+    private float balance;
 
-    public StaticChunkOffsetBox() {
+    public SoundMediaHeaderBox() {
         super(TYPE);
     }
 
-    public long[] getChunkOffsets() {
-        return chunkOffsets;
+    public float getBalance() {
+        return balance;
     }
 
     protected long getContentSize() {
-        return 8 + chunkOffsets.length * 4;
-    }
-
-    @Override
-    public void setChunkOffsets(long[] chunkOffsets) {
-        this.chunkOffsets = chunkOffsets;
+        return 8;
     }
 
     @Override
     public void _parseDetails(ByteBuffer content) {
         parseVersionAndFlags(content);
-        int entryCount = l2i(IsoTypeReader.readUInt32(content));
-        chunkOffsets = new long[entryCount];
-        for (int i = 0; i < entryCount; i++) {
-            chunkOffsets[i] = IsoTypeReader.readUInt32(content);
-        }
-
+        balance = IsoTypeReader.readFixedPoint88(content);
+        IsoTypeReader.readUInt16(content);
     }
 
     @Override
     protected void getContent(ByteBuffer byteBuffer) {
         writeVersionAndFlags(byteBuffer);
-        IsoTypeWriter.writeUInt32(byteBuffer, chunkOffsets.length);
-        for (long chunkOffset : chunkOffsets) {
-            IsoTypeWriter.writeUInt32(byteBuffer, chunkOffset);
-        }
+        IsoTypeWriter.writeFixedPoint88(byteBuffer, balance);
+        IsoTypeWriter.writeUInt16(byteBuffer, 0);
     }
 
-
+    public String toString() {
+        return "SoundMediaHeaderBox[balance=" + getBalance() + "]";
+    }
 }

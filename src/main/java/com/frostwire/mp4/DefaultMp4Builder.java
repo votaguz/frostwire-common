@@ -15,27 +15,6 @@
  */
 package com.frostwire.mp4;
 
-import com.coremedia.iso.BoxParser;
-import com.coremedia.iso.IsoFile;
-import com.coremedia.iso.IsoTypeWriter;
-import com.coremedia.iso.boxes.*;
-import com.googlecode.mp4parser.BasicContainer;
-import com.googlecode.mp4parser.DataSource;
-import com.googlecode.mp4parser.authoring.Edit;
-import com.googlecode.mp4parser.authoring.Movie;
-import com.googlecode.mp4parser.authoring.Sample;
-import com.googlecode.mp4parser.authoring.Track;
-import com.googlecode.mp4parser.authoring.tracks.CencEncryptedTrack;
-import com.googlecode.mp4parser.boxes.dece.SampleEncryptionBox;
-import com.googlecode.mp4parser.boxes.mp4.samplegrouping.GroupEntry;
-import com.googlecode.mp4parser.boxes.mp4.samplegrouping.SampleGroupDescriptionBox;
-import com.googlecode.mp4parser.boxes.mp4.samplegrouping.SampleToGroupBox;
-import com.googlecode.mp4parser.util.Mp4Arrays;
-import com.googlecode.mp4parser.util.Path;
-import com.mp4parser.iso14496.part12.SampleAuxiliaryInformationOffsetsBox;
-import com.mp4parser.iso14496.part12.SampleAuxiliaryInformationSizesBox;
-import com.mp4parser.iso23001.part7.CencSampleAuxiliaryDataFormat;
-
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.WritableByteChannel;
@@ -53,7 +32,7 @@ public class DefaultMp4Builder implements Mp4Builder {
 
     private static Logger LOG = Logger.getLogger(DefaultMp4Builder.class.getName());
     Map<Track, StaticChunkOffsetBox> chunkOffsetBoxes = new HashMap<Track, StaticChunkOffsetBox>();
-    Set<SampleAuxiliaryInformationOffsetsBox> sampleAuxiliaryInformationOffsetsBoxes = new HashSet<SampleAuxiliaryInformationOffsetsBox>();
+    //Set<SampleAuxiliaryInformationOffsetsBox> sampleAuxiliaryInformationOffsetsBoxes = new HashSet<SampleAuxiliaryInformationOffsetsBox>();
     HashMap<Track, List<Sample>> track2Sample = new HashMap<Track, List<Sample>>();
     HashMap<Track, long[]> track2SampleSizes = new HashMap<Track, long[]>();
     private Fragmenter fragmenter;
@@ -138,7 +117,7 @@ public class DefaultMp4Builder implements Mp4Builder {
                 offsets[i] += dataOffset;
             }
         }
-        for (SampleAuxiliaryInformationOffsetsBox saio : sampleAuxiliaryInformationOffsetsBoxes) {
+        /*for (SampleAuxiliaryInformationOffsetsBox saio : sampleAuxiliaryInformationOffsetsBoxes) {
             long offset = saio.getSize(); // the calculation is systematically wrong by 4, I don't want to debug why. Just a quick correction --san 14.May.13
             offset += 4 + 4 + 4 + 4 + 4 + 24;
             // size of all header we were missing otherwise (moov, trak, mdia, minf, stbl)
@@ -162,7 +141,7 @@ public class DefaultMp4Builder implements Mp4Builder {
 
             }
             saio.setOffsets(saioOffsets);
-        }
+        }*/
 
 
         return isoFile;
@@ -334,7 +313,7 @@ public class DefaultMp4Builder implements Mp4Builder {
 
             for (Edit edit : track.getEdits()) {
                 entries.add(new EditListBox.Entry(elst,
-                        Math.round(edit.getSegmentDuration() * movie.getTimescale()),
+                        java.lang.Math.round(edit.getSegmentDuration() * movie.getTimescale()),
                         edit.getMediaTime() * track.getTrackMetaData().getTimescale() / edit.getTimeScale(),
                         edit.getMediaRate()));
             }

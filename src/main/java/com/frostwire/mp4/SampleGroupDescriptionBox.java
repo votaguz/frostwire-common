@@ -16,20 +16,11 @@
 
 package com.frostwire.mp4;
 
-import com.coremedia.iso.IsoFile;
-import com.coremedia.iso.IsoTypeReader;
-import com.coremedia.iso.IsoTypeWriter;
-import com.googlecode.mp4parser.AbstractFullBox;
-import com.mp4parser.iso14496.part15.StepwiseTemporalLayerEntry;
-import com.mp4parser.iso14496.part15.SyncSampleEntry;
-import com.mp4parser.iso14496.part15.TemporalLayerSampleGroup;
-import com.mp4parser.iso14496.part15.TemporalSubLayerSampleGroup;
-
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;
 
-import static com.googlecode.mp4parser.util.CastUtils.l2i;
+import static com.frostwire.mp4.CastUtils.l2i;
 
 /**
  * <h1>4cc = "{@value #TYPE}"</h1>
@@ -121,20 +112,20 @@ public class SampleGroupDescriptionBox extends AbstractFullBox {
             groupEntry = new RollRecoveryEntry();
         } else if (RateShareEntry.TYPE.equals(groupingType)) {
             groupEntry = new RateShareEntry();
-        } else if (CencSampleEncryptionInformationGroupEntry.TYPE.equals(groupingType)) {
-            groupEntry = new CencSampleEncryptionInformationGroupEntry();
+        //} else if (CencSampleEncryptionInformationGroupEntry.TYPE.equals(groupingType)) {
+        //    groupEntry = new CencSampleEncryptionInformationGroupEntry();
         } else if (VisualRandomAccessEntry.TYPE.equals(groupingType)) {
             groupEntry = new VisualRandomAccessEntry();
         } else if (TemporalLevelEntry.TYPE.equals(groupingType)) {
             groupEntry = new TemporalLevelEntry();
-        } else if (SyncSampleEntry.TYPE.equals(groupingType)) {
+        /*} else if (SyncSampleEntry.TYPE.equals(groupingType)) {
             groupEntry = new SyncSampleEntry();
         } else if (TemporalLayerSampleGroup.TYPE.equals(groupingType)) {
             groupEntry = new TemporalLayerSampleGroup();
         } else if (TemporalSubLayerSampleGroup.TYPE.equals(groupingType)) {
             groupEntry = new TemporalSubLayerSampleGroup();
         } else if (StepwiseTemporalLayerEntry.TYPE.equals(groupingType)) {
-            groupEntry = new StepwiseTemporalLayerEntry();
+            groupEntry = new StepwiseTemporalLayerEntry();*/
         } else {
             groupEntry = new UnknownEntry(groupingType);
         }
