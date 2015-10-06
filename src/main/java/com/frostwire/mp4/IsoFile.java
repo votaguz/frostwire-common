@@ -59,7 +59,7 @@ public class IsoFile extends BasicContainer implements Closeable {
     public static byte[] fourCCtoBytes(String fourCC) {
         byte[] result = new byte[4];
         if (fourCC != null) {
-            for (int i = 0; i < Math.min(4, fourCC.length()); i++) {
+            for (int i = 0; i < java.lang.Math.min(4, fourCC.length()); i++) {
                 result[i] = (byte) fourCC.charAt(i);
             }
         }
@@ -69,7 +69,7 @@ public class IsoFile extends BasicContainer implements Closeable {
     public static String bytesToFourCC(byte[] type) {
         byte[] result = new byte[]{0, 0, 0, 0};
         if (type != null) {
-            System.arraycopy(type, 0, result, 0, Math.min(type.length, 4));
+            System.arraycopy(type, 0, result, 0, java.lang.Math.min(type.length, 4));
         }
         try {
             return new String(result, "ISO-8859-1");
