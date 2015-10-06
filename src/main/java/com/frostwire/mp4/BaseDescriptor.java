@@ -33,7 +33,7 @@ bit(7) sizeByte;
 sizeOfInstance = sizeOfInstance<<7 | sizeByte;
 }
  */
-//@Descriptor(tags = 0x00)
+@Descriptor(tags = 0x00)
 public abstract class BaseDescriptor {
     int tag;
     int sizeOfInstance;
