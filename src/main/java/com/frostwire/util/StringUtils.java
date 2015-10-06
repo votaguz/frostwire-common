@@ -93,17 +93,7 @@ public class StringUtils {
         return true;
     }
 
-    public static boolean containsCharacters(String input, char[] chars) {
-        char[] inputChars = input.toCharArray();
-        Arrays.sort(inputChars);
-        for (int i = 0; i < chars.length; i++) {
-            if (Arrays.binarySearch(inputChars, chars[i]) >= 0)
-                return true;
-        }
-        return false;
-    }
-
-    /** 
+    /**
      * @requires TODO3: fill this in
      * @effects returns the the smallest i>=bigStart
      *  s.t. little[littleStart...littleStop-1] is a prefix of big[i...] 
