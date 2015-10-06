@@ -36,7 +36,7 @@ public class PropertyBoxParserImpl extends AbstractBoxParser {
 
     public PropertyBoxParserImpl(boolean parseDetails, String... customProperties) {
         this.parseDetails = parseDetails;
-        InputStream is = getClass().getResourceAsStream("/isoparser-default.properties");
+        InputStream is = getClass().getResourceAsStream("/mp4.properties");
         try {
             mapping = new Properties();
             try {
@@ -45,7 +45,7 @@ public class PropertyBoxParserImpl extends AbstractBoxParser {
                 if (cl == null) {
                     cl = ClassLoader.getSystemClassLoader();
                 }
-                Enumeration<URL> enumeration = cl.getResources("isoparser-custom.properties");
+                Enumeration<URL> enumeration = cl.getResources("mp4.properties");
 
                 while (enumeration.hasMoreElements()) {
                     URL url = enumeration.nextElement();

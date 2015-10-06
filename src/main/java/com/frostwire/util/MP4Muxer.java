@@ -26,33 +26,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.frostwire.mp4.*;
 import org.apache.commons.io.IOUtils;
 
-import com.coremedia.iso.BoxParser;
-import com.coremedia.iso.IsoFile;
-import com.coremedia.iso.PropertyBoxParserImpl;
-import com.coremedia.iso.boxes.Box;
-import com.coremedia.iso.boxes.Container;
-import com.coremedia.iso.boxes.FileTypeBox;
-import com.coremedia.iso.boxes.HandlerBox;
-import com.coremedia.iso.boxes.MetaBox;
-import com.coremedia.iso.boxes.MovieBox;
-import com.coremedia.iso.boxes.TrackBox;
-import com.coremedia.iso.boxes.UserDataBox;
-import com.coremedia.iso.boxes.apple.AppleItemListBox;
-import com.googlecode.mp4parser.AbstractBox;
-import com.googlecode.mp4parser.DataSource;
-import com.googlecode.mp4parser.FileDataSourceImpl;
-import com.googlecode.mp4parser.authoring.Movie;
-import com.googlecode.mp4parser.authoring.Mp4TrackImpl;
-import com.googlecode.mp4parser.authoring.Track;
-import com.googlecode.mp4parser.authoring.builder.DefaultMp4Builder;
-import com.googlecode.mp4parser.boxes.apple.AppleAlbumBox;
-import com.googlecode.mp4parser.boxes.apple.AppleArtist2Box;
-import com.googlecode.mp4parser.boxes.apple.AppleArtistBox;
-import com.googlecode.mp4parser.boxes.apple.AppleCoverBox;
-import com.googlecode.mp4parser.boxes.apple.AppleMediaTypeBox;
-import com.googlecode.mp4parser.boxes.apple.AppleNameBox;
 
 /**
  * 
@@ -291,5 +267,11 @@ public final class MP4Muxer {
         public final String author;
         public final String source;
         public final byte[] jpg;
+    }
+
+    public static void main(String[] args) throws IOException {
+        MP4Metadata d = new MP4Metadata("ti", "au", "sr", null);
+        MP4Muxer m = new MP4Muxer();
+        m.mux("/Users/aldenml/Downloads/test.m4v", "/Users/aldenml/Downloads/test.m4a", "/Users/aldenml/Downloads/test.mp4", d);
     }
 }
