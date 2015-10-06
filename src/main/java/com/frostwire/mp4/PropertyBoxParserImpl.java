@@ -91,7 +91,7 @@ public class PropertyBoxParserImpl extends AbstractBoxParser {
         invoke(type, userType, parent);
         String[] param = this.param.get();
         try {
-            Class<Box> clazz = (Class<Box>) Class.forName(clazzName.get());
+            Class<Box> clazz = (Class<Box>) Class.forName("com.frostwire.mp4." + clazzName.get());
             if (param.length > 0) {
                 Class[] constructorArgsClazz = new Class[param.length];
                 Object[] constructorArgs = new Object[param.length];

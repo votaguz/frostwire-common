@@ -72,15 +72,15 @@ public class Mp4TrackImpl extends AbstractTrack {
         subSampleInformationBox = Path.getPath(stbl, "subs");
 
         // gather all movie fragment boxes from the fragments
-        /*List<MovieFragmentBox> movieFragmentBoxes = new ArrayList<MovieFragmentBox>();
+        List<MovieFragmentBox> movieFragmentBoxes = new ArrayList<MovieFragmentBox>();
         movieFragmentBoxes.addAll(((Box) trackBox.getParent()).getParent().getBoxes(MovieFragmentBox.class));
         for (IsoFile fragment : fragments) {
             movieFragmentBoxes.addAll(fragment.getBoxes(MovieFragmentBox.class));
-        }*/
+        }
 
         sampleDescriptionBox = stbl.getSampleDescriptionBox();
         int lastSubsSample = 0;
-        /*final List<MovieExtendsBox> movieExtendsBoxes = trackBox.getParent().getBoxes(MovieExtendsBox.class);
+        final List<MovieExtendsBox> movieExtendsBoxes = trackBox.getParent().getBoxes(MovieExtendsBox.class);
         if (movieExtendsBoxes.size() > 0) {
             for (MovieExtendsBox mvex : movieExtendsBoxes) {
                 final List<TrackExtendsBox> trackExtendsBoxes = mvex.getBoxes(TrackExtendsBox.class);
@@ -182,9 +182,9 @@ public class Mp4TrackImpl extends AbstractTrack {
                     }
                 }
             }
-        } else {*/
+        } else {
             sampleGroups = getSampleGroups(stbl.getBoxes(SampleGroupDescriptionBox.class), stbl.getBoxes(SampleToGroupBox.class), sampleGroups);
-        //}
+        }
 
         decodingTimes = TimeToSampleBox.blowupTimeToSamples(decodingTimeEntries);
 
