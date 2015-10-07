@@ -16,7 +16,5 @@ dependencies {
     compile 'com.frostwire:jlibtorrent:1.1.0.9'
     compile 'io.reactivex:rxjava:1.0.13'
 
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }
