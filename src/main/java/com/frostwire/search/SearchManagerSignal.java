@@ -29,24 +29,15 @@ public abstract class SearchManagerSignal {
         this.token = token;
     }
 
-    /**
-     *
-     */
     public final long token;
 
-    /**
-     *
-     */
     public static final class Results extends SearchManagerSignal {
 
-        Results(long token, List<? extends SearchResult> elements) {
+        public Results(long token, List<? extends SearchResult> elements) {
             super(token);
             this.elements = elements;
         }
         
-        /**
-         *
-         */
         public final List<? extends SearchResult> elements;
     }
 

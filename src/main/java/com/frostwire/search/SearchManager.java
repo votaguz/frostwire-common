@@ -27,6 +27,8 @@ import java.util.concurrent.TimeUnit;
  */
 public interface SearchManager {
 
+    // IMPORTANT: This is a multiplexer observable. You don't want to make this guy call onComplete() as it is reused,
+    // observed for example by LocalSearchEngine on Android and by SearchEngine on Desktop.
     Observable<SearchManagerSignal> observable();
 
     void perform(SearchPerformer performer);
